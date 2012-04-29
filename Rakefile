@@ -32,6 +32,13 @@ task :install do
       link_file(file)
     end
   end
+  setup_vimified()
+end
+
+def setup_vimified() 
+  Dir.chdir(ENV['HOME'] + "/.vim/") do
+    system %Q{git clone https://github.com/gmarik/vundle.git bundle/vundle; vim +BundleInstall +qall}
+  end
 end
 
 def replace_file(file)
