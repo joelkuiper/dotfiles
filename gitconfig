@@ -100,6 +100,7 @@
   autocrlf = false
   editor = vim
   excludesfile = ./git/gitignore
+	quotepath = false
 [advice]
   statusHints = false
 [diff]

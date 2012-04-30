@@ -38,6 +38,7 @@ alias tmux="TERM=screen-256color-bce tmux"
 # Customize to your needs...
 export PATH="/usr/local/rvm/bin:/usr/local/bin:/usr/local/sbin:/usr/local/share:$PATH"
 export TERM=dtterm
+export VIMCLOJURE_SERVER_JAR="/usr/local/lib/vimclojure/server-2.3.1.jar"
 
 # Put secret configuration settings in ~/.secrets
 if [[ -a ~/.secrets ]] then
