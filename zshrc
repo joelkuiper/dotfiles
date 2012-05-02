@@ -11,6 +11,9 @@ ZSH_THEME="candy"
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
+alias ack="/usr/bin/ack-grep" 
+alias clojure="java -cp /opt/clojure-1.4.0.jar clojure.main"
+
 # Set to this to use case-sensitive completion
 # CASE_SENSITIVE="true"
 
@@ -29,15 +32,15 @@ ZSH_THEME="candy"
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
-plugins=(vi-mode rvm ruby git osx zsh-syntax-highlighting history-substring-search)
+plugins=(vi-mode git mvn zsh-syntax-highlighting history-substring-search)
 
 source $ZSH/oh-my-zsh.sh
 
 alias tmux="TERM=screen-256color-bce tmux"
 
 # Customize to your needs...
-export PATH="/usr/local/rvm/bin:/usr/local/bin:/usr/local/sbin:/usr/local/share:$PATH"
-export TERM=dtterm
+export PATH="/usr/local/rvm/bin:/usr/local/bin:/usr/local/sbin:/opt/bin:/usr/local/share:$PATH"
+#export TERM=dtterm
 export VIMCLOJURE_SERVER_JAR="/usr/local/lib/vimclojure/server-2.3.1.jar"
 
 # Put secret configuration settings in ~/.secrets
