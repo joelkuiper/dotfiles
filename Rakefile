@@ -32,6 +32,10 @@ task :install do
       link_file(file)
     end
   end
+  puts "Cloning submodules" 
+  system %Q{git submodule init; git submodule update}
+
+  puts "Setting up vim bundles"
   setup_vimified()
 end
 
