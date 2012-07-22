@@ -99,7 +99,7 @@
 [core]
   autocrlf = false
   editor = vim
-  excludesfile = ./git/gitignore
+	excludesfile = /Users/joelkuiper/.gitignore_global
 	quotepath = false
 [advice]
   statusHints = false
@@ -111,3 +111,12 @@
   # Remember my merges
   # http://gitfu.wordpress.com/2008/04/20/git-rerere-rereremember-what-you-did-last-time/
   enabled = true
+[user]
+	name = Joël Kuiper
+	email = me@joelkuiper.eu
+[difftool "sourcetree"]
+	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
+	path = 
+[mergetool "sourcetree"]
+	cmd = /Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
+	trustExitCode = true
