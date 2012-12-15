@@ -5,7 +5,7 @@ ZSH=$HOME/.oh-my-zsh
 # Look in ~/.oh-my-zsh/themes/
 # Optionally, if you set this to "random", it'll load a random theme each
 # time that oh-my-zsh is loaded.
-ZSH_THEME="candy"
+ZSH_THEME="af-magic"
 
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
@@ -29,16 +29,21 @@ ZSH_THEME="candy"
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
-plugins=(vi-mode rvm ruby git osx zsh-syntax-highlighting history-substring-search)
+plugins=(vi-mode mvn rvm ruby git osx zsh-syntax-highlighting history-substring-search)
 
 source $ZSH/oh-my-zsh.sh
 
 alias tmux="TERM=screen-256color-bce tmux"
+alias clojure="java -jar /usr/local/Cellar/clojure/1.4.0/clojure-1.4.0.jar" 
+alias fact="elinks -dump randomfunfacts.com | sed -n '/^| /p' | tr -d \|"
+
 
 # Customize to your needs...
-export PATH="/usr/local/rvm/bin:/usr/local/bin:/usr/local/sbin:/usr/local/share:$PATH"
-export TERM=dtterm
+export PATH="/usr/local/rvm/bin:/usr/local/bin:/usr/local/sbin:/usr/local/share:/usr/local/texlive/2011/bin/x86_64-darwin:$PATH"
+export JAVA_HOME=$(/usr/libexec/java_home)
+export PATH=${JAVA_HOME}/bin:$PATH
 export VIMCLOJURE_SERVER_JAR="/usr/local/lib/vimclojure/server-2.3.1.jar"
+export LC_CTYPE="utf-8"
 
 # Put secret configuration settings in ~/.secrets
 if [[ -a ~/.secrets ]] then
