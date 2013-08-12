@@ -9,6 +9,7 @@
                       paredit
                       ac-nrepl
                       molokai-theme
+                      popup
                       pretty-mode
                       ido-ubiquitous
                       clojure-mode
@@ -61,6 +62,14 @@
   (local-set-key "M-]" 'paredit-close-square-and-newline))
 
 (add-hook 'clojure-mode-hook 'customize-clojure-mode)
+
+ (require 'ac-nrepl)
+(add-hook 'nrepl-mode-hook 'ac-nrepl-setup)
+(add-hook 'nrepl-interaction-mode-hook 'ac-nrepl-setup)
+(add-hook 'nrepl-interaction-mode-hook 'nrepl-turn-on-eldoc-mode)
+(eval-after-load "auto-complete"
+                 '(add-to-list 'ac-modes 'nrepl-mode))
+
 
 ;; Lisp
 (defun enable-lisp-utils ()
