@@ -7,9 +7,10 @@
 (defvar my-packages '(evil
                       auto-complete
                       paredit
+                      ac-nrepl
                       molokai-theme
-                      fuzzy-match
-                      slime
+                      pretty-mode
+                      ido-ubiquitous
                       clojure-mode
                       nrepl))
 
@@ -17,14 +18,19 @@
   (when (not (package-installed-p p))
     (package-install p)))
 
+;; Unicode
+(prefer-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+
 ;; Theme
 (setq molokai-theme-kit t)
 (load-theme 'molokai t)
+(global-font-lock-mode t)
 (menu-bar-mode -1)
 (tool-bar-mode -1)
-(set-face-attribute 'default nil :font "Mensch-10")
 
-(ido-mode t)
 (setq ido-enable-prefix nil
       ido-enable-flex-matching t
       ido-auto-merge-work-directories-length nil
@@ -33,32 +39,22 @@
       ido-use-virtual-buffers t
       ido-handle-duplicate-virtual-buffers 2
       ido-max-prospects 10)
+(ido-mode t)
 
 (show-paren-mode 1)
 (setq-default indent-tabs-mode nil)
+(define-key global-map (kbd "RET") 'newline-and-indent) ; When pressing RET (Enter) makes a new line and ident it
 
 ;; Evil
 (require 'evil)
 (evil-mode 1)
 
-(autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
-(add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
-(add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
-(add-hook 'ielm-mode-hook             #'enable-paredit-mode)
-(add-hook 'lisp-mode-hook             #'enable-paredit-mode)
-(add-hook 'clojure-mode-hook          #'enable-paredit-mode)
-(add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
-(add-hook 'scheme-mode-hook           #'enable-paredit-mode)
-
-;; Clojure specific
-(require 'nrepl)
-
-(add-to-list 'ac-dictionary-directories "~/.emacs.d/dict")
 (require 'auto-complete-config)
 (ac-config-default)
 
+;; Clojure specific
+(require 'nrepl)
 (defun customize-clojure-mode ()
-  (paredit-mode 1)
   (local-set-key "M-{" 'paredit-wrap-curly)
   (local-set-key "M-}" 'paredit-close-curly-and-newline)
   (local-set-key "M-[" 'paredit-wrap-square)
@@ -66,28 +62,19 @@
 
 (add-hook 'clojure-mode-hook 'customize-clojure-mode)
 
-(define-key read-expression-map (kbd "TAB") 'lisp-complete-symbol)
-(define-key lisp-mode-shared-map (kbd "RET") 'reindent-then-newline-and-indent)
+;; Lisp
+(defun enable-lisp-utils ()
+  (auto-complete-mode)
+  (pretty-mode)
+  (enable-paredit-mode))
 
-(defface esk-paren-face
-  '((((class color) (background dark))
-      (:foreground "grey50"))
-    (((class color) (background light))
-      (:foreground "grey55")))
-  "Face used to dim parentheses."
-  :group 'starter-kit-faces)
+(defvar lisps (list 'scheme-mode-hook
+                     'lisp-mode-hook
+                     'emacs-lisp-mode-hook
+                     'inferior-lisp-mode-hook
+                     'inferior-scheme-mode-hook
+                     'clojure-mode-hook))
 
-(dolist (mode '(scheme emacs-lisp lisp clojure clojurescript))
-  (when (> (display-color-cells) 8)
-    (font-lock-add-keywords (intern (concat (symbol-name mode) "-mode"))
-                            '(("(\\|)" . 'esk-paren-face))))
-  (add-hook (intern (concat (symbol-name mode) "-mode-hook"))
-            'paredit-mode))
+(dolist (hook lisps)
+  (add-hook hook 'enable-lisp-utils))
 
-(defun esk-pretty-fn ()
-  (font-lock-add-keywords nil `(("(\\(\\<fn\\>\\)"
-                                 (0 (progn (compose-region (match-beginning 1)
-                                                           (match-end 1)
-                                                           "\u0192"
-                                                           'decompose-region)))))))
-(add-hook 'clojure-mode-hook 'esk-pretty-fn)
