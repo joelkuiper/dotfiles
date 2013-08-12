@@ -10,7 +10,7 @@
                       ac-nrepl
                       molokai-theme
                       popup
-                      pretty-mode
+                      pretty-symbols-mode
                       ido-ubiquitous
                       clojure-mode
                       nrepl))
@@ -60,10 +60,9 @@
   (local-set-key "M-}" 'paredit-close-curly-and-newline)
   (local-set-key "M-[" 'paredit-wrap-square)
   (local-set-key "M-]" 'paredit-close-square-and-newline))
-
 (add-hook 'clojure-mode-hook 'customize-clojure-mode)
 
- (require 'ac-nrepl)
+(require 'ac-nrepl)
 (add-hook 'nrepl-mode-hook 'ac-nrepl-setup)
 (add-hook 'nrepl-interaction-mode-hook 'ac-nrepl-setup)
 (add-hook 'nrepl-interaction-mode-hook 'nrepl-turn-on-eldoc-mode)
@@ -72,10 +71,7 @@
 
 
 ;; Lisp
-(defun enable-lisp-utils ()
-  (auto-complete-mode)
-  (pretty-mode)
-  (enable-paredit-mode))
+
 
 (defvar lisps (list 'scheme-mode-hook
                      'lisp-mode-hook
@@ -87,3 +83,27 @@
 (dolist (hook lisps)
   (add-hook hook 'enable-lisp-utils))
 
+(custom-set-variables '(pretty-symbol-patterns
+  (let ((lisps '(emacs-lisp-mode clojure-mode inferior-lisp-mode lisp-mode scheme-mode)))
+    `(
+      ;; Basic symbols, enabled by default
+      (?λ lambda "\\<lambda\\>" (,@lisps))
+      (?λ lambda "\\<fn\\>" (,@lisps))
+      (?ƒ lambda "\\<defn\\>" (,@lisps))
+      (?ƒ lambda "\\<defn-\\>" (,@lisps))
+      (?∂ lambda "\\<partial\\>" (,@lisps))
+      (?ζ lambda "\\<apply\\>" (,@lisps))
+      ;; Relational operators --
+      (?≠ lambda "/=" (,@lisps))
+      (?≥ lambda ">=" (,@lisps))
+      (?≤ lambda "<=" (,@lisps))
+      (?Ø lambda "nil" (,@lisps))
+      ;; Logical operators
+      (?∨ logical "\\<or\\>" (,@lisps))
+      (?∧ lambda "\\<and\\>" (,@lisps))
+      (?¬ lambda "\\<not\\>" (,@lisps))))))
+
+(defun enable-lisp-utils ()
+  (auto-complete-mode)
+  (pretty-symbols-mode)
+  (enable-paredit-mode))
