@@ -11,11 +11,13 @@ ZSH_THEME="af-magic"
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
+alias ack="/usr/bin/ack-grep"
+
 # Set to this to use case-sensitive completion
-# CASE_SENSITIVE="true"
+CASE_SENSITIVE="true"
 
 # Comment this out to disable weekly auto-update checks
-# DISABLE_AUTO_UPDATE="true"
+DISABLE_AUTO_UPDATE="true"
 
 # Uncomment following line if you want to disable colors in ls
 # DISABLE_LS_COLORS="true"
@@ -29,20 +31,17 @@ ZSH_THEME="af-magic"
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
-plugins=(vi-mode mvn rvm ruby git osx zsh-syntax-highlighting history-substring-search)
+plugins=(vi-mode git mvn zsh-syntax-highlighting history-substring-search)
 
 source $ZSH/oh-my-zsh.sh
 
 alias tmux="TERM=screen-256color-bce tmux"
-alias clojure="java -jar /usr/local/Cellar/clojure/1.4.0/clojure-1.4.0.jar" 
+alias clojure="java -jar /usr/local/Cellar/clojure/1.4.0/clojure-1.4.0.jar"
 alias fact="elinks -dump randomfunfacts.com | sed -n '/^| /p' | tr -d \|"
 
 
 # Customize to your needs...
-export PATH="/usr/local/rvm/bin:/usr/local/bin:/usr/local/sbin:/usr/local/share:/usr/local/texlive/2011/bin/x86_64-darwin:$PATH"
-export JAVA_HOME=$(/usr/libexec/java_home)
-export PATH=${JAVA_HOME}/bin:$PATH
-export VIMCLOJURE_SERVER_JAR="/usr/local/lib/vimclojure/server-2.3.1.jar"
+export PATH="/usr/local/bin:/usr/local/sbin:/usr/local/share:~/bin:/usr/bin:/opt/bin:$PATH"
 export LC_CTYPE="utf-8"
 
 # Put secret configuration settings in ~/.secrets
