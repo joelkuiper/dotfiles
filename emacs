@@ -6,6 +6,7 @@
 
 (defvar my-packages '(evil
                       auto-complete
+                      anything
                       paredit
                       ac-nrepl
                       molokai-theme
@@ -18,6 +19,9 @@
 (dolist (p my-packages)
   (when (not (package-installed-p p))
     (package-install p)))
+
+;; Remove whitespace
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 ;; Unicode
 (prefer-coding-system 'utf-8)
@@ -46,6 +50,9 @@
 (setq-default indent-tabs-mode nil)
 (define-key global-map (kbd "RET") 'newline-and-indent) ; When pressing RET (Enter) makes a new line and ident it
 
+;; Anything
+(global-set-key (kbd "C-x t") 'anything-mini)
+
 ;; Evil
 (require 'evil)
 (evil-mode 1)
@@ -55,12 +62,6 @@
 
 ;; Clojure specific
 (require 'nrepl)
-(defun customize-clojure-mode ()
-  (local-set-key "M-{" 'paredit-wrap-curly)
-  (local-set-key "M-}" 'paredit-close-curly-and-newline)
-  (local-set-key "M-[" 'paredit-wrap-square)
-  (local-set-key "M-]" 'paredit-close-square-and-newline))
-(add-hook 'clojure-mode-hook 'customize-clojure-mode)
 
 (require 'ac-nrepl)
 (add-hook 'nrepl-mode-hook 'ac-nrepl-setup)
@@ -69,10 +70,7 @@
 (eval-after-load "auto-complete"
                  '(add-to-list 'ac-modes 'nrepl-mode))
 
-
 ;; Lisp
-
-
 (defvar lisps (list 'scheme-mode-hook
                      'lisp-mode-hook
                      'emacs-lisp-mode-hook
@@ -97,11 +95,7 @@
       (?≠ lambda "/=" (,@lisps))
       (?≥ lambda ">=" (,@lisps))
       (?≤ lambda "<=" (,@lisps))
-      (?Ø lambda "nil" (,@lisps))
-      ;; Logical operators
-      (?∨ logical "\\<or\\>" (,@lisps))
-      (?∧ lambda "\\<and\\>" (,@lisps))
-      (?¬ lambda "\\<not\\>" (,@lisps))))))
+      (?Ø lambda "nil" (,@lisps))))))
 
 (defun enable-lisp-utils ()
   (auto-complete-mode)

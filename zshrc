@@ -31,18 +31,16 @@ DISABLE_AUTO_UPDATE="true"
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
-plugins=(vi-mode git mvn zsh-syntax-highlighting history-substring-search)
+plugins=(git zsh-syntax-highlighting history-substring-search)
 
 source $ZSH/oh-my-zsh.sh
 
 alias tmux="TERM=screen-256color-bce tmux"
-alias clojure="java -jar /usr/local/Cellar/clojure/1.4.0/clojure-1.4.0.jar"
 alias fact="elinks -dump randomfunfacts.com | sed -n '/^| /p' | tr -d \|"
 
 
 # Customize to your needs...
-export PATH="/usr/local/bin:/usr/local/sbin:/usr/local/share:~/bin:/usr/bin:/opt/bin:$PATH"
-export LC_CTYPE="utf-8"
+export PATH="/usr/local/bin:/usr/local/sbin:/usr/local/share:$HOME/bin:/usr/bin:/opt/bin:$PATH"
 
 # Put secret configuration settings in ~/.secrets
 if [[ -a ~/.secrets ]] then
