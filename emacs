@@ -1,12 +1,11 @@
 (require 'package)
 (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
-                         ("marmalade" . "http://marmalade-repo.org/packages/")
-                         ("melpa" . "http://melpa.milkbox.net/packages/")))
+                         ("melpa" . "http://melpa.milkbox.net/packages/")
+                         ("marmalade" . "http://marmalade-repo.org/packages/")))
 (package-initialize)
 
 (defvar my-packages '(evil
                       auto-complete
-                      anything
                       paredit
                       ac-nrepl
                       molokai-theme
@@ -29,29 +28,21 @@
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
 
-;; Theme
+;; Visual
 (setq molokai-theme-kit t)
 (load-theme 'molokai t)
 (global-font-lock-mode t)
 (menu-bar-mode -1)
 (tool-bar-mode -1)
-
-(setq ido-enable-prefix nil
-      ido-enable-flex-matching t
-      ido-auto-merge-work-directories-length nil
-      ido-create-new-buffer 'always
-      ido-use-filename-at-point 'guess
-      ido-use-virtual-buffers t
-      ido-handle-duplicate-virtual-buffers 2
-      ido-max-prospects 10)
-(ido-mode t)
-
+(set-default-font "Source Code Pro")
+(set-face-attribute 'default nil :font "Source Code Pro" :height 110)
+(set-face-font 'default "Source Code Pro")
+(line-number-mode 1)
 (show-paren-mode 1)
+
+;; Whitespace
 (setq-default indent-tabs-mode nil)
 (define-key global-map (kbd "RET") 'newline-and-indent) ; When pressing RET (Enter) makes a new line and ident it
-
-;; Anything
-(global-set-key (kbd "C-x t") 'anything-mini)
 
 ;; Evil
 (require 'evil)
@@ -78,6 +69,11 @@
                      'inferior-scheme-mode-hook
                      'clojure-mode-hook))
 
+(defun enable-lisp-utils ()
+  (auto-complete-mode)
+  (pretty-symbols-mode)
+  (enable-paredit-mode))
+
 (dolist (hook lisps)
   (add-hook hook 'enable-lisp-utils))
 
@@ -97,7 +93,3 @@
       (?≤ lambda "<=" (,@lisps))
       (?Ø lambda "nil" (,@lisps))))))
 
-(defun enable-lisp-utils ()
-  (auto-complete-mode)
-  (pretty-symbols-mode)
-  (enable-paredit-mode))
