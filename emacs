@@ -12,6 +12,7 @@
                       popup
                       pretty-symbols-mode
                       ido-ubiquitous
+                      flx-ido
                       clojure-mode
                       nrepl))
 
@@ -44,9 +45,26 @@
 (setq-default indent-tabs-mode nil)
 (define-key global-map (kbd "RET") 'newline-and-indent) ; When pressing RET (Enter) makes a new line and ident it
 
+;; Ido
+(require 'flx-ido)
+(ido-mode 1)
+(ido-everywhere 1)
+(flx-ido-mode 1)
+;; disable ido faces to see flx highlights.
+(setq ido-use-faces nil)
+
+;; Projectile
+(projectile-global-mode)
+
 ;; Evil
 (require 'evil)
 (evil-mode 1)
+    (defun my-move-key (keymap-from keymap-to key)
+    "Moves key binding from one keymap to another, deleting from the old location. "
+    (define-key keymap-to key (lookup-key keymap-from key))
+    (define-key keymap-from key nil))
+(my-move-key evil-motion-state-map evil-normal-state-map (kbd "RET"))
+(my-move-key evil-motion-state-map evil-normal-state-map " ")
 
 (require 'auto-complete-config)
 (ac-config-default)
@@ -92,4 +110,3 @@
       (?≥ lambda ">=" (,@lisps))
       (?≤ lambda "<=" (,@lisps))
       (?Ø lambda "nil" (,@lisps))))))
-
