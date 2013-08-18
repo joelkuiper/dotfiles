@@ -11,6 +11,8 @@
                       molokai-theme
                       popup
                       pretty-symbols-mode
+                      helm
+                      helm-projectile
                       ido-ubiquitous
                       flx-ido
                       clojure-mode
@@ -55,6 +57,7 @@
 
 ;; Projectile
 (projectile-global-mode)
+(global-set-key (kbd "C-c t") 'helm-projectile)
 
 ;; Evil
 (require 'evil)
@@ -102,7 +105,7 @@
       (?λ lambda "\\<lambda\\>" (,@lisps))
       (?λ lambda "\\<fn\\>" (,@lisps))
       (?ƒ lambda "\\<defn\\>" (,@lisps))
-      (?ƒ lambda "\\<defn-\\>" (,@lisps))
+      (?Ψ lambda "\\<psy\\>" (,@lisps))
       (?∂ lambda "\\<partial\\>" (,@lisps))
       (?ζ lambda "\\<apply\\>" (,@lisps))
       ;; Relational operators --
