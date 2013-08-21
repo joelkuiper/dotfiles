@@ -69,6 +69,10 @@
 (my-move-key evil-motion-state-map evil-normal-state-map (kbd "RET"))
 (my-move-key evil-motion-state-map evil-normal-state-map " ")
 
+;; Ace-jump
+(require 'ace-jump-mode)
+(define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
+
 (require 'auto-complete-config)
 (ac-config-default)
 
@@ -105,7 +109,7 @@
       (?λ lambda "\\<lambda\\>" (,@lisps))
       (?λ lambda "\\<fn\\>" (,@lisps))
       (?ƒ lambda "\\<defn\\>" (,@lisps))
-      (?Ψ lambda "\\<psy\\>" (,@lisps))
+      (?Ψ lambda "\\<psi\\>" (,@lisps))
       (?∂ lambda "\\<partial\\>" (,@lisps))
       (?ζ lambda "\\<apply\\>" (,@lisps))
       ;; Relational operators --
