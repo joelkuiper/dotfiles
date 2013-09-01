@@ -8,6 +8,7 @@
                       auto-complete
                       paredit
                       ac-nrepl
+                      ace-jump-mode
                       molokai-theme
                       popup
                       pretty-symbols-mode
@@ -47,6 +48,10 @@
 (setq-default indent-tabs-mode nil)
 (define-key global-map (kbd "RET") 'newline-and-indent) ; When pressing RET (Enter) makes a new line and ident it
 
+;; Ace-jump
+(require 'ace-jump-mode)
+(define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
+
 ;; Ido
 (require 'flx-ido)
 (ido-mode 1)
@@ -68,10 +73,6 @@
     (define-key keymap-from key nil))
 (my-move-key evil-motion-state-map evil-normal-state-map (kbd "RET"))
 (my-move-key evil-motion-state-map evil-normal-state-map " ")
-
-;; Ace-jump
-(require 'ace-jump-mode)
-(define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
 
 (require 'auto-complete-config)
 (ac-config-default)
@@ -101,19 +102,3 @@
 
 (dolist (hook lisps)
   (add-hook hook 'enable-lisp-utils))
-
-(custom-set-variables '(pretty-symbol-patterns
-  (let ((lisps '(emacs-lisp-mode clojure-mode inferior-lisp-mode lisp-mode scheme-mode)))
-    `(
-      ;; Basic symbols, enabled by default
-      (?λ lambda "\\<lambda\\>" (,@lisps))
-      (?λ lambda "\\<fn\\>" (,@lisps))
-      (?ƒ lambda "\\<defn\\>" (,@lisps))
-      (?Ψ lambda "\\<psi\\>" (,@lisps))
-      (?∂ lambda "\\<partial\\>" (,@lisps))
-      (?ζ lambda "\\<apply\\>" (,@lisps))
-      ;; Relational operators --
-      (?≠ lambda "/=" (,@lisps))
-      (?≥ lambda ">=" (,@lisps))
-      (?≤ lambda "<=" (,@lisps))
-      (?Ø lambda "nil" (,@lisps))))))
