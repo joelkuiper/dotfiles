@@ -24,6 +24,8 @@
     (package-install p)))
 
 ;; Remove whitespace
+(setq default-tab-width 2)
+(setq c-basic-offset 2)
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 ;; Unicode
