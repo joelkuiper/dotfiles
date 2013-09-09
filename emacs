@@ -35,6 +35,8 @@
 (set-keyboard-coding-system 'utf-8)
 
 ;; Visual
+(linum-mode t)
+(hl-line-mode t)
 (setq molokai-theme-kit t)
 (load-theme 'molokai t)
 (global-font-lock-mode t)
