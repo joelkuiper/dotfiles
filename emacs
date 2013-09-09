@@ -6,10 +6,10 @@
 
 (defvar my-packages '(evil
                       auto-complete
+                      ess
                       paredit
                       ac-nrepl
                       ace-jump-mode
-                      molokai-theme
                       popup
                       pretty-symbols-mode
                       helm
