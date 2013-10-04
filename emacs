@@ -7,13 +7,13 @@
 (defvar my-packages '(evil
                       auto-complete
                       ess
+                      projectile
                       paredit
+                      molokai-theme
                       ac-nrepl
                       ace-jump-mode
                       popup
                       pretty-symbols-mode
-                      helm
-                      helm-projectile
                       ido-ubiquitous
                       flx-ido
                       clojure-mode
@@ -42,9 +42,6 @@
 (global-font-lock-mode t)
 (menu-bar-mode -1)
 (tool-bar-mode -1)
-(set-default-font "Source Code Pro")
-(set-face-attribute 'default nil :font "Source Code Pro" :height 110)
-(set-face-font 'default "Source Code Pro")
 (line-number-mode 1)
 (show-paren-mode 1)
 
@@ -66,7 +63,7 @@
 
 ;; Projectile
 (projectile-global-mode)
-(global-set-key (kbd "C-c t") 'helm-projectile)
+(setq projectile-enable-caching t)
 
 ;; Evil
 (require 'evil)
