@@ -11,6 +11,7 @@
                       paredit
                       molokai-theme
                       ac-nrepl
+                      flycheck
                       ace-jump-mode
                       popup
                       pretty-symbols-mode
@@ -23,9 +24,14 @@
   (when (not (package-installed-p p))
     (package-install p)))
 
-;; Remove whitespace
+;; Whitespace
 (setq default-tab-width 2)
 (setq c-basic-offset 2)
+(setq js-indent-level 2)
+(setq-default indent-tabs-mode nil)
+(define-key global-map (kbd "RET") 'newline-and-indent) ; When pressing RET (Enter) makes a new line and ident it
+
+;; Remove whitespace on save
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 ;; Unicode
@@ -36,18 +42,12 @@
 
 ;; Visual
 (linum-mode t)
-(hl-line-mode t)
 (setq molokai-theme-kit t)
 (load-theme 'molokai t)
 (global-font-lock-mode t)
 (menu-bar-mode -1)
 (tool-bar-mode -1)
-(line-number-mode 1)
 (show-paren-mode 1)
-
-;; Whitespace
-(setq-default indent-tabs-mode nil)
-(define-key global-map (kbd "RET") 'newline-and-indent) ; When pressing RET (Enter) makes a new line and ident it
 
 ;; Ace-jump
 (require 'ace-jump-mode)
@@ -62,8 +62,12 @@
 (setq ido-use-faces nil)
 
 ;; Projectile
+(require 'projectile)
 (projectile-global-mode)
 (setq projectile-enable-caching t)
+
+;; Flycheck
+(add-hook 'after-init-hook #'global-flycheck-mode)
 
 ;; Evil
 (require 'evil)
