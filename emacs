@@ -12,8 +12,9 @@
                       molokai-theme
                       ac-nrepl
                       flycheck
+                      yasnippet
+                      slime
                       popup
-                      pretty-symbols-mode
                       js2-mode
                       ido-ubiquitous
                       flx-ido
@@ -25,10 +26,10 @@
     (package-install p)))
 
 ;; Whitespace
-(setq default-tab-width 2)
-(setq c-basic-offset 2)
-(setq js-indent-level 2)
-(setq sgml-basic-offset 2)
+(setq tab-width 2)
+(setq-default c-basic-offset 2)
+(setq-default js-indent-level 2)
+(setq-default sgml-basic-offset 2)
 (setq-default indent-tabs-mode nil)
 (define-key global-map (kbd "RET") 'newline-and-indent) ; When pressing RET (Enter) makes a new line and ident it
 
@@ -42,8 +43,8 @@
 (set-keyboard-coding-system 'utf-8)
 
 ;; Visual
-(linum-mode t)
-(setq molokai-theme-kit t)
+(global-linum-mode t)
+(setq-default molokai-theme-kit t)
 (load-theme 'molokai t)
 (global-font-lock-mode t)
 (menu-bar-mode -1)
@@ -76,9 +77,19 @@
  (add-hook 'on-blur-hook #'(lambda () (save-some-buffers t)))
  (on-blur--refresh))
 
+;; Emacs Speaks Statistics
 (require 'ess-site)
 
+;; JS2-IDE
 (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+(global-set-key [f5] 'slime-js-reload)
+(add-hook 'js2-mode-hook
+          (lambda ()
+            (slime-js-minor-mode 1)))
+
+
+;; Don't know why this is nessecary
+(add-to-list 'auto-mode-alist '(".emacs" . emacs-lisp-mode))
 
 ;; Ido
 (require 'flx-ido)
@@ -92,7 +103,17 @@
 (require 'projectile)
 (projectile-global-mode)
 (setq projectile-require-project-root nil)
-(setq projectile-enable-caching t)
+
+(require 'yasnippet)
+;; js2-mode steals TAB, let's steal it back for yasnippet
+(defun js2-tab-properly ()
+  (interactive)
+  (let ((yas-fallback-behavior 'return-nil))
+    (unless (yas-expand)
+      (indent-for-tab-command)
+      (if (looking-back "^\s*")
+          (back-to-indentation)))))
+
 
 ;; Flycheck
 (add-hook 'after-init-hook #'global-flycheck-mode)
@@ -119,7 +140,6 @@
 (add-hook 'nrepl-interaction-mode-hook 'nrepl-turn-on-eldoc-mode)
 (eval-after-load "auto-complete"
                  '(add-to-list 'ac-modes 'nrepl-mode))
-
 ;; Lisp
 (defvar lisps (list 'scheme-mode-hook
                      'lisp-mode-hook
@@ -130,7 +150,6 @@
 
 (defun enable-lisp-utils ()
   (auto-complete-mode)
-  (pretty-symbols-mode)
   (enable-paredit-mode))
 
 (dolist (hook lisps)
