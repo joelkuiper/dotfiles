@@ -1,5 +1,3 @@
-(require 'package)
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Version check.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -10,11 +8,17 @@
 (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
                          ("melpa" . "http://melpa.milkbox.net/packages/")
                          ("marmalade" . "http://marmalade-repo.org/packages/")))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Packaging setup.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(require 'package)
 (package-initialize)
 
 (defvar my-packages '(evil
                       auto-complete
                       ess
+                      ace-jump-mode
                       rainbow-delimiters highlight paredit smartparens
                       key-chord
                       projectile
@@ -40,13 +44,13 @@
     (package-refresh-contents)
     ;; Install the missing packages
     (mapc (lambda (package)
-(when (not (package-installed-p package))
-(package-install package)))
-missing)
+            (when (not (package-installed-p package))
+              (package-install package)))
+          missing)
     ;; Close the compilation log.
     (let ((compile-window (get-buffer-window "*Compile-Log*")))
       (if compile-window
-(delete-window compile-window)))))
+        (delete-window compile-window)))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -57,9 +61,9 @@ missing)
 
 ;; Whitespace
 (setq tab-width 2)
-(setq-default c-basic-offset 2)
-(setq-default js-indent-level 2)
-(setq-default sgml-basic-offset 2)
+(setq c-basic-offset 2)
+(setq js-indent-level 2)
+(setq sgml-basic-offset 2)
 (setq-default indent-tabs-mode nil)
 (define-key global-map (kbd "RET") 'newline-and-indent) ; When pressing RET (Enter) makes a new line and ident it
 
@@ -135,8 +139,13 @@ missing)
 
 (require 'yasnippet)
 
+(require 'uniquify)
+(setq uniquify-buffer-name-style 'forward)
+
 ;; Flycheck
 (add-hook 'after-init-hook #'global-flycheck-mode)
+
+(require 'ace-jump-mode)
 
 ;; Evil
 (require 'evil)
@@ -149,6 +158,8 @@ missing)
 (my-move-key evil-motion-state-map evil-normal-state-map " ")
 (key-chord-mode t)
 (key-chord-define evil-insert-state-map "jk" 'evil-normal-state)
+(define-key evil-normal-state-map (kbd "SPC") 'ace-jump-mode)
+(define-key evil-visual-state-map (kbd "SPC") 'ace-jump-mode)
 
 (require 'auto-complete-config)
 (ac-config-default)
