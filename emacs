@@ -22,8 +22,8 @@
 (defvar my-packages '(evil
                       auto-complete
                       ess
-                      ace-jump-mode
-                      rainbow-delimiters highlight paredit smartparens
+                      ace-jump-mode highlight
+                      rainbow-delimiters highlight paredit evil-paredit
                       key-chord
                       projectile
                       molokai-theme
@@ -167,14 +167,14 @@
 
 (require 'auto-complete-config)
 (ac-config-default)
-(smartparens-global-mode t)
-
 ;; Lisp
 
 (defun enable-lisp-utils ()
   (auto-complete-mode)
   (rainbow-delimiters-mode)
-  (enable-paredit-mode))
+  (require 'evil-paredit)
+  (enable-paredit-mode)
+  (evil-paredit-mode t))
 
 (add-hook 'emacs-lisp-mode-hook
           '(lambda ()
@@ -194,3 +194,9 @@
              (add-hook 'nrepl-interaction-mode-hook 'ac-nrepl-setup)
              (add-hook 'nrepl-interaction-mode-hook 'nrepl-turn-on-eldoc-mode)
              (add-to-list 'ac-modes 'nrepl-mode)))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(custom-safe-themes (quote ("47583b577fb062aeb89d3c45689a4f2646b7ebcb02e6cb2d5f6e2790afb91a18" default))))
