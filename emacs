@@ -26,6 +26,7 @@
                       key-chord
                       projectile
                       molokai-theme
+                      web-mode
                       flycheck
                       yasnippet
                       popup
@@ -55,13 +56,6 @@
       (if compile-window
         (delete-window compile-window)))))
 
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
-
 ;; Whitespace
 (setq tab-width 2)
 (setq c-basic-offset 2)
@@ -81,8 +75,7 @@
 
 ;; Visual
 (global-linum-mode t)
-(setq-default molokai-theme-kit t)
-(load-theme 'molokai t)
+(load-theme 'soft-charcoal t)
 (global-font-lock-mode t)
 (menu-bar-mode -1)
 (tool-bar-mode -1)
@@ -123,6 +116,8 @@
 (add-hook 'js2-mode-hook
           (lambda ()
             (slime-js-minor-mode 1)))
+
+(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
 
 ;; Don't know why this is nessecary
 (add-to-list 'auto-mode-alist '(".emacs" . emacs-lisp-mode))
@@ -166,8 +161,8 @@
 
 (require 'auto-complete-config)
 (ac-config-default)
-;; Lisp
 
+;; Lisp
 (defun enable-lisp-utils ()
   (auto-complete-mode)
   (rainbow-delimiters-mode)
