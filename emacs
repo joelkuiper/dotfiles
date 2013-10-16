@@ -1,5 +1,8 @@
-;; Special thanks to
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; personal configuration of emacs + evil
+;; special thanks to
 ;; https://github.com/krisajenkins/EvilBegins
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Version check.
@@ -27,8 +30,8 @@
                       rainbow-delimiters highlight paredit evil-paredit
                       key-chord
                       projectile
-                      molokai-theme
                       web-mode
+                      soft-charcoal-theme
                       flycheck
                       yasnippet
                       popup
@@ -58,6 +61,11 @@
       (if compile-window
         (delete-window compile-window)))))
 
+
+;; Disable the splash screen (to enable it agin, replace the t with 0)
+(setq inhibit-splash-screen t)
+
+
 ;; Whitespace
 (setq tab-width 2)
 (setq c-basic-offset 2)
@@ -81,6 +89,7 @@
 (global-font-lock-mode t)
 (menu-bar-mode -1)
 (tool-bar-mode -1)
+(set-default-font "Inconsolata-11")
 (show-paren-mode 1)
 
 ;; Save on focus lost
@@ -138,6 +147,7 @@
 (setq projectile-require-project-root nil)
 
 (require 'yasnippet)
+(require 'org)
 
 (require 'org)
 (require 'org-remember)
@@ -149,7 +159,7 @@
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'forward)
 
-;; Flycheck
+;; Flychec
 (add-hook 'after-init-hook #'global-flycheck-mode)
 
 (require 'ace-jump-mode)
@@ -165,7 +175,6 @@
 (my-move-key evil-motion-state-map evil-normal-state-map " ")
 (key-chord-mode t)
 (key-chord-define evil-insert-state-map "jk" 'evil-normal-state)
-
 (define-key evil-normal-state-map (kbd "SPC") 'ace-jump-char-mode)
 (define-key evil-visual-state-map (kbd "SPC") 'ace-jump-char-mode)
 
@@ -198,3 +207,10 @@
              (add-hook 'nrepl-interaction-mode-hook 'ac-nrepl-setup)
              (add-hook 'nrepl-interaction-mode-hook 'nrepl-turn-on-eldoc-mode)
              (add-to-list 'ac-modes 'nrepl-mode)))
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(custom-safe-themes (quote ("865d6cb994f89c13b2d7e5961df4eabeea12494583c240c8fe9a788d0f4ee12c" default))))
