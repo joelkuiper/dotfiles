@@ -21,6 +21,8 @@
 (defvar my-packages '(evil
                       auto-complete
                       ess
+                      org
+                      remember
                       ace-jump-mode highlight
                       rainbow-delimiters highlight paredit evil-paredit
                       key-chord
@@ -137,6 +139,13 @@
 
 (require 'yasnippet)
 
+(require 'org)
+(require 'org-remember)
+(require 'remember)
+(setq default-major-mode 'org-mode)
+(add-hook 'remember-mode-hook 'org-mode)
+(global-set-key (kbd "<f12>") 'remember)
+
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'forward)
 
@@ -156,8 +165,9 @@
 (my-move-key evil-motion-state-map evil-normal-state-map " ")
 (key-chord-mode t)
 (key-chord-define evil-insert-state-map "jk" 'evil-normal-state)
-(define-key evil-normal-state-map (kbd "SPC") 'ace-jump-mode)
-(define-key evil-visual-state-map (kbd "SPC") 'ace-jump-mode)
+
+(define-key evil-normal-state-map (kbd "SPC") 'ace-jump-char-mode)
+(define-key evil-visual-state-map (kbd "SPC") 'ace-jump-char-mode)
 
 (require 'auto-complete-config)
 (ac-config-default)
