@@ -154,7 +154,21 @@
 (require 'remember)
 (setq default-major-mode 'org-mode)
 (add-hook 'remember-mode-hook 'org-mode)
+
+;; active Babel languages
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((R . t)
+   (clojure . t)
+   (emacs-lisp . t)
+   (lisp . t)
+   (js . t)
+   (sh . t)))
+
+
 (global-set-key (kbd "<f12>") 'remember)
+
+
 
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'forward)
