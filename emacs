@@ -24,19 +24,17 @@
 (defvar my-packages '(evil
                       auto-complete
                       ess
-                      org
-                      remember
-                      ace-jump-mode highlight
+                      org remember
+                      ace-jump-mode
                       rainbow-delimiters highlight paredit evil-paredit
                       key-chord
                       projectile
-                      web-mode
+                      web-mode js2-mode
                       soft-charcoal-theme
                       flycheck
                       yasnippet
                       popup
                       slime
-                      js2-mode
                       ido-ubiquitous flx-ido
                       clojure-mode
                       nrepl nrepl-eval-sexp-fu ac-nrepl))
@@ -61,27 +59,19 @@
       (if compile-window
         (delete-window compile-window)))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Customization
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Disable the splash screen (to enable it agin, replace the t with 0)
 (setq inhibit-splash-screen t)
 
+;; see http://www.emacswiki.org/emacs/CopyAndPaste
+(setq x-select-enable-clipboard t)
+(setq interprogram-paste-function 'x-cut-buffer-or-selection-value)
 
-;; Whitespace
-(setq tab-width 2)
-(setq c-basic-offset 2)
-(setq js-indent-level 2)
-(setq sgml-basic-offset 2)
-(setq-default indent-tabs-mode nil)
-(define-key global-map (kbd "RET") 'newline-and-indent) ; When pressing RET (Enter) makes a new line and ident it
-
-;; Remove whitespace on save
-(add-hook 'before-save-hook 'delete-trailing-whitespace)
-
-;; Unicode
-(prefer-coding-system 'utf-8)
-(set-default-coding-systems 'utf-8)
-(set-terminal-coding-system 'utf-8)
-(set-keyboard-coding-system 'utf-8)
+;; Don't know why this is nessecary
+(add-to-list 'auto-mode-alist '(".emacs" . emacs-lisp-mode))
 
 ;; Visual
 (global-linum-mode t)
@@ -89,8 +79,35 @@
 (global-font-lock-mode t)
 (menu-bar-mode -1)
 (tool-bar-mode -1)
-(set-default-font "Inconsolata-11")
 (show-paren-mode 1)
+(set-default-font "Inconsolata-12")
+
+(require 'ace-jump-mode)
+
+;; Evil
+(require 'evil)
+(evil-mode 1)
+(defun my-move-key (keymap-from keymap-to key)
+  "Moves key binding from one keymap to another, deleting from the old location. "
+  (define-key keymap-to key (lookup-key keymap-from key))
+  (define-key keymap-from key nil))
+(my-move-key evil-motion-state-map evil-normal-state-map (kbd "RET"))
+(my-move-key evil-motion-state-map evil-normal-state-map " ")
+(key-chord-mode t)
+(key-chord-define evil-insert-state-map "jk" 'evil-normal-state)
+(define-key evil-normal-state-map (kbd "SPC") 'ace-jump-char-mode)
+(define-key evil-visual-state-map (kbd "SPC") 'ace-jump-char-mode)
+
+;; Whitespace
+(setq tab-width 2)
+(setq c-basic-offset 2)
+(setq js-indent-level 2)
+(setq sgml-basic-offset 2)
+(setq-default indent-tabs-mode nil)
+(setq evil-shift-width 2)
+
+;; Remove whitespace on save
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 ;; Save on focus lost
 (when
@@ -130,9 +147,6 @@
 
 (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
 
-;; Don't know why this is nessecary
-(add-to-list 'auto-mode-alist '(".emacs" . emacs-lisp-mode))
-
 ;; Ido
 (require 'flx-ido)
 (ido-mode 1)
@@ -147,7 +161,7 @@
 (setq projectile-require-project-root nil)
 
 (require 'yasnippet)
-(require 'org)
+(yas-global-mode 1)
 
 (require 'org)
 (require 'org-remember)
@@ -164,33 +178,13 @@
    (lisp . t)
    (js . t)
    (sh . t)))
-
-
 (global-set-key (kbd "<f12>") 'remember)
-
-
 
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'forward)
 
-;; Flychec
+;; Flycheck
 (add-hook 'after-init-hook #'global-flycheck-mode)
-
-(require 'ace-jump-mode)
-
-;; Evil
-(require 'evil)
-(evil-mode 1)
-(defun my-move-key (keymap-from keymap-to key)
-  "Moves key binding from one keymap to another, deleting from the old location. "
-  (define-key keymap-to key (lookup-key keymap-from key))
-  (define-key keymap-from key nil))
-(my-move-key evil-motion-state-map evil-normal-state-map (kbd "RET"))
-(my-move-key evil-motion-state-map evil-normal-state-map " ")
-(key-chord-mode t)
-(key-chord-define evil-insert-state-map "jk" 'evil-normal-state)
-(define-key evil-normal-state-map (kbd "SPC") 'ace-jump-char-mode)
-(define-key evil-visual-state-map (kbd "SPC") 'ace-jump-char-mode)
 
 (require 'auto-complete-config)
 (ac-config-default)
@@ -198,6 +192,7 @@
 ;; Lisp
 (defun enable-lisp-utils ()
   (auto-complete-mode)
+  (local-set-key (kbd "RET") 'newline-and-indent)
   (rainbow-delimiters-mode)
   (require 'evil-paredit)
   (enable-paredit-mode)
@@ -222,9 +217,19 @@
              (add-hook 'nrepl-interaction-mode-hook 'nrepl-turn-on-eldoc-mode)
              (add-to-list 'ac-modes 'nrepl-mode)))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Customizations (from M-x customze-*)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-safe-themes (quote ("865d6cb994f89c13b2d7e5961df4eabeea12494583c240c8fe9a788d0f4ee12c" default))))
+ )
+
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
