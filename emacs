@@ -34,7 +34,7 @@
                       flycheck
                       yasnippet
                       popup
-                      slime
+                      slime slime-js
                       ido-ubiquitous flx-ido
                       clojure-mode
                       nrepl nrepl-eval-sexp-fu ac-nrepl))
@@ -84,7 +84,9 @@
 
 (require 'ace-jump-mode)
 
-;; Evil
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Evil
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'evil)
 (evil-mode 1)
 (defun my-move-key (keymap-from keymap-to key)
@@ -98,13 +100,16 @@
 (define-key evil-normal-state-map (kbd "SPC") 'ace-jump-char-mode)
 (define-key evil-visual-state-map (kbd "SPC") 'ace-jump-char-mode)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Other stuff
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Whitespace
 (setq tab-width 2)
 (setq c-basic-offset 2)
 (setq js-indent-level 2)
 (setq sgml-basic-offset 2)
+(setq-default evil-shift-width 2)
 (setq-default indent-tabs-mode nil)
-(setq evil-shift-width 2)
 
 ;; Remove whitespace on save
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
@@ -138,7 +143,9 @@
 ;; Emacs Speaks Statistics
 (require 'ess-site)
 
+(require 'slime)
 ;; JS2-IDE
+(require 'slime-js)
 (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
 (global-set-key [f5] 'slime-js-reload)
 (add-hook 'js2-mode-hook
@@ -159,14 +166,17 @@
 (require 'projectile)
 (projectile-global-mode)
 (setq projectile-require-project-root nil)
+(setq projectile-show-paths-function 'projectile-hashify-with-relative-paths)
 
 (require 'yasnippet)
 (yas-global-mode 1)
 
+;; org-mode
 (require 'org)
 (require 'org-remember)
 (require 'remember)
 (setq default-major-mode 'org-mode)
+(global-set-key (kbd "<f12>") 'remember)
 (add-hook 'remember-mode-hook 'org-mode)
 
 ;; active Babel languages
@@ -178,7 +188,6 @@
    (lisp . t)
    (js . t)
    (sh . t)))
-(global-set-key (kbd "<f12>") 'remember)
 
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'forward)
