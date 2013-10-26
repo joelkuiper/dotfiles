@@ -30,14 +30,12 @@
                       key-chord
                       projectile
                       web-mode js2-mode
-                      soft-charcoal-theme
                       flycheck
                       yasnippet
                       popup
+                      cider
                       slime slime-js
-                      ido-ubiquitous flx-ido
-                      clojure-mode
-                      nrepl nrepl-eval-sexp-fu ac-nrepl))
+                      ido-ubiquitous flx-ido))
 
 (defun my-missing-packages ()
   (let (missing-packages)
@@ -75,12 +73,14 @@
 
 ;; Visual
 (global-linum-mode t)
-(load-theme 'soft-charcoal t)
 (global-font-lock-mode t)
+
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (show-paren-mode 1)
-(set-default-font "Inconsolata-12")
+(add-to-list 'load-path "~/dotfiles/tomorrow-theme/GNU Emacs/")
+(require 'color-theme-tomorrow)
+(color-theme-tomorrow-night)
 
 (require 'ace-jump-mode)
 
@@ -211,20 +211,11 @@
           '(lambda ()
              (enable-lisp-utils)))
 
-;;; Clojure
 (add-hook 'clojure-mode-hook
           '(lambda ()
-             (enable-lisp-utils)
+             (enable-lisp-utils)))
 
-             (mapc '(lambda (char)
-                      (modify-syntax-entry char "w" clojure-mode-syntax-table))
-                   '(?- ?_ ?/ ?< ?> ?: ?' ?.))
 
-             (require 'ac-nrepl)
-             (add-hook 'nrepl-mode-hook 'ac-nrepl-setup)
-             (add-hook 'nrepl-interaction-mode-hook 'ac-nrepl-setup)
-             (add-hook 'nrepl-interaction-mode-hook 'nrepl-turn-on-eldoc-mode)
-             (add-to-list 'ac-modes 'nrepl-mode)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customizations (from M-x customze-*)
@@ -234,7 +225,8 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(custom-enabled-themes (quote (sanityinc-tomorrow-night)))
+ '(custom-safe-themes (quote ("06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" default))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

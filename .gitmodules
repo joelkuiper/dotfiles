@@ -4,3 +4,6 @@
 [submodule "vim"]
 	path = vim
 	url = https://joelkuiper@github.com/joelkuiper/vimified.git 
+[submodule "tomorrow-theme"]
+	path = tomorrow-theme
+	url = https://github.com/chriskempson/tomorrow-theme.git
