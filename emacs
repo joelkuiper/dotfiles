@@ -28,14 +28,13 @@
                       ace-jump-mode
                       rainbow-delimiters highlight paredit evil-paredit
                       key-chord
-                      projectile
+                      projectile grizzl
                       web-mode js2-mode
                       flycheck
                       yasnippet
                       popup
                       cider
-                      slime slime-js
-                      ido-ubiquitous flx-ido))
+                      slime slime-js))
 
 (defun my-missing-packages ()
   (let (missing-packages)
@@ -80,7 +79,7 @@
 (show-paren-mode 1)
 (add-to-list 'load-path "~/dotfiles/tomorrow-theme/GNU Emacs/")
 (require 'color-theme-tomorrow)
-(color-theme-tomorrow-night-bright)
+(color-theme-tomorrow)
 (setq ring-bell-function 'ignore)
 
 (require 'ace-jump-mode)
@@ -155,19 +154,17 @@
 
 (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
 
-;; Ido
-(require 'flx-ido)
-(ido-mode 1)
-(ido-everywhere 1)
-(flx-ido-mode 1)
-;; disable ido faces to see flx highlights.
-(setq ido-use-faces nil)
-
 ;; Projectile
 (require 'projectile)
 (projectile-global-mode)
 (setq projectile-require-project-root nil)
 (setq projectile-show-paths-function 'projectile-hashify-with-relative-paths)
+(require 'grizzl)
+(setq projectile-completion-system 'grizzl)
+;; Press Command-p for fuzzy find in project
+(global-set-key (kbd "s-p") 'projectile-find-file)
+;; Press Command-b for fuzzy switch buffer
+(global-set-key (kbd "s-b") 'projectile-switch-to-buffer)
 
 (require 'yasnippet)
 (yas-global-mode 1)
@@ -216,8 +213,6 @@
           '(lambda ()
              (enable-lisp-utils)))
 
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customizations (from M-x customze-*)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -226,14 +221,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ansi-color-faces-vector [default bold shadow italic underline bold bold-italic bold])
- '(ansi-color-names-vector (vector "#c5c8c6" "#cc6666" "#b5bd68" "#f0c674" "#81a2be" "#b294bb" "#8abeb7" "#1d1f21"))
- '(custom-enabled-themes (quote (sanityinc-tomorrow-bright)))
- '(custom-safe-themes (quote ("1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" default)))
- '(fci-rule-color "#282a2e")
- '(vc-annotate-background nil)
- '(vc-annotate-color-map (quote ((20 . "#cc6666") (40 . "#de935f") (60 . "#f0c674") (80 . "#b5bd68") (100 . "#8abeb7") (120 . "#81a2be") (140 . "#b294bb") (160 . "#cc6666") (180 . "#de935f") (200 . "#f0c674") (220 . "#b5bd68") (240 . "#8abeb7") (260 . "#81a2be") (280 . "#b294bb") (300 . "#cc6666") (320 . "#de935f") (340 . "#f0c674") (360 . "#b5bd68"))))
- '(vc-annotate-very-old-color nil))
+)
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
