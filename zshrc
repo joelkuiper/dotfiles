@@ -14,7 +14,6 @@ export TERM="xterm-256color"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
 alias ack="/usr/bin/ack-grep"
-alias node="/usr/bin/nodejs"
 
 # Set to this to use case-sensitive completion
 CASE_SENSITIVE="true"

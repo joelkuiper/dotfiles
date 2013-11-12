@@ -23,8 +23,10 @@
 
 (defvar my-packages '(evil
                       auto-complete
+                      python-mode
+                      magit
                       ess
-                      org remember
+                      org
                       ace-jump-mode
                       rainbow-delimiters highlight paredit evil-paredit
                       key-chord
@@ -63,10 +65,6 @@
 ;; Disable the splash screen (to enable it agin, replace the t with 0)
 (setq inhibit-splash-screen t)
 
-;; see http://www.emacswiki.org/emacs/CopyAndPaste
-(setq x-select-enable-clipboard t)
-(setq interprogram-paste-function 'x-cut-buffer-or-selection-value)
-
 ;; Don't know why this is nessecary
 (add-to-list 'auto-mode-alist '(".emacs" . emacs-lisp-mode))
 
@@ -79,7 +77,7 @@
 (show-paren-mode 1)
 (add-to-list 'load-path "~/dotfiles/tomorrow-theme/GNU Emacs/")
 (require 'color-theme-tomorrow)
-(color-theme-tomorrow)
+(color-theme-tomorrow-night-bright)
 (setq ring-bell-function 'ignore)
 
 (require 'ace-jump-mode)
@@ -171,11 +169,18 @@
 
 ;; org-mode
 (require 'org)
-(require 'org-remember)
-(require 'remember)
 (setq default-major-mode 'org-mode)
-(global-set-key (kbd "<f12>") 'remember)
-(add-hook 'remember-mode-hook 'org-mode)
+(setq org-html-postamble "<hr>
+  <span xmlns:dct=\"http://purl.org/dc/terms/\" xmlns:vcard=\"http://www.w3.org/2001/vcard-rdf/3.0#\">
+    <a rel=\"license\"
+       href=\"http://creativecommons.org/publicdomain/zero/1.0/\">
+      <img src=\"http://i.creativecommons.org/p/zero/1.0/80x15.png\" style=\"border-style: none;\" alt=\"CC0\" />
+    </a>
+  </span>
+  %d
+  <a href=\"https://twitter.com/%a\"><i class=\"fa fa-twitter\"></i>%a</a>
+")
+(setq org-html-head-include-default-style nil)
 
 ;; active Babel languages
 (org-babel-do-load-languages
@@ -183,6 +188,7 @@
  '((R . t)
    (clojure . t)
    (emacs-lisp . t)
+   (python . t)
    (lisp . t)
    (js . t)
    (sh . t)))
