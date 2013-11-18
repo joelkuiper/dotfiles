@@ -124,6 +124,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Whitespace
 (setq-default indent-tabs-mode nil)
+(setq standard-indent 2)
 
 ;; Remove whitespace on save
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
