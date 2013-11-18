@@ -28,15 +28,13 @@
                       ess
                       org
                       ace-jump-mode
-                      rainbow-delimiters highlight paredit evil-paredit
+                      highlight paredit evil-paredit
                       key-chord
                       projectile grizzl
                       web-mode js2-mode
                       flycheck
                       yasnippet
-                      popup
-                      cider
-                      slime slime-js))
+                      cider))
 
 (defun my-missing-packages ()
   (let (missing-packages)
@@ -61,19 +59,43 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customization
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(ido-mode t)
+(setq ido-enable-flex-matching t)
+(setq inhibit-startup-screen +1)
 
-;; Disable the splash screen (to enable it agin, replace the t with 0)
-(setq inhibit-splash-screen t)
+(menu-bar-mode -1)
+(when (fboundp 'tool-bar-mode)
+  (tool-bar-mode -1))
+(when (fboundp 'scroll-bar-mode)
+  (scroll-bar-mode -1))
 
-;; Don't know why this is nessecary
-(add-to-list 'auto-mode-alist '(".emacs" . emacs-lisp-mode))
+(require 'uniquify)
+(setq uniquify-buffer-name-style 'forward)
+
+(require 'saveplace)
+(setq-default save-place t)
+
+(setq x-select-enable-clipboard t
+      x-select-enable-primary t
+      save-interprogram-paste-before-kill t
+      apropos-do-all t
+      mouse-yank-at-point t
+      save-place-file (concat user-emacs-directory "places")
+      backup-directory-alist `(("." . ,(concat user-emacs-directory
+                                                "backups"))))
 
 ;; Visual
 (global-linum-mode t)
 (global-font-lock-mode t)
+(setq redisplay-dont-pause t
+      scroll-margin 1
+      scroll-step 1
+      scroll-conservatively 10000
+      scroll-preserve-screen-position 1)
+(setq mouse-wheel-follow-mouse 't)
+(setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))
 
-(menu-bar-mode -1)
-(tool-bar-mode -1)
+
 (show-paren-mode 1)
 (add-to-list 'load-path "~/dotfiles/tomorrow-theme/GNU Emacs/")
 (require 'color-theme-tomorrow)
@@ -102,11 +124,6 @@
 ;;; Other stuff
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Whitespace
-(setq tab-width 2)
-(setq c-basic-offset 2)
-(setq js-indent-level 2)
-(setq sgml-basic-offset 2)
-(setq-default evil-shift-width 2)
 (setq-default indent-tabs-mode nil)
 
 ;; Remove whitespace on save
@@ -141,15 +158,8 @@
 ;; Emacs Speaks Statistics
 (require 'ess-site)
 
-(require 'slime)
 ;; JS2-IDE
-(require 'slime-js)
 (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
-(global-set-key [f5] 'slime-js-reload)
-(add-hook 'js2-mode-hook
-          (lambda ()
-            (slime-js-minor-mode 1)))
-
 (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
 
 ;; Projectile
@@ -169,18 +179,18 @@
 
 ;; org-mode
 (require 'org)
+(setq org-src-fontify-natively t)
 (setq default-major-mode 'org-mode)
+(setq org-export-with-smart-quotes t)
+(setq org-html-head-include-default-style nil)
 (setq org-html-postamble "<hr>
   <span xmlns:dct=\"http://purl.org/dc/terms/\" xmlns:vcard=\"http://www.w3.org/2001/vcard-rdf/3.0#\">
     <a rel=\"license\"
        href=\"http://creativecommons.org/publicdomain/zero/1.0/\">
-      <img src=\"http://i.creativecommons.org/p/zero/1.0/80x15.png\" style=\"border-style: none;\" alt=\"CC0\" />
-    </a>
+      <img src=\"http://i.creativecommons.org/p/zero/1.0/80x15.png\" style=\"border-style: none;\" alt=\"CC0\" /></a>
   </span>
   %d
-  <a href=\"https://twitter.com/%a\"><i class=\"fa fa-twitter\"></i>%a</a>
-")
-(setq org-html-head-include-default-style nil)
+  <a href=\"https://twitter.com/%a\"><i class=\"fa fa-twitter\"></i>%a</a>")
 
 ;; active Babel languages
 (org-babel-do-load-languages
@@ -193,9 +203,6 @@
    (js . t)
    (sh . t)))
 
-(require 'uniquify)
-(setq uniquify-buffer-name-style 'forward)
-
 ;; Flycheck
 (add-hook 'after-init-hook #'global-flycheck-mode)
 
@@ -206,18 +213,15 @@
 (defun enable-lisp-utils ()
   (auto-complete-mode)
   (local-set-key (kbd "RET") 'newline-and-indent)
-  (rainbow-delimiters-mode)
   (require 'evil-paredit)
   (enable-paredit-mode)
   (evil-paredit-mode t))
 
-(add-hook 'emacs-lisp-mode-hook
-          '(lambda ()
-             (enable-lisp-utils)))
 
-(add-hook 'clojure-mode-hook
-          '(lambda ()
-             (enable-lisp-utils)))
+(dolist (mode '(emacs-lisp-mode-hook clojure-mode-hook))
+  (add-hook mode
+            '(lambda ()
+               (enable-lisp-utils))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customizations (from M-x customze-*)
