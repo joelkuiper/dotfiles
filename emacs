@@ -15,6 +15,8 @@
                          ("melpa" . "http://melpa.milkbox.net/packages/")
                          ("marmalade" . "http://marmalade-repo.org/packages/")))
 
+(add-to-list 'auto-mode-alist '(".emacs" . emacs-lisp-mode))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Packaging setup.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -55,6 +57,8 @@
     (let ((compile-window (get-buffer-window "*Compile-Log*")))
       (if compile-window
         (delete-window compile-window)))))
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customization
@@ -97,7 +101,8 @@
 
 (add-to-list 'custom-theme-load-path
              (file-name-as-directory "~/dotfiles/themes/replace-colorthemes"))
-(load-theme 'late-night t)
+(load-theme 'dark-font-lock t)
+(set-background-color "#F1F1F0")
 
 (setq ring-bell-function 'ignore)
 
@@ -231,7 +236,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-safe-themes (quote ("bbb51078321186cbbbcb38f9b74ea154154af10c5d9c61d2b0258cb4401ac038" "09feeb867d1ca5c1a33050d857ad6a5d62ad888f4b9136ec42002d6cdf310235" default))))
+ )
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
