@@ -56,7 +56,9 @@
     ;; Close the compilation log.
     (let ((compile-window (get-buffer-window "*Compile-Log*")))
       (if compile-window
-        (delete-window compile-window)))))
+          (delete-window compile-window)))))
+
+(setq exec-path (append exec-path '("/usr/local/bin")))
 
 
 
@@ -72,6 +74,7 @@
   (tool-bar-mode -1))
 (when (fboundp 'scroll-bar-mode)
   (scroll-bar-mode -1))
+(set-fringe-mode 0)
 
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'forward)
@@ -102,7 +105,7 @@
 (add-to-list 'custom-theme-load-path
              (file-name-as-directory "~/dotfiles/themes/replace-colorthemes"))
 (load-theme 'dark-font-lock t)
-(set-background-color "#F1F1F0")
+(set-background-color "#FEFEFE")
 
 (setq ring-bell-function 'ignore)
 
@@ -213,6 +216,19 @@
 
 (require 'auto-complete-config)
 (ac-config-default)
+
+;; Python
+(setq
+ python-shell-interpreter "ipython"
+ python-shell-interpreter-args ""
+ python-shell-prompt-regexp "In \\[[0-9]+\\]: "
+ python-shell-prompt-output-regexp "Out\\[[0-9]+\\]: "
+ python-shell-completion-setup-code
+ "from IPython.core.completerlib import module_completion"
+ python-shell-completion-module-string-code
+ "';'.join(module_completion('''%s'''))\n"
+ python-shell-completion-string-code
+ "';'.join(get_ipython().Completer.all_completions('''%s'''))\n")
 
 ;; Lisp
 (defun enable-lisp-utils ()
