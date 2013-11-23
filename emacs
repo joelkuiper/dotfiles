@@ -15,8 +15,6 @@
                          ("melpa" . "http://melpa.milkbox.net/packages/")
                          ("marmalade" . "http://marmalade-repo.org/packages/")))
 
-(add-to-list 'auto-mode-alist '(".emacs" . emacs-lisp-mode))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Packaging setup.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -60,13 +58,13 @@
 
 (setq exec-path (append exec-path '("/usr/local/bin")))
 
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customization
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (ido-mode t)
 (setq ido-enable-flex-matching t)
+(setq ido-everywhere t)
 (setq inhibit-startup-screen +1)
 
 (menu-bar-mode -1)
@@ -101,20 +99,27 @@
       scroll-preserve-screen-position 1)
 (setq mouse-wheel-follow-mouse 't)
 (setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))
+(set-default-font "Inconsolata-12")
 
 (add-to-list 'custom-theme-load-path
              (file-name-as-directory "~/dotfiles/themes/replace-colorthemes"))
 (load-theme 'dark-font-lock t)
 (set-background-color "#FEFEFE")
-
 (setq ring-bell-function 'ignore)
 
-(require 'ace-jump-mode)
+(defun toggle-fullscreen ()
+  "Toggle full screen"
+  (interactive)
+  (set-frame-parameter
+     nil 'fullscreen
+     (when (not (frame-parameter nil 'fullscreen)) 'fullboth)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Evil
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'evil)
+(require 'ace-jump-mode)
+
 (evil-mode 1)
 (defun my-move-key (keymap-from keymap-to key)
   "Moves key binding from one keymap to another, deleting from the old location. "
@@ -127,6 +132,26 @@
 (define-key evil-normal-state-map (kbd "SPC") 'ace-jump-char-mode)
 (define-key evil-visual-state-map (kbd "SPC") 'ace-jump-char-mode)
 
+;; ESC quits all the things
+(defun minibuffer-keyboard-quit ()
+  "Abort recursive edit.
+  In Delete Selection mode, if the mark is active, just deactivate it;
+  then it takes a second \\[keyboard-quit] to abort the minibuffer."
+  (interactive)
+  (if (and delete-selection-mode transient-mark-mode mark-active)
+    (setq deactivate-mark  t)
+    (when (get-buffer "*Completions*") (delete-windows-on
+                                         "*Completions*"))
+    (abort-recursive-edit)))
+(define-key evil-normal-state-map [escape] 'keyboard-quit)
+(define-key evil-visual-state-map [escape] 'keyboard-quit)
+(define-key minibuffer-local-map [escape] 'minibuffer-keyboard-quit)
+(define-key minibuffer-local-ns-map [escape] 'minibuffer-keyboard-quit)
+(define-key minibuffer-local-completion-map [escape] 'minibuffer-keyboard-quit)
+(define-key minibuffer-local-must-match-map [escape] 'minibuffer-keyboard-quit)
+(define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
+(global-set-key [escape] 'evil-exit-emacs-state)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Other stuff
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -134,7 +159,7 @@
 (setq-default indent-tabs-mode nil)
 (setq standard-indent 2)
 
-;; Remove whitespace on save
+;; Remove trailing whitespace on save
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 ;; Save on focus lost
@@ -166,9 +191,10 @@
 ;; Emacs Speaks Statistics
 (require 'ess-site)
 
-;; JS2-IDE
+;; File-type stuff
 (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
 (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+(add-to-list 'auto-mode-alist '(".emacs" . emacs-lisp-mode))
 
 ;; Projectile
 (require 'projectile)
@@ -178,9 +204,9 @@
 (require 'grizzl)
 (setq projectile-completion-system 'grizzl)
 ;; Press Command-p for fuzzy find in project
-(global-set-key (kbd "s-p") 'projectile-find-file)
+(global-set-key (kbd "M-p") 'projectile-find-file)
 ;; Press Command-b for fuzzy switch buffer
-(global-set-key (kbd "s-b") 'projectile-switch-to-buffer)
+(global-set-key (kbd "M-b") 'projectile-switch-to-buffer)
 
 (require 'yasnippet)
 (yas-global-mode 1)
@@ -238,7 +264,6 @@
   (enable-paredit-mode)
   (evil-paredit-mode t))
 
-
 (dolist (mode '(emacs-lisp-mode-hook clojure-mode-hook))
   (add-hook mode
             '(lambda ()
@@ -252,7 +277,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+)
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
