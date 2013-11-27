@@ -63,9 +63,16 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (ido-mode t)
-(setq ido-enable-flex-matching t)
 (setq ido-everywhere t)
+(setq ido-enable-flex-matching t)
+
 (setq inhibit-startup-screen +1)
+(defun toggle-fullscreen ()
+  "Toggle full screen"
+  (interactive)
+  (set-frame-parameter
+     nil 'fullscreen
+     (when (not (frame-parameter nil 'fullscreen)) 'fullboth)))
 
 (menu-bar-mode -1)
 (when (fboundp 'tool-bar-mode)
@@ -88,7 +95,6 @@
       save-place-file (concat user-emacs-directory "places")
       backup-directory-alist `(("." . ,(concat user-emacs-directory
                                                 "backups"))))
-
 ;; Visual
 (show-paren-mode 1)
 (global-font-lock-mode t)
@@ -213,9 +219,11 @@
 
 ;; org-mode
 (require 'org)
+(require 'org-publish)
 (setq org-src-fontify-natively t)
 (setq default-major-mode 'org-mode)
 (setq org-export-with-smart-quotes t)
+(setq org-export-async-debug t)
 (setq org-html-head-include-default-style nil)
 (setq org-html-postamble "<hr>
   <span xmlns:dct=\"http://purl.org/dc/terms/\" xmlns:vcard=\"http://www.w3.org/2001/vcard-rdf/3.0#\">
@@ -234,11 +242,34 @@
    (emacs-lisp . t)
    (python . t)
    (lisp . t)
+   (ditaa . t)
    (js . t)
    (sh . t)))
 
-;; Flycheck
-(add-hook 'after-init-hook #'global-flycheck-mode)
+;; blogging
+(setq org-publish-project-alist
+      '(
+        ("org-joelkuiper"
+         ;; Path to your org files.
+         :base-directory "~/blog/org/"
+         :base-extension "org"
+
+         ;; Path to your Jekyll project.
+         :publishing-directory "~/blog/jekyll/"
+         :recursive t
+         :publishing-function org-html-publish-to-html
+         :headline-levels 4
+         :html-extension "html"
+         :with-toc nil
+         :body-only t)
+
+        ("org-static-joel"
+         :base-directory "~/blog/org/"
+         :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf"
+         :publishing-directory "~/blog/jekyll/static/"
+         :recursive t
+         :publishing-function org-publish-attachment)
+        ("blog" :components ("org-joelkuiper" "org-static-joel"))))
 
 (require 'auto-complete-config)
 (ac-config-default)

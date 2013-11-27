@@ -13,7 +13,7 @@ export TERM="xterm-256color"
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-alias ack="/usr/bin/ack-grep"
+alias emacs="/usr/local/Cellar/emacs-mac/emacs-24.3-mac-4.5/bin/emacs -nw"
 
 # Set to this to use case-sensitive completion
 CASE_SENSITIVE="true"
@@ -48,3 +48,5 @@ if [[ -a ~/.secrets ]] then
 fi
 
 [[ -s "/usr/local/rvm/scripts/rvm" ]] && . "/usr/local/rvm/scripts/rvm"
+
+PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
