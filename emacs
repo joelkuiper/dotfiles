@@ -13,6 +13,7 @@
 
 (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
                          ("melpa" . "http://melpa.milkbox.net/packages/")
+                         ("SC"  . "http://joseito.republika.pl/sunrise-commander/")
                          ("marmalade" . "http://marmalade-repo.org/packages/")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -24,13 +25,15 @@
 (defvar my-packages '(evil
                       auto-complete
                       python-mode
+                      slime
+		      exec-path-from-shell
                       magit
                       ess
                       org
                       ace-jump-mode
                       highlight paredit evil-paredit
                       key-chord
-                      projectile grizzl
+                      projectile sunrise-commander
                       web-mode js2-mode
                       flycheck
                       yasnippet
@@ -56,7 +59,9 @@
       (if compile-window
           (delete-window compile-window)))))
 
-(setq exec-path (append exec-path '("/usr/local/bin")))
+(when (memq window-system '(mac ns))
+  (require 'exec-path-from-shell)
+  (exec-path-from-shell-initialize))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customization
@@ -66,13 +71,10 @@
 (setq ido-everywhere t)
 (setq ido-enable-flex-matching t)
 
+;; OSX ls doesn't support --dired. use brew's gnu core utils
+(setq insert-directory-program "gls" dired-use-ls-dired t)
+
 (setq inhibit-startup-screen +1)
-(defun toggle-fullscreen ()
-  "Toggle full screen"
-  (interactive)
-  (set-frame-parameter
-     nil 'fullscreen
-     (when (not (frame-parameter nil 'fullscreen)) 'fullboth)))
 
 (menu-bar-mode -1)
 (when (fboundp 'tool-bar-mode)
@@ -161,38 +163,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Other stuff
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;; Whitespace
 (setq-default indent-tabs-mode nil)
 (setq standard-indent 2)
 
 ;; Remove trailing whitespace on save
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
-
-;; Save on focus lost
-(when
-   (and (featurep 'x) window-system)
- (defvar on-blur--saved-window-id 0 "Last known focused window.")
- (defvar on-blur--timer nil "Timer refreshing known focused window.")
- (defun on-blur--refresh ()
-   "Runs on-blur-hook if emacs has lost focus."
-   (let* ((active-window (x-window-property
-                          "_NET_ACTIVE_WINDOW" nil "WINDOW" 0 nil t))
-          (active-window-id (if (numberp active-window)
-                                active-window
-                              (string-to-number
-                               (format "%x00%x"
-                                       (car active-window)
-                                       (cdr active-window)) 16)))
-          (emacs-window-id (string-to-number
-                            (frame-parameter nil 'outer-window-id))))
-     (when (and
-            (= emacs-window-id on-blur--saved-window-id)
-            (not (= active-window-id on-blur--saved-window-id)))
-       (run-hooks 'on-blur-hook))
-     (setq on-blur--saved-window-id active-window-id)
-     (run-with-timer 1 nil 'on-blur--refresh)))
- (add-hook 'on-blur-hook #'(lambda () (save-some-buffers t)))
- (on-blur--refresh))
 
 ;; Emacs Speaks Statistics
 (require 'ess-site)
@@ -205,14 +182,7 @@
 ;; Projectile
 (require 'projectile)
 (projectile-global-mode)
-(setq projectile-require-project-root nil)
 (setq projectile-show-paths-function 'projectile-hashify-with-relative-paths)
-(require 'grizzl)
-(setq projectile-completion-system 'grizzl)
-;; Press Command-p for fuzzy find in project
-(global-set-key (kbd "M-p") 'projectile-find-file)
-;; Press Command-b for fuzzy switch buffer
-(global-set-key (kbd "M-b") 'projectile-switch-to-buffer)
 
 (require 'yasnippet)
 (yas-global-mode 1)
@@ -220,8 +190,8 @@
 ;; org-mode
 (require 'org)
 (require 'org-publish)
-(setq org-src-fontify-natively t)
 (setq default-major-mode 'org-mode)
+(setq org-src-fontify-natively t)
 (setq org-export-with-smart-quotes t)
 (setq org-export-async-debug t)
 (setq org-html-head-include-default-style nil)
@@ -243,13 +213,11 @@
    (python . t)
    (lisp . t)
    (ditaa . t)
-   (js . t)
    (sh . t)))
 
 ;; blogging
 (setq org-publish-project-alist
-      '(
-        ("org-joelkuiper"
+      '(("org-joelkuiper"
          ;; Path to your org files.
          :base-directory "~/blog/org/"
          :base-extension "org"
@@ -264,30 +232,19 @@
          :body-only t)
 
         ("org-static-joel"
-         :base-directory "~/blog/org/"
+         :base-directory "~/blog/org/_posts/assets/"
          :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf"
-         :publishing-directory "~/blog/jekyll/static/"
-         :recursive t
+         :publishing-directory "~/blog/jekyll/assets/"
          :publishing-function org-publish-attachment)
         ("blog" :components ("org-joelkuiper" "org-static-joel"))))
 
 (require 'auto-complete-config)
 (ac-config-default)
 
-;; Python
-(setq
- python-shell-interpreter "ipython"
- python-shell-interpreter-args ""
- python-shell-prompt-regexp "In \\[[0-9]+\\]: "
- python-shell-prompt-output-regexp "Out\\[[0-9]+\\]: "
- python-shell-completion-setup-code
- "from IPython.core.completerlib import module_completion"
- python-shell-completion-module-string-code
- "';'.join(module_completion('''%s'''))\n"
- python-shell-completion-string-code
- "';'.join(get_ipython().Completer.all_completions('''%s'''))\n")
-
 ;; Lisp
+(require 'slime)
+(setq slime-default-lisp 'sbcl)
+
 (defun enable-lisp-utils ()
   (auto-complete-mode)
   (local-set-key (kbd "RET") 'newline-and-indent)
@@ -295,7 +252,7 @@
   (enable-paredit-mode)
   (evil-paredit-mode t))
 
-(dolist (mode '(emacs-lisp-mode-hook clojure-mode-hook))
+(dolist (mode '(emacs-lisp-mode-hook inferior-lisp-mode-hook clojure-mode-hook))
   (add-hook mode
             '(lambda ()
                (enable-lisp-utils))))
