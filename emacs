@@ -22,22 +22,26 @@
 (require 'package)
 (package-initialize)
 
-(defvar my-packages '(evil
+(defvar my-packages '(;; Essentials
+                      evil
                       auto-complete
-                      ein
-                      magit
-                      langtool flyspell-lazy
-                      exec-path-from-shell
-                      ess
-                      org htmlize
                       ace-jump-mode
-                      highlight paredit evil-paredit
                       key-chord
-                      projectile sunrise-commander
-                      web-mode js2-mode
-                      flycheck
                       yasnippet
-                      cider))
+                      exec-path-from-shell
+                      ;; Project management
+                      magit ;; git
+                      projectile sunrise-commander
+                      ;; Writing
+                      org htmlize
+                      langtool flyspell-lazy ;; Spellcheck
+                      ;; Language support
+                      ess ;; R
+                      ein python-mode ;; Python
+                      cider ;; Clojure
+                      web-mode js2-mode ;; Web development
+                      highlight paredit evil-paredit ;; LISP
+                      ))
 
 (defun my-missing-packages ()
   (let (missing-packages)
@@ -241,14 +245,6 @@
       org-export-with-smart-quotes t
       org-export-async-debug t
       org-html-head-include-default-style nil)
-(setq org-html-postamble "<hr>
-  <span xmlns:dct=\"http://purl.org/dc/terms/\" xmlns:vcard=\"http://www.w3.org/2001/vcard-rdf/3.0#\">
-    <a rel=\"license\"
-       href=\"http://creativecommons.org/publicdomain/zero/1.0/\">
-      <img src=\"http://i.creativecommons.org/p/zero/1.0/80x15.png\" style=\"border-style: none;\" alt=\"CC0\" /></a>
-  </span>
-  %d
-  <a href=\"https://twitter.com/%a\"><i class=\"fa fa-twitter\"></i>%a</a>")
 
 ;; active Babel languages
 (org-babel-do-load-languages
