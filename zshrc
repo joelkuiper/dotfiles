@@ -50,3 +50,4 @@ fi
 [[ -s "/usr/local/rvm/scripts/rvm" ]] && . "/usr/local/rvm/scripts/rvm"
 
 PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
+PYTHONPATH=/usr/local/lib/python2.7/site-packages:$PYTHONPATH

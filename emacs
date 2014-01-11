@@ -24,12 +24,12 @@
 
 (defvar my-packages '(evil
                       auto-complete
-                      python-mode
-                      slime
-		      exec-path-from-shell
+                      ein
                       magit
+                      langtool flyspell-lazy
+                      exec-path-from-shell
                       ess
-                      org
+                      org htmlize
                       ace-jump-mode
                       highlight paredit evil-paredit
                       key-chord
@@ -68,11 +68,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (ido-mode t)
-(setq ido-everywhere t)
-(setq ido-enable-flex-matching t)
+(setq ido-everywhere t
+      ido-enable-flex-matching t)
 
 ;; OSX ls doesn't support --dired. use brew's gnu core utils
-(setq insert-directory-program "gls" dired-use-ls-dired t)
+(when (memq window-system '(mac ns))
+  (setq insert-directory-program "gls" dired-use-ls-dired t))
 
 (setq inhibit-startup-screen +1)
 
@@ -105,8 +106,8 @@
       scroll-step 1
       scroll-conservatively 10000
       scroll-preserve-screen-position 1)
-(setq mouse-wheel-follow-mouse 't)
-(setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))
+(setq mouse-wheel-follow-mouse 't
+      mouse-wheel-scroll-amount '(1 ((shift) . 1)))
 (set-default-font "Inconsolata-12")
 
 (add-to-list 'custom-theme-load-path
@@ -133,10 +134,11 @@
   "Moves key binding from one keymap to another, deleting from the old location. "
   (define-key keymap-to key (lookup-key keymap-from key))
   (define-key keymap-from key nil))
+
 (my-move-key evil-motion-state-map evil-normal-state-map (kbd "RET"))
 (my-move-key evil-motion-state-map evil-normal-state-map " ")
 (key-chord-mode t)
-(key-chord-define evil-insert-state-map "jk" 'evil-normal-state)
+(key-chord-define evil-insert-state-map "jj" 'evil-normal-state)
 (define-key evil-normal-state-map (kbd "SPC") 'ace-jump-char-mode)
 (define-key evil-visual-state-map (kbd "SPC") 'ace-jump-char-mode)
 
@@ -174,7 +176,7 @@
 ;; Emacs Speaks Statistics
 (require 'ess-site)
 
-;; File-type stuff
+;; File-types
 (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
 (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
 (add-to-list 'auto-mode-alist '(".emacs" . emacs-lisp-mode))
@@ -187,14 +189,58 @@
 (require 'yasnippet)
 (yas-global-mode 1)
 
+;; I am dyslectic as fuck
+(require 'flyspell-lazy)
+(flyspell-lazy-mode 1)
+
+(when (file-exists-p "/usr/local/Cellar/languagetool/2.3/libexec/languagetool-commandline.jar")
+  (require 'langtool)
+  (setq langtool-language-tool-jar "/usr/local/Cellar/languagetool/2.3/libexec/languagetool-commandline.jar"
+        langtool-mother-tongue "nl"
+        langtool-disabled-rules '("WHITESPACE_RULE"
+                                  "EN_UNPAIRED_BRACKETS"
+                                  "COMMA_PARENTHESIS_WHITESPACE"
+                                  "EN_QUOTES")))
+
+(when (executable-find "hunspell")
+  (setq-default ispell-program-name "hunspell")
+  (setq ispell-really-hunspell t)
+  (eval-after-load "flyspell"
+    '(progn
+       (define-key flyspell-mouse-map [down-mouse-3] #'flyspell-correct-word)
+       (define-key flyspell-mouse-map [mouse-3] #'undefined))))
+
+(dolist (hook '(text-mode-hook))
+  (add-hook hook (lambda () (flyspell-mode 1))))
+(dolist (hook '(change-log-mode-hook log-edit-mode-hook))
+  (add-hook hook (lambda () (flyspell-mode -1))))
+
+(global-set-key (kbd "<f8>") 'ispell-word)
+(defun flyspell-check-next-highlighted-word ()
+  "Custom function to spell check next highlighted word"
+  (interactive)
+  (flyspell-goto-next-error)
+  (ispell-word))
+(global-set-key (kbd "M-<f8>") 'flyspell-check-next-highlighted-word)
+
+(dolist (mode '(emacs-lisp-mode-hook
+                inferior-lisp-mode-hook
+                clojure-mode-hook
+                python-mode-hook
+                js-mode-hook
+                R-mode-hook))
+  (add-hook mode
+            '(lambda ()
+               (flyspell-prog-mode))))
+
 ;; org-mode
 (require 'org)
 (require 'org-publish)
 (setq default-major-mode 'org-mode)
-(setq org-src-fontify-natively t)
-(setq org-export-with-smart-quotes t)
-(setq org-export-async-debug t)
-(setq org-html-head-include-default-style nil)
+(setq org-src-fontify-natively t
+      org-export-with-smart-quotes t
+      org-export-async-debug t
+      org-html-head-include-default-style nil)
 (setq org-html-postamble "<hr>
   <span xmlns:dct=\"http://purl.org/dc/terms/\" xmlns:vcard=\"http://www.w3.org/2001/vcard-rdf/3.0#\">
     <a rel=\"license\"
@@ -241,10 +287,6 @@
 (require 'auto-complete-config)
 (ac-config-default)
 
-;; Lisp
-(require 'slime)
-(setq slime-default-lisp 'sbcl)
-
 (defun enable-lisp-utils ()
   (auto-complete-mode)
   (local-set-key (kbd "RET") 'newline-and-indent)
@@ -252,7 +294,9 @@
   (enable-paredit-mode)
   (evil-paredit-mode t))
 
-(dolist (mode '(emacs-lisp-mode-hook inferior-lisp-mode-hook clojure-mode-hook))
+(dolist (mode '(emacs-lisp-mode-hook
+                inferior-lisp-mode-hook
+                clojure-mode-hook))
   (add-hook mode
             '(lambda ()
                (enable-lisp-utils))))
