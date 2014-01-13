@@ -13,6 +13,7 @@
 
 (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
                          ("melpa" . "http://melpa.milkbox.net/packages/")
+                         ("org" . "http://orgmode.org/elpa/")
                          ("SC"  . "http://joseito.republika.pl/sunrise-commander/")
                          ("marmalade" . "http://marmalade-repo.org/packages/")))
 
@@ -183,6 +184,7 @@
 ;; File-types
 (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
 (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.org$\\'" . org-mode))
 (add-to-list 'auto-mode-alist '(".emacs" . emacs-lisp-mode))
 
 ;; Projectile
@@ -279,6 +281,17 @@
          :publishing-directory "~/blog/jekyll/assets/"
          :publishing-function org-publish-attachment)
         ("blog" :components ("org-joelkuiper" "org-static-joel"))))
+
+(defun org-custom-link-asset-follow (path)
+  (org-open-file-with-emacs
+   (format "./assets/%s" path)))
+
+(defun org-custom-link-asset-export (path desc format)
+  (cond
+   ((eq format 'html)
+    (format "<img src=\"/assets/%s\" alt=\"%s\"/>" path desc))))
+
+(org-add-link-type "asset" 'org-custom-link-asset-follow 'org-custom-link-asset-export)
 
 (require 'auto-complete-config)
 (ac-config-default)
