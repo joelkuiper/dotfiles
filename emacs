@@ -248,6 +248,8 @@
       org-export-async-debug t
       org-html-head-include-default-style nil)
 
+(setq org-latex-pdf-process (list "latexmk -pdf -bibtex -f %f"))
+
 ;; active Babel languages
 (org-babel-do-load-languages
  'org-babel-load-languages
@@ -279,6 +281,7 @@
          :base-directory "~/blog/org/_posts/assets/"
          :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf"
          :publishing-directory "~/blog/jekyll/assets/"
+         :recursive t
          :publishing-function org-publish-attachment)
         ("blog" :components ("org-joelkuiper" "org-static-joel"))))
 

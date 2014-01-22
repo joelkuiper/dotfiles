@@ -40,7 +40,7 @@ source $ZSH/oh-my-zsh.sh
 alias fact="elinks -dump randomfunfacts.com | sed -n '/^| /p' | tr -d \|"
 
 # Customize to your needs...
-export PATH="/usr/local/bin:/usr/local/sbin:/usr/local/share:$HOME/bin:/usr/bin:/opt/bin:$PATH"
+export PATH="/sbin/:/usr/sbin/:/usr/local/bin:/usr/local/sbin:/usr/local/share:$HOME/bin:/usr/bin:/opt/bin:$PATH"
 
 # Put secret configuration settings in ~/.secrets
 if [[ -a ~/.secrets ]] then
@@ -50,4 +50,5 @@ fi
 [[ -s "/usr/local/rvm/scripts/rvm" ]] && . "/usr/local/rvm/scripts/rvm"
 
 PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
+PATH=$PATH:/usr/local/texlive/2013/bin/universal-darwin:$PATH # Add pdflatex
 PYTHONPATH=/usr/local/lib/python2.7/site-packages:$PYTHONPATH
