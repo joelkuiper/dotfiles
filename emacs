@@ -34,7 +34,7 @@
                       magit ;; git
                       projectile sunrise-commander
                       ;; Writing
-                      org htmlize
+                      org-plus-contrib htmlize
                       langtool flyspell-lazy ;; Spellcheck
                       ;; Language support
                       ess ;; R
@@ -170,6 +170,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Other stuff
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Default mode
+(setq default-major-mode 'org-mode)
 
 ;; Whitespace
 (setq-default indent-tabs-mode nil)
@@ -242,13 +244,15 @@
 ;; org-mode
 (require 'org)
 (require 'org-publish)
-(setq default-major-mode 'org-mode)
 (setq org-src-fontify-natively t
       org-export-with-smart-quotes t
       org-export-async-debug t
       org-html-head-include-default-style nil)
 
-(setq org-latex-pdf-process (list "latexmk -pdf -bibtex -f %f"))
+(setq org-latex-pdf-process (list "latexm -pdf -bibtex -gg -f %f"))
+
+;; Dangerous! don't do anything stupid ;-)
+(setq org-confirm-babel-evaluate nil)
 
 ;; active Babel languages
 (org-babel-do-load-languages
@@ -292,7 +296,7 @@
 (defun org-custom-link-asset-export (path desc format)
   (cond
    ((eq format 'html)
-    (format "<img src=\"/assets/%s\" alt=\"%s\"/>" path desc))))
+    (format "<img src=\"assets/%s\" alt=\"%s\"/>" path desc))))
 
 (org-add-link-type "asset" 'org-custom-link-asset-follow 'org-custom-link-asset-export)
 
