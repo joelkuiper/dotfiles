@@ -249,7 +249,7 @@
       org-export-async-debug t
       org-html-head-include-default-style nil)
 
-(setq org-latex-pdf-process (list "latexm -pdf -bibtex -gg -f %f"))
+(setq org-latex-pdf-process (list "latexmk -pdf -bibtex -gg -f %f"))
 
 ;; Dangerous! don't do anything stupid ;-)
 (setq org-confirm-babel-evaluate nil)
