@@ -88,6 +88,7 @@
 (when (fboundp 'scroll-bar-mode)
   (scroll-bar-mode -1))
 (set-fringe-mode 0)
+(blink-cursor-mode 0)
 
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'forward)
@@ -102,7 +103,7 @@
       mouse-yank-at-point t
       save-place-file (concat user-emacs-directory "places")
       backup-directory-alist `(("." . ,(concat user-emacs-directory
-                                                "backups"))))
+                                               "backups"))))
 ;; Visual
 (show-paren-mode 1)
 (global-font-lock-mode t)
@@ -110,11 +111,12 @@
       scroll-margin 1
       scroll-step 1
       scroll-conservatively 10000
-      scroll-preserve-screen-position 1)
+      scroll-preserve-screen-position 1
+      font-lock-support-mode 'jit-lock-mode)
 (setq mouse-wheel-follow-mouse 't
       mouse-wheel-scroll-amount '(1 ((shift) . 1)))
-(set-default-font "Inconsolata-12")
 
+(set-default-font "Inconsolata-12")
 (add-to-list 'custom-theme-load-path
              (file-name-as-directory "~/dotfiles/themes/replace-colorthemes"))
 (load-theme 'dark-font-lock t)
@@ -175,7 +177,8 @@
 
 ;; Whitespace
 (setq-default indent-tabs-mode nil)
-(setq standard-indent 2)
+(setq standard-indent 2
+      tab-width 2)
 
 ;; Remove trailing whitespace on save
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
@@ -193,9 +196,13 @@
 (require 'projectile)
 (projectile-global-mode)
 (setq projectile-show-paths-function 'projectile-hashify-with-relative-paths)
+(global-set-key (kbd "<f9>") 'sunrise)
 
 (require 'yasnippet)
 (yas-global-mode 1)
+
+(require 'auto-complete-config)
+(ac-config-default)
 
 ;; I am dyslectic as fuck
 (require 'flyspell-lazy)
@@ -300,9 +307,7 @@
 
 (org-add-link-type "asset" 'org-custom-link-asset-follow 'org-custom-link-asset-export)
 
-(require 'auto-complete-config)
-(ac-config-default)
-
+;; Lisp
 (defun enable-lisp-utils ()
   (auto-complete-mode)
   (local-set-key (kbd "RET") 'newline-and-indent)
