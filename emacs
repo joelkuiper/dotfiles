@@ -32,7 +32,8 @@
                       exec-path-from-shell
                       ;; Project management
                       magit ;; git
-                      projectile sunrise-commander
+                      projectile
+                      sunrise-commander
                       ;; Writing
                       org-plus-contrib htmlize
                       langtool flyspell-lazy ;; Spellcheck
@@ -116,7 +117,20 @@
 (setq mouse-wheel-follow-mouse 't
       mouse-wheel-scroll-amount '(1 ((shift) . 1)))
 
-(set-default-font "Inconsolata-12")
+(set-face-attribute 'default nil
+                    :family "Inconsolata"
+                    :height 120
+                    :weight 'normal
+                    :width 'normal)
+(when (functionp 'set-fontset-font)
+  (set-fontset-font "fontset-default"
+                    'unicode
+                    (font-spec :family "DejaVu Sans Mono"
+                               :width 'normal
+                               :weight 'normal)))
+
+
+
 (add-to-list 'custom-theme-load-path
              (file-name-as-directory "~/dotfiles/themes/replace-colorthemes"))
 (load-theme 'dark-font-lock t)
@@ -149,26 +163,6 @@
 (define-key evil-normal-state-map (kbd "SPC") 'ace-jump-char-mode)
 (define-key evil-visual-state-map (kbd "SPC") 'ace-jump-char-mode)
 
-;; ESC quits all the things
-(defun minibuffer-keyboard-quit ()
-  "Abort recursive edit.
-  In Delete Selection mode, if the mark is active, just deactivate it;
-  then it takes a second \\[keyboard-quit] to abort the minibuffer."
-  (interactive)
-  (if (and delete-selection-mode transient-mark-mode mark-active)
-    (setq deactivate-mark  t)
-    (when (get-buffer "*Completions*") (delete-windows-on
-                                         "*Completions*"))
-    (abort-recursive-edit)))
-(define-key evil-normal-state-map [escape] 'keyboard-quit)
-(define-key evil-visual-state-map [escape] 'keyboard-quit)
-(define-key minibuffer-local-map [escape] 'minibuffer-keyboard-quit)
-(define-key minibuffer-local-ns-map [escape] 'minibuffer-keyboard-quit)
-(define-key minibuffer-local-completion-map [escape] 'minibuffer-keyboard-quit)
-(define-key minibuffer-local-must-match-map [escape] 'minibuffer-keyboard-quit)
-(define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
-(global-set-key [escape] 'evil-exit-emacs-state)
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Other stuff
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -195,7 +189,8 @@
 (require 'projectile)
 (projectile-global-mode)
 (setq projectile-show-paths-function 'projectile-hashify-with-relative-paths)
-(global-set-key (kbd "<f9>") 'sunrise)
+(global-set-key "\C-cs" 'sunrise)
+(global-set-key "\C-cg" 'magit-status)
 
 (require 'yasnippet)
 (yas-global-mode 1)
@@ -237,11 +232,9 @@
   (ispell-word))
 (global-set-key (kbd "M-<f8>") 'flyspell-check-next-highlighted-word)
 
-(dolist (mode '(emacs-lisp-mode-hook
-                inferior-lisp-mode-hook
+(dolist (mode '(lisp-mode-hook
                 clojure-mode-hook
                 python-mode-hook
-                js-mode-hook
                 R-mode-hook))
   (add-hook mode
             '(lambda ()
@@ -253,12 +246,10 @@
 (setq org-src-fontify-natively t
       org-export-with-smart-quotes t
       org-export-async-debug t
+      org-confirm-babel-evaluate nil ;; yeah don't do anything stupid
       org-html-head-include-default-style nil)
 
 (setq org-latex-pdf-process (list "make; latexmk -pdf -bibtex -gg -f %f"))
-
-;; Dangerous! don't do anything stupid ;-)
-(setq org-confirm-babel-evaluate nil)
 
 ;; active Babel languages
 (org-babel-do-load-languages
@@ -315,7 +306,8 @@
   (evil-paredit-mode t))
 
 (dolist (mode '(emacs-lisp-mode-hook
-                inferior-lisp-mode-hook
+                lisp-mode-hook
+                cider-repl-mode-hook
                 clojure-mode-hook))
   (add-hook mode
             '(lambda ()
