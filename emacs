@@ -266,11 +266,11 @@
 (setq org-publish-project-alist
       '(("org-joelkuiper"
          ;; Path to your org files.
-         :base-directory "~/blog/org/"
+         :base-directory "~/Remote/org/"
          :base-extension "org"
 
          ;; Path to your Jekyll project.
-         :publishing-directory "~/blog/jekyll/"
+         :publishing-directory "~/Remote/blog/"
          :recursive t
          :publishing-function org-html-publish-to-html
          :headline-levels 4
@@ -279,7 +279,7 @@
          :body-only t)
 
         ("org-static-joel"
-         :base-directory "~/blog/org/_posts/assets/"
+         :base-directory "~/Remote/org/_posts/assets/"
          :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf"
          :publishing-directory "~/blog/jekyll/assets/"
          :recursive t
