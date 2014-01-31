@@ -281,7 +281,7 @@
         ("org-static-joel"
          :base-directory "~/Remote/org/_posts/assets/"
          :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf"
-         :publishing-directory "~/blog/jekyll/assets/"
+         :publishing-directory "~/Remote/blog/assets/"
          :recursive t
          :publishing-function org-publish-attachment)
         ("blog" :components ("org-joelkuiper" "org-static-joel"))))
