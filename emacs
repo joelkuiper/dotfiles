@@ -36,7 +36,7 @@
                       sunrise-commander
                       ;; Writing
                       org-plus-contrib htmlize
-                      langtool flyspell-lazy ;; Spellcheck
+                      langtool wordsmith-mode ;; Spellcheck
                       ;; Language support
                       ess ;; R
                       ein python-mode ;; Python
@@ -91,6 +91,48 @@
 (set-fringe-mode 0)
 (blink-cursor-mode 0)
 
+;; emacs strptease http://bzg.fr/emacs-strip-tease.html
+;; See http://bzg.fr/emacs-hide-mode-line.html
+(defvar-local hidden-mode-line-mode nil)
+(defvar-local hide-mode-line nil)
+
+(define-minor-mode hidden-mode-line-mode
+  "Minor mode to hide the mode-line in the current buffer."
+  :init-value nil
+  :global nil
+  :variable hidden-mode-line-mode
+  :group 'editing-basics
+  (if hidden-mode-line-mode
+      (setq hide-mode-line mode-line-format
+            mode-line-format nil)
+    (setq mode-line-format hide-mode-line
+          hide-mode-line nil))
+  (force-mode-line-update)
+  ;; Apparently force-mode-line-update is not always enough to
+  ;; redisplay the mode-line
+  (redraw-display)
+  (when (and (called-interactively-p 'interactive)
+             hidden-mode-line-mode)
+    (run-with-idle-timer
+     0 nil 'message
+     (concat "Hidden Mode Line Mode enabled.  "
+             "Use M-x hidden-mode-line-mode to make the mode-line appear."))))
+
+;; A small minor mode to use a big fringe
+(defvar big-fringe-mode nil)
+(define-minor-mode big-fringe-mode
+  "Minor mode to hide the mode-line in the current buffer."
+  :init-value nil
+  :global t
+  :variable big-fringe-mode
+  :group 'editing-basics
+  (if (not big-fringe-mode)
+      (set-fringe-style nil)
+    (set-fringe-mode
+     (/ (- (frame-pixel-width)
+           (* 100 (frame-char-width)))
+        2))))
+
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'forward)
 
@@ -105,15 +147,13 @@
       save-place-file (concat user-emacs-directory "places")
       backup-directory-alist `(("." . ,(concat user-emacs-directory
                                                "backups"))))
-;; Visual
 (show-paren-mode 1)
 (global-font-lock-mode t)
 (setq redisplay-dont-pause t
       scroll-margin 1
       scroll-step 1
       scroll-conservatively 10000
-      scroll-preserve-screen-position 1
-      font-lock-support-mode 'jit-lock-mode)
+      scroll-preserve-screen-position 1)
 (setq mouse-wheel-follow-mouse 't
       mouse-wheel-scroll-amount '(1 ((shift) . 1)))
 
@@ -129,11 +169,9 @@
                                :width 'normal
                                :weight 'normal)))
 
-
-
 (add-to-list 'custom-theme-load-path
              (file-name-as-directory "~/dotfiles/themes/replace-colorthemes"))
-(load-theme 'dark-font-lock t)
+(load-theme 'montz t)
 (set-background-color "#FEFEFE")
 (setq ring-bell-function 'ignore)
 
@@ -166,9 +204,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Other stuff
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Default mode
-(setq default-major-mode 'org-mode)
-
 ;; Whitespace
 (setq-default indent-tabs-mode nil)
 (setq tab-width 2)
@@ -199,9 +234,6 @@
 (ac-config-default)
 
 ;; I am dyslectic as fuck
-(require 'flyspell-lazy)
-(flyspell-lazy-mode 1)
-
 (when (file-exists-p "/usr/local/Cellar/languagetool/2.3/libexec/languagetool-commandline.jar")
   (require 'langtool)
   (setq langtool-language-tool-jar "/usr/local/Cellar/languagetool/2.3/libexec/languagetool-commandline.jar"
@@ -219,8 +251,11 @@
        (define-key flyspell-mouse-map [down-mouse-3] #'flyspell-correct-word)
        (define-key flyspell-mouse-map [mouse-3] #'undefined))))
 
-(dolist (hook '(text-mode-hook))
-  (add-hook hook (lambda () (flyspell-mode 1))))
+(dolist (hook '(org-mode-hook))
+  (add-hook hook (lambda ()
+                   (visual-line-mode 1)
+                   (flyspell-mode 1)
+                   (wordsmith-mode 1))))
 (dolist (hook '(change-log-mode-hook log-edit-mode-hook))
   (add-hook hook (lambda () (flyspell-mode -1))))
 
