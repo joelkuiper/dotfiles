@@ -79,9 +79,6 @@ endif
 if count(g:vimified_packages, 'color')
   syntax on
   set background=light
-  Bundle 'https://bitbucket.org/kisom/eink.vim.git'
-  colorscheme eink
-
 endif
 " }}}
 
