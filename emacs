@@ -223,6 +223,23 @@
 ;; Emacs Speaks Statistics
 (require 'ess-site)
 
+;; Lisp
+(defun enable-lisp-utils ()
+  (auto-complete-mode)
+  (local-set-key (kbd "RET") 'newline-and-indent)
+  (require 'evil-paredit)
+  (enable-paredit-mode)
+  (evil-paredit-mode t))
+
+(dolist (mode '(emacs-lisp-mode-hook
+                lisp-mode-hook
+                cider-repl-mode-hook
+                clojure-mode-hook))
+  (add-hook mode
+            '(lambda ()
+               (enable-lisp-utils))))
+
+
 ;; File-types
 (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
 (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
@@ -240,7 +257,7 @@
 (require 'auto-complete-config)
 (ac-config-default)
 
-;; I am dyslectic as fuck
+;; I am dyslectic
 (when (file-exists-p "/usr/local/Cellar/languagetool/2.3/libexec/languagetool-commandline.jar")
   (require 'langtool)
   (setq langtool-language-tool-jar "/usr/local/Cellar/languagetool/2.3/libexec/languagetool-commandline.jar"
@@ -293,9 +310,10 @@
       org-html-head-include-default-style nil)
 
 (setq org-latex-pdf-process (list "make; latexmk -pdf -bibtex -gg -f %f"))
+
+;; for bibtex2html see: http://foswiki.org/Tasks.Item11919
 (when (memq window-system '(mac ns))
-  (setenv "TMPDIR" ".") ; for bibtex2html see: http://foswiki.org/Tasks.Item11919
-  )
+  (setenv "TMPDIR" "."))
 
 ;; active Babel languages
 (org-babel-do-load-languages
@@ -323,13 +341,13 @@
          :with-toc nil
          :body-only t)
 
-        ("org-static-joel"
+        ("org-static-joelkuiper"
          :base-directory "~/Remote/org/_posts/assets/"
          :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf"
          :publishing-directory "~/Remote/blog/assets/"
          :recursive t
          :publishing-function org-publish-attachment)
-        ("blog" :components ("org-joelkuiper" "org-static-joel"))))
+        ("blog" :components ("org-joelkuiper" "org-static-joelkuiper"))))
 
 (defun org-custom-link-asset-follow (path)
   (org-open-file-with-emacs
@@ -341,22 +359,6 @@
     (format "<img src=\"assets/%s\" alt=\"%s\"/>" path desc))))
 
 (org-add-link-type "asset" 'org-custom-link-asset-follow 'org-custom-link-asset-export)
-
-;; Lisp
-(defun enable-lisp-utils ()
-  (auto-complete-mode)
-  (local-set-key (kbd "RET") 'newline-and-indent)
-  (require 'evil-paredit)
-  (enable-paredit-mode)
-  (evil-paredit-mode t))
-
-(dolist (mode '(emacs-lisp-mode-hook
-                lisp-mode-hook
-                cider-repl-mode-hook
-                clojure-mode-hook))
-  (add-hook mode
-            '(lambda ()
-               (enable-lisp-utils))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customizations (from M-x customze-*)
