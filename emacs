@@ -202,11 +202,10 @@
 (define-key evil-visual-state-map (kbd "SPC") 'ace-jump-char-mode)
 
 ;; Leaders
-
 (evil-leader/set-key
-  "g" 'magit-status
-  "s" 'sunrise
-  "f" 'find-file
+  "g"  'magit-status
+  "s"  'sunrise
+  "f"  'find-file
   "pf" 'projectile-find-file
   "ps" 'projectile-switch-project)
 
@@ -256,6 +255,9 @@
 
 (require 'auto-complete-config)
 (ac-config-default)
+(setq ac-auto-start 4)
+(ac-set-trigger-key "TAB")
+(define-key ac-mode-map (kbd "M-SPC") 'auto-complete)
 
 ;; I am dyslectic
 (when (file-exists-p "/usr/local/Cellar/languagetool/2.3/libexec/languagetool-commandline.jar")
