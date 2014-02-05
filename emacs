@@ -88,8 +88,8 @@
   (tool-bar-mode -1))
 (when (fboundp 'scroll-bar-mode)
   (scroll-bar-mode -1))
-(set-fringe-mode 0)
 (blink-cursor-mode 0)
+(set-fringe-mode 0)
 
 ;; emacs strptease http://bzg.fr/emacs-strip-tease.html
 ;; See http://bzg.fr/emacs-hide-mode-line.html
@@ -145,8 +145,8 @@
       apropos-do-all t
       mouse-yank-at-point t
       save-place-file (concat user-emacs-directory "places")
-      backup-directory-alist `(("." . ,(concat user-emacs-directory
-                                               "backups"))))
+      backup-directory-alist `(("." . ,(concat user-emacs-directory "backups"))))
+
 (show-paren-mode 1)
 (global-font-lock-mode t)
 (setq redisplay-dont-pause t
@@ -159,7 +159,6 @@
 
 (set-face-attribute 'default nil
                     :family "Inconsolata"
-                    :height 120
                     :weight 'normal
                     :width 'normal)
 (when (functionp 'set-fontset-font)
@@ -171,8 +170,7 @@
 
 (add-to-list 'custom-theme-load-path
              (file-name-as-directory "~/dotfiles/themes/replace-colorthemes"))
-(load-theme 'montz t)
-(set-background-color "#FEFEFE")
+(load-theme 'dark-font-lock t)
 (setq ring-bell-function 'ignore)
 
 (defun toggle-fullscreen ()
@@ -190,7 +188,7 @@
 
 (evil-mode 1)
 (defun my-move-key (keymap-from keymap-to key)
-  "Moves key binding from one keymap to another, deleting from the old location. "
+  "Moves key binding from one keymap to another, deleting from the old location"
   (define-key keymap-to key (lookup-key keymap-from key))
   (define-key keymap-from key nil))
 
@@ -278,6 +276,7 @@
 ;; org-mode
 (require 'org)
 (require 'org-publish)
+(require 'ox-bibtex)
 (setq org-src-fontify-natively t
       org-export-with-smart-quotes t
       org-export-async-debug t
@@ -294,8 +293,7 @@
    (emacs-lisp . t)
    (python . t)
    (lisp . t)
-   (ditaa . t)
-   (sh . t)))
+   (ditaa . t)))
 
 ;; blogging
 (setq org-publish-project-alist
