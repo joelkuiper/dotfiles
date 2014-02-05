@@ -11,9 +11,9 @@
   (error "This setup requires Emacs v24, or higher. You have: v%d" emacs-major-version))
 
 
-(setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
+(setq package-archives '(("org" . "http://orgmode.org/elpa/")
+                         ("gnu" . "http://elpa.gnu.org/packages/")
                          ("melpa" . "http://melpa.milkbox.net/packages/")
-                         ("org" . "http://orgmode.org/elpa/")
                          ("SC"  . "http://joseito.republika.pl/sunrise-commander/")
                          ("marmalade" . "http://marmalade-repo.org/packages/")))
 
@@ -24,7 +24,7 @@
 (package-initialize)
 
 (defvar my-packages '(;; Essentials
-                      evil
+                      evil evil-leader
                       auto-complete
                       ace-jump-mode
                       key-chord
@@ -35,7 +35,7 @@
                       projectile
                       sunrise-commander
                       ;; Writing
-                      org-plus-contrib htmlize
+                      org org-plus-contrib htmlize
                       langtool wordsmith-mode ;; Spellcheck
                       ;; Language support
                       ess ;; R
@@ -58,8 +58,7 @@
     ;; Install the missing packages
     (mapc (lambda (package)
             (when (not (package-installed-p package))
-              (package-install package)))
-          missing)
+              (package-install package))) missing)
     ;; Close the compilation log.
     (let ((compile-window (get-buffer-window "*Compile-Log*")))
       (if compile-window
@@ -184,8 +183,11 @@
 ;;; Evil
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'evil)
+(require 'evil-leader)
 (require 'ace-jump-mode)
 
+(global-evil-leader-mode)
+(evil-leader/set-leader ",")
 (evil-mode 1)
 (defun my-move-key (keymap-from keymap-to key)
   "Moves key binding from one keymap to another, deleting from the old location"
@@ -198,6 +200,15 @@
 (key-chord-define evil-insert-state-map "jj" 'evil-normal-state)
 (define-key evil-normal-state-map (kbd "SPC") 'ace-jump-char-mode)
 (define-key evil-visual-state-map (kbd "SPC") 'ace-jump-char-mode)
+
+;; Leaders
+
+(evil-leader/set-key
+  "g" 'magit-status
+  "s" 'sunrise
+  "f" 'find-file
+  "pf" 'projectile-find-file
+  "ps" 'projectile-switch-project)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Other stuff
@@ -222,8 +233,6 @@
 (require 'projectile)
 (projectile-global-mode)
 (setq projectile-show-paths-function 'projectile-hashify-with-relative-paths)
-(global-set-key "\C-cs" 'sunrise)
-(global-set-key "\C-cg" 'magit-status)
 
 (require 'yasnippet)
 (yas-global-mode 1)
@@ -284,6 +293,9 @@
       org-html-head-include-default-style nil)
 
 (setq org-latex-pdf-process (list "make; latexmk -pdf -bibtex -gg -f %f"))
+(when (memq window-system '(mac ns))
+  (setenv "TMPDIR" ".") ; for bibtex2html see: http://foswiki.org/Tasks.Item11919
+  )
 
 ;; active Babel languages
 (org-babel-do-load-languages
