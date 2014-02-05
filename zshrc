@@ -38,6 +38,7 @@ plugins=(git git-flow vi-mode zsh-syntax-highlighting history-substring-search)
 source $ZSH/oh-my-zsh.sh
 
 alias fact="elinks -dump randomfunfacts.com | sed -n '/^| /p' | tr -d \|"
+alias bibtex2html="export TMPDIR=. && /usr/local/bin/bibtex2html"
 
 # Customize to your needs...
 export PATH="/sbin/:/usr/sbin/:/usr/local/bin:/usr/local/sbin:/usr/local/share:$HOME/bin:/usr/bin:/opt/bin:$PATH"
@@ -50,5 +51,5 @@ fi
 [[ -s "/usr/local/rvm/scripts/rvm" ]] && . "/usr/local/rvm/scripts/rvm"
 
 PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
-PATH=$PATH:/usr/local/texlive/2013/bin/universal-darwin:$PATH # Add pdflatex
+PATH=$PATH:/usr/local/texlive/2013/bin/universal-darwin # Add pdflatex
 PYTHONPATH=/usr/local/lib/python2.7/site-packages:$PYTHONPATH
