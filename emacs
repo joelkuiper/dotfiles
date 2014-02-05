@@ -257,7 +257,6 @@
 (ac-config-default)
 (setq ac-auto-start 4)
 (ac-set-trigger-key "TAB")
-(define-key ac-mode-map (kbd "M-SPC") 'auto-complete)
 
 ;; I am dyslectic
 (when (file-exists-p "/usr/local/Cellar/languagetool/2.3/libexec/languagetool-commandline.jar")
