@@ -7,6 +7,3 @@
 [submodule "tomorrow-theme"]
 	path = tomorrow-theme
 	url = https://github.com/chriskempson/tomorrow-theme.git
-[submodule "themes/replace-colorthemes"]
-	path = themes/replace-colorthemes
-	url = https://github.com/emacs-jp/replace-colorthemes.git
