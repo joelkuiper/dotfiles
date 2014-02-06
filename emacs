@@ -30,6 +30,8 @@
                       key-chord
                       yasnippet
                       exec-path-from-shell
+                      ;; Themes
+                      leuven-theme
                       ;; Project management
                       magit ;; git
                       projectile
@@ -77,7 +79,7 @@
       ido-enable-flex-matching t)
 
 ;; OSX ls doesn't support --dired. use brew's gnu core utils
-(when (memq window-system '(mac ns))
+(when (and (memq window-system '(mac ns)) (executable-find "gls"))
   (setq insert-directory-program "gls" dired-use-ls-dired t))
 
 (setq inhibit-startup-screen +1)
@@ -89,6 +91,10 @@
   (scroll-bar-mode -1))
 (blink-cursor-mode 0)
 (set-fringe-mode 0)
+
+;; Zoom with C-=/- (nice for presentations)
+(global-set-key (kbd "C-=") 'text-scale-increase)
+(global-set-key (kbd "C--") 'text-scale-decrease)
 
 ;; emacs strptease http://bzg.fr/emacs-strip-tease.html
 ;; See http://bzg.fr/emacs-hide-mode-line.html
@@ -155,6 +161,7 @@
       scroll-preserve-screen-position 1)
 (setq mouse-wheel-follow-mouse 't
       mouse-wheel-scroll-amount '(1 ((shift) . 1)))
+(setq ring-bell-function 'ignore)
 
 (set-face-attribute 'default nil
                     :family "Inconsolata"
@@ -167,10 +174,7 @@
                                :width 'normal
                                :weight 'normal)))
 
-(add-to-list 'custom-theme-load-path
-             (file-name-as-directory "~/dotfiles/themes/replace-colorthemes"))
-(load-theme 'dark-font-lock t)
-(setq ring-bell-function 'ignore)
+(load-theme 'leuven t)
 
 (defun toggle-fullscreen ()
   "Toggle full screen"
@@ -206,6 +210,7 @@
   "g"  'magit-status
   "s"  'sunrise
   "f"  'find-file
+  "b"  'switch-to-buffer
   "pf" 'projectile-find-file
   "ps" 'projectile-switch-project)
 
