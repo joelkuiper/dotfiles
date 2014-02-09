@@ -28,7 +28,6 @@
                       auto-complete
                       ace-jump-mode
                       key-chord
-                      yasnippet
                       exec-path-from-shell
                       ;; Themes
                       leuven-theme
@@ -90,7 +89,6 @@
 (when (fboundp 'scroll-bar-mode)
   (scroll-bar-mode -1))
 (blink-cursor-mode 0)
-(set-fringe-mode 0)
 
 ;; Zoom with C-=/- (nice for presentations)
 (global-set-key (kbd "C-=") 'text-scale-increase)
@@ -211,6 +209,7 @@
   "s"  'sunrise
   "f"  'find-file
   "b"  'switch-to-buffer
+  "e"  'eshell
   "pf" 'projectile-find-file
   "ps" 'projectile-switch-project)
 
@@ -254,9 +253,6 @@
 (require 'projectile)
 (projectile-global-mode)
 (setq projectile-show-paths-function 'projectile-hashify-with-relative-paths)
-
-(require 'yasnippet)
-(yas-global-mode 1)
 
 (require 'auto-complete-config)
 (ac-config-default)
