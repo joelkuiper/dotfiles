@@ -29,6 +29,7 @@
                       ace-jump-mode
                       key-chord
                       exec-path-from-shell
+                      ido-ubiquitous
                       ;; Themes
                       leuven-theme
                       ;; Project management
@@ -37,13 +38,13 @@
                       sunrise-commander
                       ;; Writing
                       org org-plus-contrib htmlize
-                      langtool wordsmith-mode ;; Spellcheck
+                      langtool ;; Spellcheck
                       ;; Language support
                       ess ;; R
                       ein python-mode ;; Python
                       cider cider-tracing clojure-test-mode ;; Clojure
                       web-mode js2-mode ;; Web development
-                      highlight paredit evil-paredit ;; LISP
+                      highlight paredit evil-paredit pretty-mode-plus ;; LISP
                       ))
 
 (defun my-missing-packages ()
@@ -73,11 +74,12 @@
 ;;; Customization
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(ido-mode t)
 (setq ido-everywhere t
+      ido-ubiquitous-mode 1
       ido-enable-flex-matching t)
+(ido-mode t)
 
-;; OSX ls doesn't support --dired. use brew's gnu core utils
+;; OSX ls doesn't support --dired. use brews' GNU core-utils
 (when (and (memq window-system '(mac ns)) (executable-find "gls"))
   (setq insert-directory-program "gls" dired-use-ls-dired t))
 
@@ -249,6 +251,9 @@
 (add-to-list 'auto-mode-alist '("\\.org$\\'" . org-mode))
 (add-to-list 'auto-mode-alist '(".emacs" . emacs-lisp-mode))
 
+(require 'pretty-mode-plus)
+(global-pretty-mode 1)
+
 ;; Projectile
 (require 'projectile)
 (projectile-global-mode)
@@ -256,8 +261,6 @@
 
 (require 'auto-complete-config)
 (ac-config-default)
-(setq ac-auto-start 4)
-(ac-set-trigger-key "TAB")
 
 ;; I am dyslectic
 (when (file-exists-p "/usr/local/Cellar/languagetool/2.3/libexec/languagetool-commandline.jar")
@@ -280,8 +283,7 @@
 (dolist (hook '(org-mode-hook))
   (add-hook hook (lambda ()
                    (visual-line-mode 1)
-                   (flyspell-mode 1)
-                   (wordsmith-mode 1))))
+                   (flyspell-mode 1))))
 (dolist (hook '(change-log-mode-hook log-edit-mode-hook))
   (add-hook hook (lambda () (flyspell-mode -1))))
 
