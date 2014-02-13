@@ -11,19 +11,20 @@
   (error "This setup requires Emacs v24, or higher. You have: v%d" emacs-major-version))
 
 
-(setq package-archives '(("org" . "http://orgmode.org/elpa/")
-                         ("gnu" . "http://elpa.gnu.org/packages/")
-                         ("melpa" . "http://melpa.milkbox.net/packages/")
-                         ("SC"  . "http://joseito.republika.pl/sunrise-commander/")
-                         ("marmalade" . "http://marmalade-repo.org/packages/")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Packaging setup.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(setq package-archives '(("org" . "http://orgmode.org/elpa/")
+                         ("gnu" . "http://elpa.gnu.org/packages/")
+                         ("marmalade" . "http://marmalade-repo.org/packages/")
+                         ("melpa" . "http://melpa.milkbox.net/packages/")
+                         ("SC"  . "http://joseito.republika.pl/sunrise-commander/")))
+
 (require 'package)
 (package-initialize)
 
-(defvar my-packages '(;; Essentials
+(defvar my-packages '(;; Core
                       evil evil-leader
                       auto-complete
                       ace-jump-mode
@@ -71,10 +72,44 @@
   (exec-path-from-shell-initialize))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Evil
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(require 'evil)
+(require 'evil-leader)
+(require 'ace-jump-mode)
+
+(global-evil-leader-mode)
+(evil-leader/set-leader ",")
+(evil-mode 1)
+(defun my-move-key (keymap-from keymap-to key)
+  "Moves key binding from one keymap to another, deleting from the old location"
+  (define-key keymap-to key (lookup-key keymap-from key))
+  (define-key keymap-from key nil))
+
+(my-move-key evil-motion-state-map evil-normal-state-map (kbd "RET"))
+(my-move-key evil-motion-state-map evil-normal-state-map " ")
+(key-chord-mode t)
+(key-chord-define evil-insert-state-map "jj" 'evil-normal-state)
+(define-key evil-normal-state-map (kbd "SPC") 'ace-jump-char-mode)
+(define-key evil-visual-state-map (kbd "SPC") 'ace-jump-char-mode)
+
+;; Leaders
+(evil-leader/set-key
+  "g"  'magit-status
+  "s"  'sunrise
+  "f"  'find-file
+  "b"  'switch-to-buffer
+  "e"  'eshell
+  "ws" 'whitespace-mode
+  "pf" 'projectile-find-file
+  "ps" 'projectile-switch-project
+  "pg" 'projectile-grep)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customization
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 (setq ido-everywhere t
+      ido-use-virtual-buffers t
       ido-ubiquitous-mode 1
       ido-enable-flex-matching t)
 (ido-mode t)
@@ -90,39 +125,12 @@
   (tool-bar-mode -1))
 (when (fboundp 'scroll-bar-mode)
   (scroll-bar-mode -1))
-(blink-cursor-mode 0)
 
 ;; Zoom with C-=/- (nice for presentations)
 (global-set-key (kbd "C-=") 'text-scale-increase)
 (global-set-key (kbd "C--") 'text-scale-decrease)
 
-;; emacs strptease http://bzg.fr/emacs-strip-tease.html
-;; See http://bzg.fr/emacs-hide-mode-line.html
-(defvar-local hidden-mode-line-mode nil)
-(defvar-local hide-mode-line nil)
-
-(define-minor-mode hidden-mode-line-mode
-  "Minor mode to hide the mode-line in the current buffer."
-  :init-value nil
-  :global nil
-  :variable hidden-mode-line-mode
-  :group 'editing-basics
-  (if hidden-mode-line-mode
-      (setq hide-mode-line mode-line-format
-            mode-line-format nil)
-    (setq mode-line-format hide-mode-line
-          hide-mode-line nil))
-  (force-mode-line-update)
-  ;; Apparently force-mode-line-update is not always enough to
-  ;; redisplay the mode-line
-  (redraw-display)
-  (when (and (called-interactively-p 'interactive)
-             hidden-mode-line-mode)
-    (run-with-idle-timer
-     0 nil 'message
-     (concat "Hidden Mode Line Mode enabled.  "
-             "Use M-x hidden-mode-line-mode to make the mode-line appear."))))
-
+;; emacs striptease http://bzg.fr/emacs-strip-tease.html
 ;; A small minor mode to use a big fringe
 (defvar big-fringe-mode nil)
 (define-minor-mode big-fringe-mode
@@ -154,14 +162,17 @@
 
 (show-paren-mode 1)
 (global-font-lock-mode t)
+(load-theme 'leuven t)
+(setq ring-bell-function 'ignore)
+
+;; Smooth scrolling
+;; From http://stackoverflow.com/questions/3631220/fix-to-get-smooth-scrolling-in-emacs
 (setq redisplay-dont-pause t
+      mouse-wheel-progressive-speed nil
       scroll-margin 1
       scroll-step 1
       scroll-conservatively 10000
       scroll-preserve-screen-position 1)
-(setq mouse-wheel-follow-mouse 't
-      mouse-wheel-scroll-amount '(1 ((shift) . 1)))
-(setq ring-bell-function 'ignore)
 
 (set-face-attribute 'default nil
                     :family "Inconsolata"
@@ -174,8 +185,6 @@
                                :width 'normal
                                :weight 'normal)))
 
-(load-theme 'leuven t)
-
 (defun toggle-fullscreen ()
   "Toggle full screen"
   (interactive)
@@ -183,47 +192,16 @@
      nil 'fullscreen
      (when (not (frame-parameter nil 'fullscreen)) 'fullboth)))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Evil
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(require 'evil)
-(require 'evil-leader)
-(require 'ace-jump-mode)
-
-(global-evil-leader-mode)
-(evil-leader/set-leader ",")
-(evil-mode 1)
-(defun my-move-key (keymap-from keymap-to key)
-  "Moves key binding from one keymap to another, deleting from the old location"
-  (define-key keymap-to key (lookup-key keymap-from key))
-  (define-key keymap-from key nil))
-
-(my-move-key evil-motion-state-map evil-normal-state-map (kbd "RET"))
-(my-move-key evil-motion-state-map evil-normal-state-map " ")
-(key-chord-mode t)
-(key-chord-define evil-insert-state-map "jj" 'evil-normal-state)
-(define-key evil-normal-state-map (kbd "SPC") 'ace-jump-char-mode)
-(define-key evil-visual-state-map (kbd "SPC") 'ace-jump-char-mode)
-
-;; Leaders
-(evil-leader/set-key
-  "g"  'magit-status
-  "s"  'sunrise
-  "f"  'find-file
-  "b"  'switch-to-buffer
-  "e"  'eshell
-  "pf" 'projectile-find-file
-  "ps" 'projectile-switch-project)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Other stuff
+;;; Programming
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Whitespace
 (setq-default indent-tabs-mode nil)
 (setq tab-width 2)
 
-;; Remove trailing whitespace on save
-(add-hook 'before-save-hook 'delete-trailing-whitespace)
+;; Cleanup whitespace on save
+(add-hook 'before-save-hook 'whitespace-cleanup)
 
 ;; Emacs Speaks Statistics
 (require 'ess-site)
@@ -262,6 +240,9 @@
 (require 'auto-complete-config)
 (ac-config-default)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Writing & Blogging
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; I am dyslectic
 (when (file-exists-p "/usr/local/Cellar/languagetool/2.3/libexec/languagetool-commandline.jar")
   (require 'langtool)
@@ -273,8 +254,9 @@
                                   "EN_QUOTES")))
 
 (when (executable-find "hunspell")
-  (setq-default ispell-program-name "hunspell")
-  (setq ispell-really-hunspell t)
+  (setq-default flyspell-issue-welcome-flag nil
+                ispell-program-name "hunspell"
+                ispell-really-hunspell t)
   (eval-after-load "flyspell"
     '(progn
        (define-key flyspell-mouse-map [down-mouse-3] #'flyspell-correct-word)
@@ -311,9 +293,15 @@
       org-export-with-smart-quotes t
       org-export-async-debug t
       org-confirm-babel-evaluate nil ;; yeah don't do anything stupid
+      org-export-babel-evaluate nil
       org-html-head-include-default-style nil)
 
-(setq org-latex-pdf-process (list "make; latexmk -pdf -bibtex -gg -f %f"))
+(setq org-latex-pdf-process (list "make; latexmk -pdf -bibtex -g %f"))
+(setq org-latex-listings 't)
+(add-to-list 'org-latex-packages-alist '("" "listings"))
+(add-to-list 'org-latex-packages-alist '("" "times"))
+(add-to-list 'org-latex-packages-alist '("protrusion=true,expansion=true" "microtype"))
+(add-to-list 'org-latex-packages-alist '("usenames,dvipsnames" "xcolor"))
 
 ;; for bibtex2html see: http://foswiki.org/Tasks.Item11919
 (when (memq window-system '(mac ns))
