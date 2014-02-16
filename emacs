@@ -296,7 +296,7 @@
       org-export-babel-evaluate nil
       org-html-head-include-default-style nil)
 
-(setq org-latex-pdf-process (list "make; latexmk -pdf -bibtex -g %f"))
+(setq org-latex-pdf-process (list "make; latexmk -gg -bibtex -pdf -latexoption=-shell-escape -f -silent %f"))
 (setq org-latex-listings 't)
 (add-to-list 'org-latex-packages-alist '("" "listings"))
 (add-to-list 'org-latex-packages-alist '("" "times"))
