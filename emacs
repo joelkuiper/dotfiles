@@ -31,6 +31,8 @@
                       key-chord
                       exec-path-from-shell
                       ido-ubiquitous
+                      ;; web-browser
+                      w3m
                       ;; Themes
                       leuven-theme
                       ;; Project management
@@ -95,11 +97,13 @@
 
 ;; Leaders
 (evil-leader/set-key
+  "x"  'execute-extended-command
   "g"  'magit-status
   "s"  'sunrise
   "f"  'find-file
   "b"  'switch-to-buffer
   "e"  'eshell
+  "u"  'undo-tree-visualize
   "ws" 'whitespace-mode
   "pf" 'projectile-find-file
   "ps" 'projectile-switch-project
@@ -351,6 +355,23 @@
     (format "<img src=\"assets/%s\" alt=\"%s\"/>" path desc))))
 
 (org-add-link-type "asset" 'org-custom-link-asset-follow 'org-custom-link-asset-export)
+
+
+;; Web browsing http://beatofthegeek.com/2014/02/my-setup-for-using-emacs-as-web-browser.html
+;;change default browser for 'browse-url' to w3m
+(setq
+ w3m-home-page "duckduckgo.com/lite"
+ browse-url-browser-function 'w3m-goto-url-new-session)
+
+;;change w3m user-agent to android
+(setq w3m-user-agent "Mozilla/5.0 (Linux; U; Android 2.3.3; zh-tw; HTC_Pyramid Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.")
+
+(defun w3m-open-site (site)
+  "Opens site in new w3m session with 'http://' appended"
+  (interactive
+   (list (read-string "Enter website address(default: w3m-home):" nil nil w3m-home-page nil )))
+  (w3m-goto-url-new-session
+   (concat "http://" site)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customizations (from M-x customze-*)
