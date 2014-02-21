@@ -134,6 +134,9 @@
 (global-set-key (kbd "C-=") 'text-scale-increase)
 (global-set-key (kbd "C--") 'text-scale-decrease)
 
+;; http://emacs.wordpress.com/2007/01/28/simple-window-configuration-management/
+(winner-mode 1)
+
 ;; emacs striptease http://bzg.fr/emacs-strip-tease.html
 ;; A small minor mode to use a big fringe
 (defvar big-fringe-mode nil)
