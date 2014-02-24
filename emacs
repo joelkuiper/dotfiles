@@ -10,8 +10,6 @@
 (when (< emacs-major-version 24)
   (error "This setup requires Emacs v24, or higher. You have: v%d" emacs-major-version))
 
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Packaging setup.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -107,7 +105,9 @@
   "ws" 'whitespace-mode
   "pf" 'projectile-find-file
   "ps" 'projectile-switch-project
-  "pg" 'projectile-grep)
+  "pg" 'projectile-grep
+  "di" 'duckduckgo-search
+  "wi" 'wikipedia-search)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customization
@@ -169,7 +169,9 @@
 
 (show-paren-mode 1)
 (global-font-lock-mode t)
+
 (load-theme 'leuven t)
+
 (setq ring-bell-function 'ignore)
 
 ;; Smooth scrolling
@@ -199,13 +201,18 @@
      nil 'fullscreen
      (when (not (frame-parameter nil 'fullscreen)) 'fullboth)))
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Programming
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Whitespace
 (setq-default indent-tabs-mode nil)
 (setq tab-width 2)
+
+;; Also highlight long lines in whitespace-mode
+(require 'whitespace)
+(setq whitespace-line-column 79)
+(setq whitespace-style
+      '(face lines-tail spaces tabs newline space-mark tab-mark newline-mark))
 
 ;; Cleanup whitespace on save
 (add-hook 'before-save-hook 'whitespace-cleanup)
@@ -225,10 +232,7 @@
                 lisp-mode-hook
                 cider-repl-mode-hook
                 clojure-mode-hook))
-  (add-hook mode
-            '(lambda ()
-               (enable-lisp-utils))))
-
+  (add-hook mode 'enable-lisp-utils))
 
 ;; File-types
 (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
@@ -269,10 +273,13 @@
        (define-key flyspell-mouse-map [down-mouse-3] #'flyspell-correct-word)
        (define-key flyspell-mouse-map [mouse-3] #'undefined))))
 
+(defun enable-write-utils ()
+  (visual-line-mode 1)
+  (flyspell-mode 1))
+
 (dolist (hook '(org-mode-hook))
-  (add-hook hook (lambda ()
-                   (visual-line-mode 1)
-                   (flyspell-mode 1))))
+  (add-hook hook 'enable-write-utils))
+
 (dolist (hook '(change-log-mode-hook log-edit-mode-hook))
   (add-hook hook (lambda () (flyspell-mode -1))))
 
@@ -288,9 +295,7 @@
                 clojure-mode-hook
                 python-mode-hook
                 R-mode-hook))
-  (add-hook mode
-            '(lambda ()
-               (flyspell-prog-mode))))
+  (add-hook mode 'flyspell-prog-mode))
 
 ;; org-mode
 (require 'org)
@@ -361,20 +366,43 @@
 
 
 ;; Web browsing http://beatofthegeek.com/2014/02/my-setup-for-using-emacs-as-web-browser.html
-;;change default browser for 'browse-url' to w3m
+;; change default browser for 'browse-url' to w3m
 (setq
- w3m-home-page "duckduckgo.com/lite"
- browse-url-browser-function 'w3m-goto-url-new-session)
+ browse-url-browser-function 'w3m-browse-url
+ w3m-pop-up-windows t
+ w3m-make-new-session nil
+ w3m-confirm-leaving-secure-page nil
+ w3m-view-this-url-new-session-in-background t
+ w3m-home-page "duckduckgo.com/lite")
 
 ;;change w3m user-agent to android
 (setq w3m-user-agent "Mozilla/5.0 (Linux; U; Android 2.3.3; zh-tw; HTC_Pyramid Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.")
 
-(defun w3m-open-site (site)
-  "Opens site in new w3m session with 'http://' appended"
+(defun wikipedia-search (search-term)
+  "Search for SEARCH-TERM on wikipedia"
   (interactive
-   (list (read-string "Enter website address(default: w3m-home):" nil nil w3m-home-page nil )))
-  (w3m-goto-url-new-session
-   (concat "http://" site)))
+   (let ((term (if mark-active
+                   (buffer-substring (region-beginning) (region-end))
+                 (word-at-point))))
+     (list
+      (read-string
+       (format "Wikipedia (%s):" term) nil nil term))))
+  (browse-url
+   (concat
+    "http://en.m.wikipedia.org/w/index.php?search=" search-term))) 
+
+(defun duckduckgo-search (search-term)
+  "Search for SEARCH-TERM on DuckDuckGo"
+  (interactive
+   (let ((term (if mark-active
+                   (buffer-substring (region-beginning) (region-end))
+                 (word-at-point))))
+     (list
+      (read-string
+       (format "DuckDuckGo (%s):" term) nil nil term))))
+  (browse-url
+   (concat
+    "https://duckduckgo.com/lite/?q=" search-term)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customizations (from M-x customze-*)
