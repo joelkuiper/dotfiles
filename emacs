@@ -89,7 +89,7 @@
 (my-move-key evil-motion-state-map evil-normal-state-map (kbd "RET"))
 (my-move-key evil-motion-state-map evil-normal-state-map " ")
 (key-chord-mode t)
-(key-chord-define evil-insert-state-map "jj" 'evil-normal-state)
+(key-chord-define evil-insert-state-map "jk" 'evil-normal-state)
 (define-key evil-normal-state-map (kbd "SPC") 'ace-jump-char-mode)
 (define-key evil-visual-state-map (kbd "SPC") 'ace-jump-char-mode)
 
@@ -299,7 +299,8 @@
 
 ;; org-mode
 (require 'org)
-(require 'org-publish)
+(require 'ox-publish)
+(require 'ox-odt)
 (require 'ox-bibtex)
 (setq org-src-fontify-natively t
       org-export-with-smart-quotes t
@@ -367,42 +368,43 @@
 
 ;; Web browsing http://beatofthegeek.com/2014/02/my-setup-for-using-emacs-as-web-browser.html
 ;; change default browser for 'browse-url' to w3m
-(setq
- browse-url-browser-function 'w3m-browse-url
- w3m-pop-up-windows t
- w3m-make-new-session nil
- w3m-confirm-leaving-secure-page nil
- w3m-view-this-url-new-session-in-background t
- w3m-home-page "duckduckgo.com/lite")
+(when (executable-find "w3m")
+  (setq w3m-command (executable-find "w3m"))
+  (require 'w3m)
 
-;;change w3m user-agent to android
-(setq w3m-user-agent "Mozilla/5.0 (Linux; U; Android 2.3.3; zh-tw; HTC_Pyramid Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.")
+  (setq
+   browse-url-browser-function 'w3m-browse-url
+   w3m-confirm-leaving-secure-page nil
+   w3m-use-cookies t
+   w3m-home-page "duckduckgo.com/lite")
 
-(defun wikipedia-search (search-term)
-  "Search for SEARCH-TERM on wikipedia"
-  (interactive
-   (let ((term (if mark-active
-                   (buffer-substring (region-beginning) (region-end))
-                 (word-at-point))))
-     (list
-      (read-string
-       (format "Wikipedia (%s):" term) nil nil term))))
-  (browse-url
-   (concat
-    "http://en.m.wikipedia.org/w/index.php?search=" search-term))) 
+  ;; Change w3m user-agent to Android.
+  (setq w3m-user-agent "Mozilla/5.0 (Linux; U; Android 2.0.1; en-us; Droid Build/ESD56) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17")
 
-(defun duckduckgo-search (search-term)
-  "Search for SEARCH-TERM on DuckDuckGo"
-  (interactive
-   (let ((term (if mark-active
-                   (buffer-substring (region-beginning) (region-end))
-                 (word-at-point))))
-     (list
-      (read-string
-       (format "DuckDuckGo (%s):" term) nil nil term))))
-  (browse-url
-   (concat
-    "https://duckduckgo.com/lite/?q=" search-term)))
+  (defun wikipedia-search (search-term)
+    "Search for SEARCH-TERM on wikipedia"
+    (interactive
+     (let ((term (if mark-active
+                     (buffer-substring (region-beginning) (region-end))
+                   (word-at-point))))
+       (list
+        (read-string
+         (format "Wikipedia (%s):" term) nil nil term))))
+    (browse-url
+     (concat
+      "http://en.m.wikipedia.org/w/index.php?search=" search-term)))
+
+  (defun duckduckgo-search (search-term)
+    "Search for SEARCH-TERM"
+    (interactive
+     (let ((term (if mark-active
+                     (buffer-substring (region-beginning) (region-end))
+                   (word-at-point))))
+       (list
+        (read-string
+         (format "DuckDuckGo (%s):" term) nil nil term))))
+    (browse-url
+     (concat "https://duckduckgo.com/lite/?q=" search-term))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customizations (from M-x customze-*)
