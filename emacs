@@ -118,7 +118,7 @@
       ido-enable-flex-matching t)
 (ido-mode t)
 
-;; OSX ls doesn't support --dired. use brews' GNU core-utils
+;; BSD ls doesn't support --dired. use brews' GNU core-utils
 (when (and (memq window-system '(mac ns)) (executable-find "gls"))
   (setq insert-directory-program "gls" dired-use-ls-dired t))
 
@@ -215,7 +215,10 @@
       '(face lines-tail spaces tabs newline space-mark tab-mark newline-mark))
 
 ;; Cleanup whitespace on save
-(add-hook 'before-save-hook 'whitespace-cleanup)
+(add-hook 'before-save-hook
+          (lambda ()
+            (whitespace-cleanup)
+            (delete-trailing-whitespace)))
 
 ;; Emacs Speaks Statistics
 (require 'ess-site)
@@ -275,6 +278,7 @@
 
 (defun enable-write-utils ()
   (visual-line-mode 1)
+  (electric-indent-mode 1)
   (flyspell-mode 1))
 
 (dolist (hook '(org-mode-hook))
@@ -365,7 +369,6 @@
 
 (org-add-link-type "asset" 'org-custom-link-asset-follow 'org-custom-link-asset-export)
 
-
 ;; Web browsing http://beatofthegeek.com/2014/02/my-setup-for-using-emacs-as-web-browser.html
 ;; change default browser for 'browse-url' to w3m
 (when (executable-find "w3m")
@@ -376,10 +379,10 @@
    browse-url-browser-function 'w3m-browse-url
    w3m-confirm-leaving-secure-page nil
    w3m-use-cookies t
+   ;; Change w3m user-agent to Android.
+   w3m-user-agent "Mozilla/5.0 (Linux; U; Android 2.0.1; en-us; Droid Build/ESD56) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17"
+   ;; Set homepage
    w3m-home-page "duckduckgo.com/lite")
-
-  ;; Change w3m user-agent to Android.
-  (setq w3m-user-agent "Mozilla/5.0 (Linux; U; Android 2.0.1; en-us; Droid Build/ESD56) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17")
 
   (defun wikipedia-search (search-term)
     "Search for SEARCH-TERM on wikipedia"
