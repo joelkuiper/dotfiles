@@ -16,8 +16,7 @@
 (setq package-archives '(("org" . "http://orgmode.org/elpa/")
                          ("gnu" . "http://elpa.gnu.org/packages/")
                          ("marmalade" . "http://marmalade-repo.org/packages/")
-                         ("melpa" . "http://melpa.milkbox.net/packages/")
-                         ("SC"  . "http://joseito.republika.pl/sunrise-commander/")))
+                         ("melpa" . "http://melpa.milkbox.net/packages/")))
 
 (require 'package)
 (package-initialize)
@@ -28,7 +27,10 @@
                       ace-jump-mode
                       key-chord
                       exec-path-from-shell
+                      flx-ido
+                      ido-vertical-mode
                       ido-ubiquitous
+                      smex
                       ;; web-browser
                       w3m
                       ;; Themes
@@ -36,13 +38,13 @@
                       ;; Project management
                       magit ;; git
                       projectile
-                      sunrise-commander
                       ;; Writing
-                      org org-plus-contrib htmlize
+                      org-plus-contrib htmlize
                       langtool ;; Spellcheck
                       ;; Language support
                       ess ;; R
-                      ein python-mode ;; Python
+                      elpy ;; python
+                      auctex ;; LaTeX
                       cider cider-tracing clojure-test-mode ;; Clojure
                       web-mode js2-mode ;; Web development
                       highlight paredit evil-paredit pretty-mode-plus ;; LISP
@@ -95,9 +97,8 @@
 
 ;; Leaders
 (evil-leader/set-key
-  "x"  'execute-extended-command
+  "x"  'smex
   "g"  'magit-status
-  "s"  'sunrise
   "f"  'find-file
   "b"  'switch-to-buffer
   "e"  'eshell
@@ -112,18 +113,29 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customization
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(setq ido-everywhere t
-      ido-use-virtual-buffers t
-      ido-ubiquitous-mode 1
-      ido-enable-flex-matching t)
-(ido-mode t)
+
+;; IDO
+(setq ido-everywhere nil
+      ido-enable-flex-matching t
+      ido-create-new-buffer 'always
+      ido-use-filename-at-point 'guess
+      ido-use-faces t)
+(ido-mode 'buffer)
+
+;; Vertical completion menu
+(require 'ido-vertical-mode)
+(ido-vertical-mode)
+
+;; IDO support pretty much everwhere
+(require 'ido-ubiquitous)
+(ido-ubiquitous)
 
 ;; BSD ls doesn't support --dired. use brews' GNU core-utils
 (when (and (memq window-system '(mac ns)) (executable-find "gls"))
   (setq insert-directory-program "gls" dired-use-ls-dired t))
 
+;; Hide all the bars
 (setq inhibit-startup-screen +1)
-
 (menu-bar-mode -1)
 (when (fboundp 'tool-bar-mode)
   (tool-bar-mode -1))
@@ -153,9 +165,6 @@
            (* 100 (frame-char-width)))
         2))))
 
-(require 'uniquify)
-(setq uniquify-buffer-name-style 'forward)
-
 (require 'saveplace)
 (setq-default save-place t)
 
@@ -167,11 +176,15 @@
       save-place-file (concat user-emacs-directory "places")
       backup-directory-alist `(("." . ,(concat user-emacs-directory "backups"))))
 
+;; Visual
 (show-paren-mode 1)
 (global-font-lock-mode t)
-
 (load-theme 'leuven t)
 
+(require 'pretty-mode-plus)
+(global-pretty-mode 1)
+
+;; No bell
 (setq ring-bell-function 'ignore)
 
 ;; Smooth scrolling
@@ -231,20 +244,17 @@
   (enable-paredit-mode)
   (evil-paredit-mode t))
 
-(dolist (mode '(emacs-lisp-mode-hook
+(dolist (hook '(emacs-lisp-mode-hook
                 lisp-mode-hook
                 cider-repl-mode-hook
                 clojure-mode-hook))
-  (add-hook mode 'enable-lisp-utils))
+  (add-hook hook 'enable-lisp-utils))
 
 ;; File-types
 (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
 (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.org$\\'" . org-mode))
 (add-to-list 'auto-mode-alist '(".emacs" . emacs-lisp-mode))
-
-(require 'pretty-mode-plus)
-(global-pretty-mode 1)
 
 ;; Projectile
 (require 'projectile)
@@ -257,6 +267,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Writing & Blogging
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; LaTeX
+(setq TeX-PDF-mode t)
+
 ;; I am dyslectic
 (when (file-exists-p "/usr/local/Cellar/languagetool/2.3/libexec/languagetool-commandline.jar")
   (require 'langtool)
@@ -277,11 +290,12 @@
        (define-key flyspell-mouse-map [mouse-3] #'undefined))))
 
 (defun enable-write-utils ()
-  (visual-line-mode 1)
+  (auto-fill-mode 1)
   (electric-indent-mode 1)
+  (LaTeX-math-mode 1)
   (flyspell-mode 1))
 
-(dolist (hook '(org-mode-hook))
+(dolist (hook '(org-mode-hook latex-mode-hook))
   (add-hook hook 'enable-write-utils))
 
 (dolist (hook '(change-log-mode-hook log-edit-mode-hook))
@@ -313,16 +327,22 @@
       org-export-babel-evaluate nil
       org-html-head-include-default-style nil)
 
+;; for bibtex2html see: http://foswiki.org/Tasks.Item11919
+(when (memq window-system '(mac ns))
+  (setenv "TMPDIR" "."))
+
+;; LaTeX-org-export
 (setq org-latex-pdf-process (list "make; latexmk -gg -bibtex -pdf -latexoption=-shell-escape -f -silent %f"))
 (setq org-latex-listings 't)
+(setq org-export-with-LaTeX-fragments t)
+(setq org-latex-create-formula-image-program 'imagemagick)
+
 (add-to-list 'org-latex-packages-alist '("" "listings"))
 (add-to-list 'org-latex-packages-alist '("" "times"))
 (add-to-list 'org-latex-packages-alist '("protrusion=true,expansion=true" "microtype"))
 (add-to-list 'org-latex-packages-alist '("usenames,dvipsnames" "xcolor"))
 
-;; for bibtex2html see: http://foswiki.org/Tasks.Item11919
-(when (memq window-system '(mac ns))
-  (setenv "TMPDIR" "."))
+
 
 ;; active Babel languages
 (org-babel-do-load-languages
