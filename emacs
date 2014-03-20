@@ -47,7 +47,7 @@
                       auctex ;; LaTeX
                       cider cider-tracing clojure-test-mode ;; Clojure
                       web-mode js2-mode ;; Web development
-                      highlight paredit evil-paredit pretty-mode-plus ;; LISP
+                      highlight paredit evil-paredit pretty-mode ;; LISP
                       ))
 
 (defun my-missing-packages ()
@@ -181,8 +181,9 @@
 (global-font-lock-mode t)
 (load-theme 'leuven t)
 
-(require 'pretty-mode-plus)
-(global-pretty-mode 1)
+(require 'pretty-mode)
+; if you want to set it globally
+(global-pretty-mode t)
 
 ;; No bell
 (setq ring-bell-function 'ignore)
@@ -341,8 +342,6 @@
 (add-to-list 'org-latex-packages-alist '("" "times"))
 (add-to-list 'org-latex-packages-alist '("protrusion=true,expansion=true" "microtype"))
 (add-to-list 'org-latex-packages-alist '("usenames,dvipsnames" "xcolor"))
-
-
 
 ;; active Babel languages
 (org-babel-do-load-languages
