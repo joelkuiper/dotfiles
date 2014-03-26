@@ -28,7 +28,6 @@
                       key-chord
                       exec-path-from-shell
                       flx-ido
-                      ido-vertical-mode
                       ido-ubiquitous
                       smex
                       ;; web-browser
@@ -44,8 +43,7 @@
                       ;; Language support
                       ess ;; R
                       elpy ;; python
-                      auctex ;; LaTeX
-                      cider cider-tracing clojure-test-mode ;; Clojure
+                      cider ;; Clojure
                       web-mode js2-mode ;; Web development
                       highlight paredit evil-paredit pretty-mode ;; LISP
                       ))
@@ -72,6 +70,8 @@
 (when (memq window-system '(mac ns))
   (require 'exec-path-from-shell)
   (exec-path-from-shell-initialize))
+
+(setq inhibit-splash-screen t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Evil
@@ -110,11 +110,17 @@
   "di" 'duckduckgo-search
   "wi" 'wikipedia-search)
 
+;; Always, always, prefer UTF-8, anything else is insanity
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(set-language-environment "UTF-8")
+(prefer-coding-system 'utf-8)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customization
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; IDO
+;; ido
 (setq ido-everywhere nil
       ido-enable-flex-matching t
       ido-create-new-buffer 'always
@@ -122,9 +128,11 @@
       ido-use-faces t)
 (ido-mode 'buffer)
 
-;; Vertical completion menu
-(require 'ido-vertical-mode)
-(ido-vertical-mode)
+(setq redisplay-dont-pause t
+  scroll-margin 1
+  scroll-step 1
+  scroll-conservatively 10000
+  scroll-preserve-screen-position 1)
 
 ;; IDO support pretty much everwhere
 (require 'ido-ubiquitous)
@@ -134,17 +142,14 @@
 (when (and (memq window-system '(mac ns)) (executable-find "gls"))
   (setq insert-directory-program "gls" dired-use-ls-dired t))
 
-;; Hide all the bars
-(setq inhibit-startup-screen +1)
 (menu-bar-mode -1)
-(when (fboundp 'tool-bar-mode)
-  (tool-bar-mode -1))
-(when (fboundp 'scroll-bar-mode)
-  (scroll-bar-mode -1))
-
-;; Zoom with C-=/- (nice for presentations)
-(global-set-key (kbd "C-=") 'text-scale-increase)
-(global-set-key (kbd "C--") 'text-scale-decrease)
+(when (window-system)
+  (set-scroll-bar-mode 'nil)
+  (mouse-wheel-mode t))
+(tool-bar-mode -1)
+(tooltip-mode -1)
+(blink-cursor-mode -1)
+(setq make-pointer-invisible t)
 
 ;; http://emacs.wordpress.com/2007/01/28/simple-window-configuration-management/
 (winner-mode 1)
@@ -182,38 +187,24 @@
 (load-theme 'leuven t)
 
 (require 'pretty-mode)
-; if you want to set it globally
 (global-pretty-mode t)
 
 ;; No bell
 (setq ring-bell-function 'ignore)
 
-;; Smooth scrolling
-;; From http://stackoverflow.com/questions/3631220/fix-to-get-smooth-scrolling-in-emacs
-(setq redisplay-dont-pause t
-      mouse-wheel-progressive-speed nil
-      scroll-margin 1
-      scroll-step 1
-      scroll-conservatively 10000
-      scroll-preserve-screen-position 1)
-
 (set-face-attribute 'default nil
                     :family "Inconsolata"
+                    :height 140
                     :weight 'normal
                     :width 'normal)
+
 (when (functionp 'set-fontset-font)
   (set-fontset-font "fontset-default"
                     'unicode
                     (font-spec :family "DejaVu Sans Mono"
                                :width 'normal
+                               :size 12.4
                                :weight 'normal)))
-
-(defun toggle-fullscreen ()
-  "Toggle full screen"
-  (interactive)
-  (set-frame-parameter
-     nil 'fullscreen
-     (when (not (frame-parameter nil 'fullscreen)) 'fullboth)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Programming
@@ -268,9 +259,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Writing & Blogging
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; LaTeX
-(setq TeX-PDF-mode t)
-
 ;; I am dyslectic
 (when (file-exists-p "/usr/local/Cellar/languagetool/2.3/libexec/languagetool-commandline.jar")
   (require 'langtool)
@@ -291,9 +279,8 @@
        (define-key flyspell-mouse-map [mouse-3] #'undefined))))
 
 (defun enable-write-utils ()
-  (auto-fill-mode 1)
+  (visual-line-mode 1)
   (electric-indent-mode 1)
-  (LaTeX-math-mode 1)
   (flyspell-mode 1))
 
 (dolist (hook '(org-mode-hook latex-mode-hook))
@@ -312,6 +299,8 @@
 
 (dolist (mode '(lisp-mode-hook
                 clojure-mode-hook
+                js2-mode-hook
+                web-mode-hook
                 python-mode-hook
                 R-mode-hook))
   (add-hook mode 'flyspell-prog-mode))
@@ -323,7 +312,6 @@
 (require 'ox-bibtex)
 (setq org-src-fontify-natively t
       org-export-with-smart-quotes t
-      org-export-async-debug t
       org-confirm-babel-evaluate nil ;; yeah don't do anything stupid
       org-export-babel-evaluate nil
       org-html-head-include-default-style nil)
@@ -333,10 +321,8 @@
   (setenv "TMPDIR" "."))
 
 ;; LaTeX-org-export
-(setq org-latex-pdf-process (list "make; latexmk -gg -bibtex -pdf -latexoption=-shell-escape -f -silent %f"))
+(setq org-latex-pdf-process (list "make; latexmk -bibtex -pdf -latexoption=-shell-escape -f -silent %f"))
 (setq org-latex-listings 't)
-(setq org-export-with-LaTeX-fragments t)
-(setq org-latex-create-formula-image-program 'imagemagick)
 
 (add-to-list 'org-latex-packages-alist '("" "listings"))
 (add-to-list 'org-latex-packages-alist '("" "times"))
