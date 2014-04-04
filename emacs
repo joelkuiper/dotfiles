@@ -23,6 +23,7 @@
 
 (defvar my-packages '(;; Core
                       evil evil-leader
+                      yasnippet
                       auto-complete
                       ace-jump-mode
                       key-chord
@@ -33,7 +34,7 @@
                       ;; web-browser
                       w3m
                       ;; Themes
-                      leuven-theme
+                      leuven-theme monokai-theme
                       ;; Project management
                       magit ;; git
                       projectile
@@ -67,11 +68,11 @@
       (if compile-window
           (delete-window compile-window)))))
 
+(setq inhibit-splash-screen t)
 (when (memq window-system '(mac ns))
   (require 'exec-path-from-shell)
   (exec-path-from-shell-initialize))
 
-(setq inhibit-splash-screen t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Evil
@@ -102,13 +103,14 @@
   "f"  'find-file
   "b"  'switch-to-buffer
   "e"  'eshell
+  "k"  'ido-kill-buffer
   "u"  'undo-tree-visualize
   "ws" 'whitespace-mode
   "pf" 'projectile-find-file
   "ps" 'projectile-switch-project
   "pg" 'projectile-grep
-  "di" 'duckduckgo-search
-  "wi" 'wikipedia-search)
+  "id" 'duckduckgo-search
+  "iw" 'wikipedia-search)
 
 ;; Always, always, prefer UTF-8, anything else is insanity
 (set-terminal-coding-system 'utf-8)
@@ -119,7 +121,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customization
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 ;; ido
 (setq ido-everywhere nil
       ido-enable-flex-matching t
@@ -128,13 +129,7 @@
       ido-use-faces t)
 (ido-mode 'buffer)
 
-(setq redisplay-dont-pause t
-  scroll-margin 1
-  scroll-step 1
-  scroll-conservatively 10000
-  scroll-preserve-screen-position 1)
-
-;; IDO support pretty much everwhere
+;; ido support pretty much everwhere
 (require 'ido-ubiquitous)
 (ido-ubiquitous)
 
@@ -147,8 +142,6 @@
   (set-scroll-bar-mode 'nil)
   (mouse-wheel-mode t))
 (tool-bar-mode -1)
-(tooltip-mode -1)
-(blink-cursor-mode -1)
 (setq make-pointer-invisible t)
 
 ;; http://emacs.wordpress.com/2007/01/28/simple-window-configuration-management/
@@ -184,7 +177,7 @@
 ;; Visual
 (show-paren-mode 1)
 (global-font-lock-mode t)
-(load-theme 'leuven t)
+(load-theme 'monokai t)
 
 (require 'pretty-mode)
 (global-pretty-mode t)
@@ -209,6 +202,16 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Programming
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(require 'yasnippet)
+(yas-global-mode 1)
+
+(require 'auto-complete)
+(require 'auto-complete-config)
+(add-to-list 'ac-dictionary-directories "~/.emacs.d/ac-dict")
+(ac-config-default)
+(ac-set-trigger-key "TAB")
+(ac-set-trigger-key "<tab>")
+
 ;; Whitespace
 (setq-default indent-tabs-mode nil)
 (setq tab-width 2)
@@ -225,12 +228,16 @@
             (whitespace-cleanup)
             (delete-trailing-whitespace)))
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Languages
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;; Emacs Speaks Statistics
 (require 'ess-site)
 
 ;; Lisp
 (defun enable-lisp-utils ()
-  (auto-complete-mode)
   (local-set-key (kbd "RET") 'newline-and-indent)
   (require 'evil-paredit)
   (enable-paredit-mode)
@@ -243,18 +250,15 @@
   (add-hook hook 'enable-lisp-utils))
 
 ;; File-types
-(add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
 (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.org$\\'" . org-mode))
 (add-to-list 'auto-mode-alist '(".emacs" . emacs-lisp-mode))
+(add-to-list 'auto-mode-alist '("\\.js.?" . js2-mode))
 
 ;; Projectile
 (require 'projectile)
 (projectile-global-mode)
 (setq projectile-show-paths-function 'projectile-hashify-with-relative-paths)
-
-(require 'auto-complete-config)
-(ac-config-default)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Writing & Blogging
@@ -289,22 +293,6 @@
 (dolist (hook '(change-log-mode-hook log-edit-mode-hook))
   (add-hook hook (lambda () (flyspell-mode -1))))
 
-(global-set-key (kbd "<f8>") 'ispell-word)
-(defun flyspell-check-next-highlighted-word ()
-  "Custom function to spell check next highlighted word"
-  (interactive)
-  (flyspell-goto-next-error)
-  (ispell-word))
-(global-set-key (kbd "M-<f8>") 'flyspell-check-next-highlighted-word)
-
-(dolist (mode '(lisp-mode-hook
-                clojure-mode-hook
-                js2-mode-hook
-                web-mode-hook
-                python-mode-hook
-                R-mode-hook))
-  (add-hook mode 'flyspell-prog-mode))
-
 ;; org-mode
 (require 'org)
 (require 'ox-publish)
@@ -321,7 +309,7 @@
   (setenv "TMPDIR" "."))
 
 ;; LaTeX-org-export
-(setq org-latex-pdf-process (list "make; latexmk -bibtex -pdf -latexoption=-shell-escape -f -silent %f"))
+(setq org-latex-pdf-process (list "make; latexmk -gg -bibtex -pdf -latexoption=-shell-escape -f -silent %f"))
 (setq org-latex-listings 't)
 
 (add-to-list 'org-latex-packages-alist '("" "listings"))
@@ -374,6 +362,9 @@
 
 (org-add-link-type "asset" 'org-custom-link-asset-follow 'org-custom-link-asset-export)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Browsing
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Web browsing http://beatofthegeek.com/2014/02/my-setup-for-using-emacs-as-web-browser.html
 ;; change default browser for 'browse-url' to w3m
 (when (executable-find "w3m")
@@ -422,7 +413,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
-)
+ '(safe-local-variable-values (quote ((js-indent-level . 2)))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
