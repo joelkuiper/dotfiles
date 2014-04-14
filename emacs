@@ -34,9 +34,11 @@
                       key-chord
                       exec-path-from-shell
                       flx-ido
+                      diminish
                       ido-ubiquitous
                       smex
                       browse-kill-ring
+                      rainbow-delimiters
                       ;; web-browser
                       w3m
                       ;; Themes
@@ -44,6 +46,7 @@
                       ;; Project management
                       magit ;; git
                       projectile
+                      real-auto-save
                       ;; Writing
                       org-plus-contrib htmlize
                       langtool ;; Spellcheck
@@ -74,13 +77,55 @@
       (if compile-window
           (delete-window compile-window)))))
 
-(setq inhibit-splash-screen t)
-(when (memq window-system '(mac ns))
-  (require 'exec-path-from-shell)
-  (exec-path-from-shell-initialize))
+;; Always, always, prefer UTF-8, anything else is insanity
+(set-language-environment "UTF-8")
+(prefer-coding-system 'utf-8)
+(when (display-graphic-p)
+  (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
 
-(when (eq system-type 'darwin)
-  (setq mac-right-option-modifier 'none))
+(require 'diminish)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; OSX Specific
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(when (or (eq system-type 'darwin) (memq window-system '(mac ns)))
+  (require 'exec-path-from-shell)
+  (exec-path-from-shell-initialize)
+
+  (setq mac-right-option-modifier 'none)
+
+  ;; for bibtex2html see: http://foswiki.org/Tasks.Item11919
+  (setenv "TMPDIR" ".")
+
+  ;; BSD ls doesn't support --dired. use brews' GNU core-utils
+  (when (executable-find "gls")
+    (setq insert-directory-program "gls" dired-use-ls-dired t)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Util
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun reload-buffer ()
+  "revert-buffer without confirmation."
+  (interactive)
+  (revert-buffer t t))
+
+;; emacs striptease http://bzg.fr/emacs-strip-tease.html
+;; A small minor mode to use a big fringe
+(defvar big-fringe-mode nil)
+(define-minor-mode big-fringe-mode
+  "Minor mode to hide the mode-line in the current buffer."
+  :init-value nil
+  :global t
+  :variable big-fringe-mode
+  :group 'editing-basics
+  (if (not big-fringe-mode)
+      (set-fringe-style nil)
+    (set-fringe-mode
+     (/ (- (frame-pixel-width)
+           (* 100 (frame-char-width)))
+        2))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Evil
@@ -107,12 +152,13 @@
 ;; Leaders
 (evil-leader/set-key
   "x"  'smex
+  "e"  'eval-expression
   "g"  'magit-status
   "f"  'find-file
-  "b"  'switch-to-buffer
-  "e"  'eshell
-  "k"  'ido-kill-buffer
-  "y"  'browse-kill-ring
+  "sh"  'eshell
+  "br" 'reload-buffer
+  "bs" 'switch-to-buffer
+  "bk" 'ido-kill-buffer
   "u"  'undo-tree-visualize
   "ws" 'whitespace-mode
   "pf" 'projectile-find-file
@@ -121,14 +167,12 @@
   "id" 'duckduckgo-search
   "iw" 'wikipedia-search)
 
-;; Always, always, prefer UTF-8, anything else is insanity
-(set-terminal-coding-system 'utf-8)
-(set-keyboard-coding-system 'utf-8)
-(set-language-environment "UTF-8")
-(prefer-coding-system 'utf-8)
-(when (display-graphic-p)
-  (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
-
+(require 'undo-tree)
+(global-undo-tree-mode 1)
+(eval-after-load "diminish"
+  '(progn
+     (eval-after-load "undo-tree"
+       '(diminish 'undo-tree-mode "↺"))))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customization
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -144,38 +188,8 @@
 (require 'ido-ubiquitous)
 (ido-ubiquitous)
 
-;; BSD ls doesn't support --dired. use brews' GNU core-utils
-(when (and (memq window-system '(mac ns)) (executable-find "gls"))
-  (setq insert-directory-program "gls" dired-use-ls-dired t))
-
-(menu-bar-mode -1)
-(when (window-system)
-  (set-scroll-bar-mode 'nil)
-  (mouse-wheel-mode t))
-(tool-bar-mode -1)
-(setq make-pointer-invisible t)
-
 ;; http://emacs.wordpress.com/2007/01/28/simple-window-configuration-management/
 (winner-mode 1)
-
-;; emacs striptease http://bzg.fr/emacs-strip-tease.html
-;; A small minor mode to use a big fringe
-(defvar big-fringe-mode nil)
-(define-minor-mode big-fringe-mode
-  "Minor mode to hide the mode-line in the current buffer."
-  :init-value nil
-  :global t
-  :variable big-fringe-mode
-  :group 'editing-basics
-  (if (not big-fringe-mode)
-      (set-fringe-style nil)
-    (set-fringe-mode
-     (/ (- (frame-pixel-width)
-           (* 100 (frame-char-width)))
-        2))))
-
-(require 'saveplace)
-(setq-default save-place t)
 
 (setq x-select-enable-clipboard t
       x-select-enable-primary t
@@ -183,20 +197,32 @@
       apropos-do-all t
       mouse-yank-at-point t
       version-control t
-      auto-save-default nil
-      save-place-file (concat user-emacs-directory "places")
-      backup-directory-alist `(("." . ,(concat user-emacs-directory "backups"))))
+      backup-inhibited 1
+      auto-save-default nil)
 
 ;; Visual
-(show-paren-mode 1)
+(setq inhibit-splash-screen t)
+
 (global-font-lock-mode t)
 (load-theme 'leuven t)
+
+(setq blink-matching-paren nil)
+(show-paren-mode t)
+(setq show-paren-delay 0)
+(require 'rainbow-delimiters)
+(global-rainbow-delimiters-mode)
 
 (require 'pretty-mode)
 (global-pretty-mode t)
 
 ;; No bell
 (setq ring-bell-function 'ignore)
+
+(when (window-system)
+  (scroll-bar-mode -1)
+  (mouse-wheel-mode t))
+(tool-bar-mode -1)
+(setq make-pointer-invisible t)
 
 (set-face-attribute 'default nil
                     :family "Inconsolata"
@@ -211,12 +237,23 @@
                                :width 'normal
                                :size 12.4
                                :weight 'normal)))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Projects
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Projectile
+(require 'projectile)
+(projectile-global-mode)
+(setq projectile-show-paths-function 'projectile-hashify-with-relative-paths)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Programming
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'yasnippet)
 (yas-global-mode 1)
+(eval-after-load "diminish"
+  '(progn
+     (eval-after-load "yasnippet"
+       '(diminish 'yas-minor-mode "✂"))))
 
 (require 'auto-complete)
 (require 'auto-complete-config)
@@ -224,6 +261,10 @@
 (ac-config-default)
 (ac-set-trigger-key "TAB")
 (ac-set-trigger-key "<tab>")
+(eval-after-load "diminish"
+  '(progn
+     (eval-after-load "auto-complete"
+       '(diminish 'auto-complete-mode "↝"))))
 
 ;; Whitespace
 (setq-default indent-tabs-mode nil)
@@ -245,6 +286,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Languages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; File-types
+(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.org$\\'" . org-mode))
+(add-to-list 'auto-mode-alist '(".emacs" . emacs-lisp-mode))
+(add-to-list 'auto-mode-alist '("\\.js.?" . js2-mode))
 
 ;; Emacs Speaks Statistics
 (require 'ess-site)
@@ -260,17 +306,6 @@
                 cider-repl-mode-hook
                 clojure-mode-hook))
   (add-hook hook 'enable-lisp-utils))
-
-;; File-types
-(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.org$\\'" . org-mode))
-(add-to-list 'auto-mode-alist '(".emacs" . emacs-lisp-mode))
-(add-to-list 'auto-mode-alist '("\\.js.?" . js2-mode))
-
-;; Projectile
-(require 'projectile)
-(projectile-global-mode)
-(setq projectile-show-paths-function 'projectile-hashify-with-relative-paths)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Writing & Blogging
@@ -297,6 +332,7 @@
        (define-key flyspell-mouse-map [mouse-3] #'undefined))))
 
 (defun enable-write-utils ()
+  (turn-on-real-auto-save)
   (visual-line-mode 1)
   (electric-indent-mode 1)
   (flyspell-mode 1))
@@ -315,15 +351,12 @@
 (require 'ox-bibtex)
 (setq org-src-fontify-natively t
       org-export-with-smart-quotes t
+      org-startup-with-inline-images t
       org-confirm-babel-evaluate nil ;; yeah don't do anything stupid
       org-export-with-section-numbers nil
       org-html-include-timestamps nil
       org-export-babel-evaluate nil
       org-html-head-include-default-style nil)
-
-;; for bibtex2html see: http://foswiki.org/Tasks.Item11919
-(when (memq window-system '(mac ns))
-  (setenv "TMPDIR" "."))
 
 (setq org-plantuml-jar-path
       (expand-file-name "/usr/local/Cellar/plantuml/7994/plantuml.7994.jar"))
@@ -334,8 +367,6 @@
 
 (add-to-list 'org-latex-packages-alist '("" "listings"))
 (add-to-list 'org-latex-packages-alist '("" "times"))
-(add-to-list 'org-latex-packages-alist '("" "epstopdf"))
-(add-to-list 'org-latex-packages-alist '("" "makeidx"))
 (add-to-list 'org-latex-packages-alist '("protrusion=true,expansion=true" "microtype"))
 (add-to-list 'org-latex-packages-alist '("usenames,dvipsnames" "xcolor"))
 
