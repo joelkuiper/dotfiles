@@ -10,6 +10,11 @@
 (when (< emacs-major-version 24)
   (error "This setup requires Emacs v24, or higher. You have: v%d" emacs-major-version))
 
+(setq user-full-name "Joël Kuiper"
+      user-mail-address "me@joelkuiper.eu")
+
+(load-file "~/.emacs.secrets")
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Packaging setup.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -31,6 +36,7 @@
                       flx-ido
                       ido-ubiquitous
                       smex
+                      browse-kill-ring
                       ;; web-browser
                       w3m
                       ;; Themes
@@ -73,6 +79,8 @@
   (require 'exec-path-from-shell)
   (exec-path-from-shell-initialize))
 
+(when (eq system-type 'darwin)
+  (setq mac-right-option-modifier 'none))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Evil
@@ -104,6 +112,7 @@
   "b"  'switch-to-buffer
   "e"  'eshell
   "k"  'ido-kill-buffer
+  "y"  'browse-kill-ring
   "u"  'undo-tree-visualize
   "ws" 'whitespace-mode
   "pf" 'projectile-find-file
@@ -117,6 +126,8 @@
 (set-keyboard-coding-system 'utf-8)
 (set-language-environment "UTF-8")
 (prefer-coding-system 'utf-8)
+(when (display-graphic-p)
+  (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customization
@@ -171,13 +182,15 @@
       save-interprogram-paste-before-kill t
       apropos-do-all t
       mouse-yank-at-point t
+      version-control t
+      auto-save-default nil
       save-place-file (concat user-emacs-directory "places")
       backup-directory-alist `(("." . ,(concat user-emacs-directory "backups"))))
 
 ;; Visual
 (show-paren-mode 1)
 (global-font-lock-mode t)
-(load-theme 'monokai t)
+(load-theme 'leuven t)
 
 (require 'pretty-mode)
 (global-pretty-mode t)
@@ -214,6 +227,7 @@
 
 ;; Whitespace
 (setq-default indent-tabs-mode nil)
+(global-set-key (kbd "RET") 'newline-and-indent)
 (setq tab-width 2)
 
 ;; Also highlight long lines in whitespace-mode
@@ -228,7 +242,6 @@
             (whitespace-cleanup)
             (delete-trailing-whitespace)))
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Languages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -238,7 +251,6 @@
 
 ;; Lisp
 (defun enable-lisp-utils ()
-  (local-set-key (kbd "RET") 'newline-and-indent)
   (require 'evil-paredit)
   (enable-paredit-mode)
   (evil-paredit-mode t))
@@ -263,6 +275,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Writing & Blogging
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(setq sentence-end-double-space nil)
+
 ;; I am dyslectic
 (when (file-exists-p "/usr/local/Cellar/languagetool/2.3/libexec/languagetool-commandline.jar")
   (require 'langtool)
@@ -297,10 +311,13 @@
 (require 'org)
 (require 'ox-publish)
 (require 'ox-odt)
+(require 'ox-latex)
 (require 'ox-bibtex)
 (setq org-src-fontify-natively t
       org-export-with-smart-quotes t
       org-confirm-babel-evaluate nil ;; yeah don't do anything stupid
+      org-export-with-section-numbers nil
+      org-html-include-timestamps nil
       org-export-babel-evaluate nil
       org-html-head-include-default-style nil)
 
@@ -308,14 +325,27 @@
 (when (memq window-system '(mac ns))
   (setenv "TMPDIR" "."))
 
+(setq org-plantuml-jar-path
+      (expand-file-name "/usr/local/Cellar/plantuml/7994/plantuml.7994.jar"))
+
 ;; LaTeX-org-export
 (setq org-latex-pdf-process (list "make; latexmk -gg -bibtex -pdf -latexoption=-shell-escape -f -silent %f"))
 (setq org-latex-listings 't)
 
 (add-to-list 'org-latex-packages-alist '("" "listings"))
 (add-to-list 'org-latex-packages-alist '("" "times"))
+(add-to-list 'org-latex-packages-alist '("" "epstopdf"))
+(add-to-list 'org-latex-packages-alist '("" "makeidx"))
 (add-to-list 'org-latex-packages-alist '("protrusion=true,expansion=true" "microtype"))
 (add-to-list 'org-latex-packages-alist '("usenames,dvipsnames" "xcolor"))
+
+(require 'org-crypt)
+(org-crypt-use-before-save-magic)
+(setq org-tags-exclude-from-inheritance (quote ("crypt")))
+
+;; GPG key to use for encryption
+;; Either the Key ID or set to nil to use symmetric encryption.
+(setq org-crypt-key nil)
 
 ;; active Babel languages
 (org-babel-do-load-languages
@@ -323,6 +353,8 @@
  '((R . t)
    (clojure . t)
    (emacs-lisp . t)
+   (plantuml . t)
+   (dot . t)
    (python . t)
    (lisp . t)
    (ditaa . t)))
@@ -350,17 +382,6 @@
          :recursive t
          :publishing-function org-publish-attachment)
         ("blog" :components ("org-joelkuiper" "org-static-joelkuiper"))))
-
-(defun org-custom-link-asset-follow (path)
-  (org-open-file-with-emacs
-   (format "./assets/%s" path)))
-
-(defun org-custom-link-asset-export (path desc format)
-  (cond
-   ((eq format 'html)
-    (format "<img src=\"assets/%s\" alt=\"%s\"/>" path desc))))
-
-(org-add-link-type "asset" 'org-custom-link-asset-follow 'org-custom-link-asset-export)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Browsing
@@ -413,7 +434,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(safe-local-variable-values (quote ((js-indent-level . 2)))))
+)
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
