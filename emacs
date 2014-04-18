@@ -42,7 +42,7 @@
                       ;; web-browser
                       w3m
                       ;; Themes
-                      leuven-theme monokai-theme
+                      leuven-theme solarized-theme
                       ;; Project management
                       magit ;; git
                       projectile
@@ -83,7 +83,6 @@
 (when (display-graphic-p)
   (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
 
-(require 'diminish)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; OSX Specific
@@ -155,8 +154,9 @@
   "e"  'eval-expression
   "g"  'magit-status
   "f"  'find-file
-  "sh"  'eshell
+  "sh" 'eshell
   "br" 'reload-buffer
+  "y"  'browse-kill-ring
   "bs" 'switch-to-buffer
   "bk" 'ido-kill-buffer
   "u"  'undo-tree-visualize
@@ -184,6 +184,8 @@
       ido-use-faces t)
 (ido-mode 'buffer)
 
+(require 'diminish)
+
 ;; ido support pretty much everwhere
 (require 'ido-ubiquitous)
 (ido-ubiquitous)
@@ -204,7 +206,7 @@
 (setq inhibit-splash-screen t)
 
 (global-font-lock-mode t)
-(load-theme 'leuven t)
+(load-theme 'solarized-dark t)
 
 (setq blink-matching-paren nil)
 (show-paren-mode t)
@@ -220,6 +222,7 @@
 
 (when (window-system)
   (scroll-bar-mode -1)
+  (blink-cursor-mode -1)
   (mouse-wheel-mode t))
 (tool-bar-mode -1)
 (setq make-pointer-invisible t)
@@ -307,6 +310,9 @@
                 clojure-mode-hook))
   (add-hook hook 'enable-lisp-utils))
 
+;; Javascript
+(setq js2-basic-offset 2)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Writing & Blogging
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -362,7 +368,7 @@
       (expand-file-name "/usr/local/Cellar/plantuml/7994/plantuml.7994.jar"))
 
 ;; LaTeX-org-export
-(setq org-latex-pdf-process (list "make; latexmk -gg -bibtex -pdf -latexoption=-shell-escape -f -silent %f"))
+(setq org-latex-pdf-process (list "make; latexmk -bibtex -pdf -latexoption=-shell-escape %f"))
 (setq org-latex-listings 't)
 
 (add-to-list 'org-latex-packages-alist '("" "listings"))
@@ -465,7 +471,10 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
-)
+ '(custom-safe-themes
+   (quote
+    ("8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" default)))
+ '(safe-local-variable-values (quote ((js-indent-level . 2)))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
