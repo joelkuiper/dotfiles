@@ -33,8 +33,8 @@
                       ace-jump-mode
                       key-chord
                       exec-path-from-shell
+                      linum-relative
                       flx-ido
-                      diminish
                       ido-ubiquitous
                       smex
                       browse-kill-ring
@@ -42,7 +42,7 @@
                       ;; web-browser
                       w3m
                       ;; Themes
-                      leuven-theme solarized-theme
+                      leuven-theme solarized-theme monokai-theme
                       ;; Project management
                       magit ;; git
                       projectile
@@ -169,10 +169,7 @@
 
 (require 'undo-tree)
 (global-undo-tree-mode 1)
-(eval-after-load "diminish"
-  '(progn
-     (eval-after-load "undo-tree"
-       '(diminish 'undo-tree-mode "↺"))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customization
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -183,8 +180,6 @@
       ido-use-filename-at-point 'guess
       ido-use-faces t)
 (ido-mode 'buffer)
-
-(require 'diminish)
 
 ;; ido support pretty much everwhere
 (require 'ido-ubiquitous)
@@ -205,8 +200,11 @@
 ;; Visual
 (setq inhibit-splash-screen t)
 
+(require 'linum-relative)
+(global-linum-mode 1)
+
 (global-font-lock-mode t)
-(load-theme 'solarized-dark t)
+(load-theme 'leuven t)
 
 (setq blink-matching-paren nil)
 (show-paren-mode t)
@@ -253,10 +251,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'yasnippet)
 (yas-global-mode 1)
-(eval-after-load "diminish"
-  '(progn
-     (eval-after-load "yasnippet"
-       '(diminish 'yas-minor-mode "✂"))))
 
 (require 'auto-complete)
 (require 'auto-complete-config)
@@ -264,10 +258,6 @@
 (ac-config-default)
 (ac-set-trigger-key "TAB")
 (ac-set-trigger-key "<tab>")
-(eval-after-load "diminish"
-  '(progn
-     (eval-after-load "auto-complete"
-       '(diminish 'auto-complete-mode "↝"))))
 
 ;; Whitespace
 (setq-default indent-tabs-mode nil)
@@ -343,7 +333,7 @@
   (electric-indent-mode 1)
   (flyspell-mode 1))
 
-(dolist (hook '(org-mode-hook latex-mode-hook))
+(dolist (hook '(text-mode-hook org-mode-hook latex-mode-hook))
   (add-hook hook 'enable-write-utils))
 
 (dolist (hook '(change-log-mode-hook log-edit-mode-hook))
@@ -357,7 +347,6 @@
 (require 'ox-bibtex)
 (setq org-src-fontify-natively t
       org-export-with-smart-quotes t
-      org-startup-with-inline-images t
       org-confirm-babel-evaluate nil ;; yeah don't do anything stupid
       org-export-with-section-numbers nil
       org-html-include-timestamps nil
@@ -375,14 +364,6 @@
 (add-to-list 'org-latex-packages-alist '("" "times"))
 (add-to-list 'org-latex-packages-alist '("protrusion=true,expansion=true" "microtype"))
 (add-to-list 'org-latex-packages-alist '("usenames,dvipsnames" "xcolor"))
-
-(require 'org-crypt)
-(org-crypt-use-before-save-magic)
-(setq org-tags-exclude-from-inheritance (quote ("crypt")))
-
-;; GPG key to use for encryption
-;; Either the Key ID or set to nil to use symmetric encryption.
-(setq org-crypt-key nil)
 
 ;; active Babel languages
 (org-babel-do-load-languages
@@ -473,7 +454,8 @@
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
    (quote
-    ("8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" default)))
+    ("60f04e478dedc16397353fb9f33f0d895ea3dab4f581307fbf0aa2f07e658a40" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" default)))
+ '(magit-use-overlays nil)
  '(safe-local-variable-values (quote ((js-indent-level . 2)))))
 
 (custom-set-faces
