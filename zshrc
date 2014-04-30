@@ -7,7 +7,13 @@ ZSH=$HOME/.oh-my-zsh
 # time that oh-my-zsh is loaded.
 ZSH_THEME="minimal"
 
+export DOCKER_HOST=tcp://localhost:4243
 export TERM="xterm-256color"
+
+# pip should only run if there is a virtualenv currently activated
+export PIP_REQUIRE_VIRTUALENV=true
+# cache pip-installed packages to avoid re-downloading
+export PIP_DOWNLOAD_CACHE=$HOME/.pip/cache
 
 #Example aliases
 # alias zshconfig="mate ~/.zshrc"
