@@ -14,7 +14,6 @@
       user-mail-address "me@joelkuiper.eu")
 
 (load-file "~/.emacs.secrets")
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Packaging setup.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -28,17 +27,15 @@
 
 (defvar my-packages '(;; Core
                       evil evil-leader
-                      yasnippet
-                      auto-complete
                       ace-jump-mode
                       key-chord
+                      auto-complete
                       exec-path-from-shell
                       linum-relative
                       flx-ido
                       ido-ubiquitous
                       smex
                       browse-kill-ring
-                      rainbow-delimiters
                       ;; web-browser
                       w3m
                       ;; Themes
@@ -46,14 +43,13 @@
                       ;; Project management
                       magit ;; git
                       projectile
-                      real-auto-save
                       ;; Writing
                       org-plus-contrib htmlize
                       langtool ;; Spellcheck
                       ;; Language support
                       ess ;; R
-                      elpy ;; python
                       cider ;; Clojure
+                      python-mode
                       web-mode js2-mode ;; Web development
                       highlight paredit evil-paredit pretty-mode ;; LISP
                       ))
@@ -82,7 +78,6 @@
 (prefer-coding-system 'utf-8)
 (when (display-graphic-p)
   (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; OSX Specific
@@ -192,10 +187,7 @@
       x-select-enable-primary t
       save-interprogram-paste-before-kill t
       apropos-do-all t
-      mouse-yank-at-point t
-      version-control t
-      backup-inhibited 1
-      auto-save-default nil)
+      mouse-yank-at-point t)
 
 ;; Visual
 (setq inhibit-splash-screen t)
@@ -206,11 +198,7 @@
 (global-font-lock-mode t)
 (load-theme 'leuven t)
 
-(setq blink-matching-paren nil)
 (show-paren-mode t)
-(setq show-paren-delay 0)
-(require 'rainbow-delimiters)
-(global-rainbow-delimiters-mode)
 
 (require 'pretty-mode)
 (global-pretty-mode t)
@@ -223,7 +211,6 @@
   (blink-cursor-mode -1)
   (mouse-wheel-mode t))
 (tool-bar-mode -1)
-(setq make-pointer-invisible t)
 
 (set-face-attribute 'default nil
                     :family "Inconsolata"
@@ -249,15 +236,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Programming
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(require 'yasnippet)
-(yas-global-mode 1)
-
-(require 'auto-complete)
 (require 'auto-complete-config)
-(add-to-list 'ac-dictionary-directories "~/.emacs.d/ac-dict")
 (ac-config-default)
-(ac-set-trigger-key "TAB")
-(ac-set-trigger-key "<tab>")
+(setq ac-auto-start 4)
+
+(setq version-control t
+      auto-save-visited-file-name t)
 
 ;; Whitespace
 (setq-default indent-tabs-mode nil)
@@ -328,7 +312,6 @@
        (define-key flyspell-mouse-map [mouse-3] #'undefined))))
 
 (defun enable-write-utils ()
-  (turn-on-real-auto-save)
   (visual-line-mode 1)
   (electric-indent-mode 1)
   (flyspell-mode 1))
@@ -342,7 +325,6 @@
 ;; org-mode
 (require 'org)
 (require 'ox-publish)
-(require 'ox-odt)
 (require 'ox-latex)
 (require 'ox-bibtex)
 (setq org-src-fontify-natively t
