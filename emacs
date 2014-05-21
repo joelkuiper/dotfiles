@@ -19,6 +19,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (setq package-archives '(("org" . "http://orgmode.org/elpa/")
                          ("gnu" . "http://elpa.gnu.org/packages/")
+                         ("sunrise" . "http://joseito.republika.pl/sunrise-commander/")
                          ("marmalade" . "http://marmalade-repo.org/packages/")
                          ("melpa" . "http://melpa.milkbox.net/packages/")))
 
@@ -39,10 +40,11 @@
                       ;; web-browser
                       w3m
                       ;; Themes
-                      leuven-theme solarized-theme monokai-theme
+                      leuven-theme solarized-theme
                       ;; Project management
                       magit ;; git
                       projectile
+                      sunrise-commander
                       ;; Writing
                       org-plus-contrib htmlize
                       langtool ;; Spellcheck
@@ -84,6 +86,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (when (or (eq system-type 'darwin) (memq window-system '(mac ns)))
+  (setq gc-cons-threshold (* 40 1024 1024))
+
   (require 'exec-path-from-shell)
   (exec-path-from-shell-initialize)
 
@@ -94,11 +98,16 @@
 
   ;; BSD ls doesn't support --dired. use brews' GNU core-utils
   (when (executable-find "gls")
-    (setq insert-directory-program "gls" dired-use-ls-dired t)))
+    (setq
+     dired-listing-switches "-alh"
+     insert-directory-program "gls" dired-use-ls-dired t)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Util
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(display-time)
+(setq display-time-24hr-format t)
+(setq display-time-day-and-date t)
 
 (defun reload-buffer ()
   "revert-buffer without confirmation."
@@ -148,11 +157,12 @@
   "x"  'smex
   "e"  'eval-expression
   "g"  'magit-status
+  "s"  'sunrise
   "f"  'find-file
   "sh" 'eshell
-  "br" 'reload-buffer
   "y"  'browse-kill-ring
   "bs" 'switch-to-buffer
+  "br" 'reload-buffer
   "bk" 'ido-kill-buffer
   "u"  'undo-tree-visualize
   "ws" 'whitespace-mode
@@ -240,8 +250,14 @@
 (ac-config-default)
 (setq ac-auto-start 4)
 
-(setq version-control t
-      auto-save-visited-file-name t)
+(setq
+   version-control t
+   kept-new-versions 6
+   kept-old-versions 2
+   backup-by-copying t
+   backup-directory-alist '(("." . "~/.emacs.d/saves"))
+   delete-old-versions t)
+
 
 ;; Whitespace
 (setq-default indent-tabs-mode nil)
