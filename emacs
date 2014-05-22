@@ -44,7 +44,6 @@
                       ;; Project management
                       magit ;; git
                       projectile
-                      sunrise-commander
                       ;; Writing
                       org-plus-contrib htmlize
                       langtool ;; Spellcheck
@@ -157,10 +156,10 @@
   "x"  'smex
   "e"  'eval-expression
   "g"  'magit-status
-  "s"  'sunrise
   "f"  'find-file
   "sh" 'eshell
   "y"  'browse-kill-ring
+  "r"  'org-capture
   "bs" 'switch-to-buffer
   "br" 'reload-buffer
   "bk" 'ido-kill-buffer
@@ -351,6 +350,14 @@
       org-export-babel-evaluate nil
       org-html-head-include-default-style nil)
 
+(setq org-directory "~/Dropbox/org")
+(setq org-default-notes-file (concat org-directory "/notes.org"))
+(setq org-capture-templates
+      '(("t" "Todo" entry (file+headline (concat org-directory "/todo.org") "Tasks")
+         "* TODO %?\n  %i\n  %a")
+        ("j" "Journal" entry (file+datetree (concat org-directory "/journal.org"))
+         "* %?\nEntered on %U\n  %i\n  %a")))
+
 (setq org-plantuml-jar-path
       (expand-file-name "/usr/local/Cellar/plantuml/7994/plantuml.7994.jar"))
 
@@ -450,9 +457,6 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   (quote
-    ("60f04e478dedc16397353fb9f33f0d895ea3dab4f581307fbf0aa2f07e658a40" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" default)))
  '(magit-use-overlays nil)
  '(safe-local-variable-values (quote ((js-indent-level . 2)))))
 
