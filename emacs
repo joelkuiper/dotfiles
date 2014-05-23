@@ -350,6 +350,17 @@
       org-export-babel-evaluate nil
       org-html-head-include-default-style nil)
 
+(defun org-custom-link-asset-follow (path)
+  (org-open-file-with-emacs
+   (format "./assets/%s" path)))
+
+(defun org-custom-link-asset-export (path desc format)
+  (cond
+   ((eq format 'html)
+    (format "<img src=\"/assets/%s\" alt=\"%s\"/>" path desc))))
+
+(org-add-link-type "asset" 'org-custom-link-asset-follow 'org-custom-link-asset-export)
+
 (setq org-directory "~/Dropbox/org")
 (setq org-default-notes-file (concat org-directory "/notes.org"))
 (setq org-capture-templates
