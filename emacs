@@ -19,7 +19,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (setq package-archives '(("org" . "http://orgmode.org/elpa/")
                          ("gnu" . "http://elpa.gnu.org/packages/")
-                         ("sunrise" . "http://joseito.republika.pl/sunrise-commander/")
                          ("marmalade" . "http://marmalade-repo.org/packages/")
                          ("melpa" . "http://melpa.milkbox.net/packages/")))
 
@@ -198,14 +197,50 @@
       apropos-do-all t
       mouse-yank-at-point t)
 
-;; Visual
-(setq inhibit-splash-screen t)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Visual
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(require 'linum-relative)
-(global-linum-mode 1)
+(setq inhibit-splash-screen t)
 
 (global-font-lock-mode t)
 (load-theme 'leuven t)
+
+
+;; From http://yoo2080.wordpress.com/2013/05/30/monospace-font-in-tables-and-source-code-blocks-in-org-mode-proportional-font-in-other-parts/
+(add-hook 'text-mode-hook 'variable-pitch-mode)
+(defun my-adjoin-to-list-or-symbol (element list-or-symbol)
+  (let ((list (if (not (listp list-or-symbol))
+                  (list list-or-symbol)
+                list-or-symbol)))
+    (require 'cl-lib)
+    (cl-adjoin element list)))
+
+(eval-after-load "org"
+  '(mapc
+    (lambda (face)
+      (set-face-attribute
+       face nil
+       :inherit
+       (my-adjoin-to-list-or-symbol
+        'fixed-pitch
+        (face-attribute face :inherit))))
+    (list 'org-code 'org-block 'org-table 'org-block-background)))
+
+;; http://blogs.msdn.com/b/visualstudio/archive/2014/05/23/announcing-update-to-productivity-power-tools-2013.aspx
+(defface mundane-line-face
+  '((t (:height 0.7)))
+  "")
+
+(defun add-mundane-line-font-lock ()
+  (font-lock-add-keywords nil '(("^[ \t(){};]*\n"
+                               0
+                               '(face mundane-line-face font-lock-multiline t)
+                               prepend))))
+(add-hook 'prog-mode-hook 'add-mundane-line-font-lock)
+
+(require 'linum-relative)
+(global-linum-mode 1)
 
 (show-paren-mode t)
 
@@ -227,6 +262,12 @@
                     :weight 'normal
                     :width 'normal)
 
+(set-face-attribute 'variable-pitch nil
+                    :family "DejaVu Sans Condensed"
+                    :height 130
+                    :weight 'normal
+                    :width 'normal)
+
 (when (functionp 'set-fontset-font)
   (set-fontset-font "fontset-default"
                     'unicode
@@ -234,6 +275,7 @@
                                :width 'normal
                                :size 12.4
                                :weight 'normal)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Projects
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -257,11 +299,9 @@
    backup-directory-alist '(("." . "~/.emacs.d/saves"))
    delete-old-versions t)
 
-
 ;; Whitespace
 (setq-default indent-tabs-mode nil)
-(global-set-key (kbd "RET") 'newline-and-indent)
-(setq tab-width 2)
+(setq-default tab-width 2)
 
 ;; Also highlight long lines in whitespace-mode
 (require 'whitespace)
@@ -283,6 +323,8 @@
 (add-to-list 'auto-mode-alist '("\\.org$\\'" . org-mode))
 (add-to-list 'auto-mode-alist '(".emacs" . emacs-lisp-mode))
 (add-to-list 'auto-mode-alist '("\\.js.?" . js2-mode))
+(add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
+(add-to-list 'interpreter-mode-alist '("python" . python-mode))
 
 ;; Emacs Speaks Statistics
 (require 'ess-site)
@@ -291,6 +333,7 @@
 (defun enable-lisp-utils ()
   (require 'evil-paredit)
   (enable-paredit-mode)
+  (local-set-key (kbd "RET") 'newline-and-indent)
   (evil-paredit-mode t))
 
 (dolist (hook '(emacs-lisp-mode-hook
@@ -298,9 +341,6 @@
                 cider-repl-mode-hook
                 clojure-mode-hook))
   (add-hook hook 'enable-lisp-utils))
-
-;; Javascript
-(setq js2-basic-offset 2)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Writing & Blogging
@@ -346,7 +386,6 @@
       org-export-with-smart-quotes t
       org-confirm-babel-evaluate nil ;; yeah don't do anything stupid
       org-export-with-section-numbers nil
-      org-html-include-timestamps nil
       org-export-babel-evaluate nil
       org-html-head-include-default-style nil)
 
@@ -373,13 +412,12 @@
       (expand-file-name "/usr/local/Cellar/plantuml/7994/plantuml.7994.jar"))
 
 ;; LaTeX-org-export
-(setq org-latex-pdf-process (list "make; latexmk -bibtex -pdf -latexoption=-shell-escape %f"))
+(setq org-latex-pdf-process (list "make; latexmk --bibtex --pdf --latexoption=-shell-escape %f"))
 (setq org-latex-listings 't)
 
 (add-to-list 'org-latex-packages-alist '("" "listings"))
 (add-to-list 'org-latex-packages-alist '("" "times"))
 (add-to-list 'org-latex-packages-alist '("protrusion=true,expansion=true" "microtype"))
-(add-to-list 'org-latex-packages-alist '("usenames,dvipsnames" "xcolor"))
 
 ;; active Babel languages
 (org-babel-do-load-languages
@@ -468,8 +506,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(magit-use-overlays nil)
- '(safe-local-variable-values (quote ((js-indent-level . 2)))))
+ )
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
