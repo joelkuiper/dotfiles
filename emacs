@@ -227,18 +227,6 @@
         (face-attribute face :inherit))))
     (list 'org-code 'org-block 'org-table 'org-block-background)))
 
-;; http://blogs.msdn.com/b/visualstudio/archive/2014/05/23/announcing-update-to-productivity-power-tools-2013.aspx
-(defface mundane-line-face
-  '((t (:height 0.7)))
-  "")
-
-(defun add-mundane-line-font-lock ()
-  (font-lock-add-keywords nil '(("^[ \t(){};]*\n"
-                               0
-                               '(face mundane-line-face font-lock-multiline t)
-                               prepend))))
-(add-hook 'prog-mode-hook 'add-mundane-line-font-lock)
-
 (require 'linum-relative)
 (global-linum-mode 1)
 
@@ -506,7 +494,8 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(js2-basic-offset 2)
+ '(safe-local-variable-values (quote ((js-indent-level . 2)))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
