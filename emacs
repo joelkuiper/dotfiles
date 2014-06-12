@@ -1,7 +1,5 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; personal configuration of emacs + evil
-;; special thanks to
-;; https://github.com/krisajenkins/EvilBegins
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -19,7 +17,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (setq package-archives '(("org" . "http://orgmode.org/elpa/")
                          ("gnu" . "http://elpa.gnu.org/packages/")
-                         ("marmalade" . "http://marmalade-repo.org/packages/")
                          ("melpa" . "http://melpa.milkbox.net/packages/")))
 
 (require 'package)
@@ -97,8 +94,9 @@
   ;; BSD ls doesn't support --dired. use brews' GNU core-utils
   (when (executable-find "gls")
     (setq
+     dired-use-ls-dired t
      dired-listing-switches "-alh"
-     insert-directory-program "gls" dired-use-ls-dired t)))
+     insert-directory-program "gls")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Util
@@ -152,22 +150,22 @@
 
 ;; Leaders
 (evil-leader/set-key
-  "x"  'smex
+  "x"  'smex ;; eXecute
   "e"  'eval-expression
   "g"  'magit-status
   "f"  'find-file
-  "sh" 'eshell
+  "sh" 'eshell ; SHell
   "y"  'browse-kill-ring
-  "r"  'org-capture
-  "bs" 'switch-to-buffer
-  "br" 'reload-buffer
+  "r"  'org-capture ; Remember
+  "bs" 'switch-to-buffer ; BufferSwitch
+  "br" 'reload-buffer ; BufferReload
   "bk" 'ido-kill-buffer
   "u"  'undo-tree-visualize
   "ws" 'whitespace-mode
   "pf" 'projectile-find-file
   "ps" 'projectile-switch-project
   "pg" 'projectile-grep
-  "id" 'duckduckgo-search
+  "id" 'duckduckgo-search ;; InternetDuckduckgo
   "iw" 'wikipedia-search)
 
 (require 'undo-tree)
@@ -200,12 +198,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Visual
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 (setq inhibit-splash-screen t)
 
 (global-font-lock-mode t)
+(setq font-lock-maximum-decoration t)
 (load-theme 'leuven t)
-
 
 ;; From http://yoo2080.wordpress.com/2013/05/30/monospace-font-in-tables-and-source-code-blocks-in-org-mode-proportional-font-in-other-parts/
 (add-hook 'text-mode-hook 'variable-pitch-mode)
@@ -234,6 +231,7 @@
 
 (require 'pretty-mode)
 (global-pretty-mode t)
+(add-to-list 'pretty-default-groups :greek)
 
 ;; No bell
 (setq ring-bell-function 'ignore)
@@ -320,8 +318,8 @@
 ;; Lisp
 (defun enable-lisp-utils ()
   (require 'evil-paredit)
-  (enable-paredit-mode)
   (local-set-key (kbd "RET") 'newline-and-indent)
+  (enable-paredit-mode)
   (evil-paredit-mode t))
 
 (dolist (hook '(emacs-lisp-mode-hook
@@ -400,7 +398,7 @@
       (expand-file-name "/usr/local/Cellar/plantuml/7994/plantuml.7994.jar"))
 
 ;; LaTeX-org-export
-(setq org-latex-pdf-process (list "make; latexmk --bibtex --pdf --latexoption=-shell-escape %f"))
+(setq org-latex-pdf-process (list "make; latexmk -f -gg --bibtex --pdf --latexoption=-shell-escape %f"))
 (setq org-latex-listings 't)
 
 (add-to-list 'org-latex-packages-alist '("" "listings"))
