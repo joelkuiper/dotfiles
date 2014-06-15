@@ -24,7 +24,6 @@
 
 (defvar my-packages '(;; Core
                       evil evil-leader
-                      ace-jump-mode
                       key-chord
                       auto-complete
                       exec-path-from-shell
@@ -131,7 +130,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'evil)
 (require 'evil-leader)
-(require 'ace-jump-mode)
 
 (global-evil-leader-mode)
 (evil-leader/set-leader ",")
@@ -145,8 +143,6 @@
 (my-move-key evil-motion-state-map evil-normal-state-map " ")
 (key-chord-mode t)
 (key-chord-define evil-insert-state-map "jk" 'evil-normal-state)
-(define-key evil-normal-state-map (kbd "SPC") 'ace-jump-char-mode)
-(define-key evil-visual-state-map (kbd "SPC") 'ace-jump-char-mode)
 
 ;; Leaders
 (evil-leader/set-key
@@ -291,7 +287,7 @@
 
 ;; Also highlight long lines in whitespace-mode
 (require 'whitespace)
-(setq whitespace-line-column 79)
+(setq whitespace-line-column 99)
 (setq whitespace-style
       '(face lines-tail spaces tabs newline space-mark tab-mark newline-mark))
 
@@ -374,6 +370,9 @@
       org-export-with-section-numbers nil
       org-export-babel-evaluate nil
       org-html-head-include-default-style nil)
+
+(setq org-todo-keywords
+      '((sequence "TODO" "IN PROGRESS" "VERIFY" "|" "SUSPENDED" "DONE")))
 
 (defun org-custom-link-asset-follow (path)
   (org-open-file-with-emacs
