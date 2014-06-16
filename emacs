@@ -35,7 +35,7 @@
                       ;; web-browser
                       w3m
                       ;; Themes
-                      leuven-theme solarized-theme
+                      leuven-theme monokai-theme
                       ;; Project management
                       magit ;; git
                       projectile
@@ -235,8 +235,8 @@
 (when (window-system)
   (scroll-bar-mode -1)
   (blink-cursor-mode -1)
+  (tool-bar-mode -1)
   (mouse-wheel-mode t))
-(tool-bar-mode -1)
 
 (set-face-attribute 'default nil
                     :family "Inconsolata"
@@ -266,13 +266,6 @@
 (projectile-global-mode)
 (setq projectile-show-paths-function 'projectile-hashify-with-relative-paths)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Programming
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(require 'auto-complete-config)
-(ac-config-default)
-(setq ac-auto-start 4)
-
 (setq
    version-control t
    kept-new-versions 6
@@ -280,6 +273,13 @@
    backup-by-copying t
    backup-directory-alist '(("." . "~/.emacs.d/saves"))
    delete-old-versions t)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Programming
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(require 'auto-complete-config)
+(ac-config-default)
+(setq ac-auto-start 4)
 
 ;; Whitespace
 (setq-default indent-tabs-mode nil)
@@ -491,8 +491,24 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(cua-global-mark-cursor-color "#2aa198")
+ '(cua-normal-cursor-color "#839496")
+ '(cua-overwrite-cursor-color "#b58900")
+ '(cua-read-only-cursor-color "#859900")
+ '(custom-safe-themes
+   (quote
+    ("75c9f0b0499ecdd0c856939a5de052742d85af81814e84faa666522c2bba7e85" "0e121ff9bef6937edad8dfcff7d88ac9219b5b4f1570fd1702e546a80dba0832" "60f04e478dedc16397353fb9f33f0d895ea3dab4f581307fbf0aa2f07e658a40" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" default)))
+ '(highlight-symbol-colors
+   (--map
+    (solarized-color-blend it "#002b36" 0.25)
+    (quote
+     ("#b58900" "#2aa198" "#dc322f" "#6c71c4" "#859900" "#cb4b16" "#268bd2"))))
+ '(highlight-symbol-foreground-color "#93a1a1")
  '(js2-basic-offset 2)
- '(safe-local-variable-values (quote ((js-indent-level . 2)))))
+ '(safe-local-variable-values (quote ((js-indent-level . 2))))
+ '(smartrep-mode-line-active-bg (solarized-color-blend "#859900" "#073642" 0.2))
+ '(term-default-bg-color "#002b36")
+ '(term-default-fg-color "#839496"))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
