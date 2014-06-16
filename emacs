@@ -144,6 +144,9 @@
 (key-chord-mode t)
 (key-chord-define evil-insert-state-map "jk" 'evil-normal-state)
 
+(setq evil-shift-width 2)
+(put 'narrow-to-region 'disabled nil) ;narrow to region should be enabled by default
+
 ;; Leaders
 (evil-leader/set-key
   "x"  'smex ;; eXecute
@@ -282,8 +285,13 @@
    delete-old-versions t)
 
 ;; Whitespace
-(setq-default indent-tabs-mode nil)
+(setq
+ indent-tabs-mode nil
+ tab-always-indent 'complete ;try to complete before identing
+ )
 (setq-default tab-width 2)
+
+(electric-indent-mode +1)
 
 ;; Also highlight long lines in whitespace-mode
 (require 'whitespace)
