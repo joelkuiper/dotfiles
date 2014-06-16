@@ -45,7 +45,6 @@
                       ;; Language support
                       ess ;; R
                       cider ;; Clojure
-                      python-mode
                       web-mode js2-mode ;; Web development
                       highlight paredit evil-paredit pretty-mode ;; LISP
                       ))
