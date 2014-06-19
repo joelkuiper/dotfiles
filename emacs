@@ -27,7 +27,6 @@
                       key-chord
                       auto-complete
                       exec-path-from-shell
-                      linum-relative
                       flx-ido
                       ido-ubiquitous
                       smex
@@ -35,7 +34,7 @@
                       ;; web-browser
                       w3m
                       ;; Themes
-                      leuven-theme monokai-theme
+                      leuven-theme
                       ;; Project management
                       magit ;; git
                       projectile
@@ -43,7 +42,7 @@
                       org-plus-contrib htmlize
                       langtool ;; Spellcheck
                       ;; Language support
-                      ess ;; R
+                      ess ess-R-data-view ess-R-object-popup ;; R
                       cider ;; Clojure
                       web-mode js2-mode ;; Web development
                       highlight paredit evil-paredit pretty-mode ;; LISP
@@ -84,7 +83,8 @@
   (require 'exec-path-from-shell)
   (exec-path-from-shell-initialize)
 
-  (setq mac-right-option-modifier 'none)
+  (setq mac-option-modifier nil
+        mac-command-modifier 'meta)
 
   ;; for bibtex2html see: http://foswiki.org/Tasks.Item11919
   (setenv "TMPDIR" ".")
@@ -102,6 +102,9 @@
 (display-time)
 (setq display-time-24hr-format t)
 (setq display-time-day-and-date t)
+
+(require 'smex)
+(smex-initialize)
 
 (defun reload-buffer ()
   "revert-buffer without confirmation."
@@ -199,7 +202,6 @@
 (setq inhibit-splash-screen t)
 
 (global-font-lock-mode t)
-(setq font-lock-maximum-decoration t)
 (load-theme 'leuven t)
 
 ;; From http://yoo2080.wordpress.com/2013/05/30/monospace-font-in-tables-and-source-code-blocks-in-org-mode-proportional-font-in-other-parts/
@@ -211,25 +213,11 @@
     (require 'cl-lib)
     (cl-adjoin element list)))
 
-(eval-after-load "org"
-  '(mapc
-    (lambda (face)
-      (set-face-attribute
-       face nil
-       :inherit
-       (my-adjoin-to-list-or-symbol
-        'fixed-pitch
-        (face-attribute face :inherit))))
-    (list 'org-code 'org-block 'org-table 'org-block-background)))
-
-(require 'linum-relative)
-(global-linum-mode 1)
 
 (show-paren-mode t)
 
 (require 'pretty-mode)
 (global-pretty-mode t)
-(add-to-list 'pretty-default-groups :greek)
 
 ;; No bell
 (setq ring-bell-function 'ignore)
@@ -240,25 +228,17 @@
   (tool-bar-mode -1)
   (mouse-wheel-mode t))
 
-(set-face-attribute 'default nil
-                    :family "Inconsolata"
-                    :height 140
-                    :weight 'normal
-                    :width 'normal)
-
 (set-face-attribute 'variable-pitch nil
                     :family "DejaVu Sans Condensed"
                     :height 130
                     :weight 'normal
                     :width 'normal)
 
-(when (functionp 'set-fontset-font)
-  (set-fontset-font "fontset-default"
-                    'unicode
-                    (font-spec :family "DejaVu Sans Mono"
-                               :width 'normal
-                               :size 12.4
-                               :weight 'normal)))
+(set-face-attribute 'default nil
+                    :family "DejaVu Sans Mono"
+                    :height 120
+                    :weight 'normal
+                    :width 'normal)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Projects
@@ -286,15 +266,15 @@
 ;; Whitespace
 (setq
  indent-tabs-mode nil
+ tab-width 2
  tab-always-indent 'complete ;try to complete before identing
  )
-(setq-default tab-width 2)
 
 (electric-indent-mode +1)
 
 ;; Also highlight long lines in whitespace-mode
 (require 'whitespace)
-(setq whitespace-line-column 99)
+(setq whitespace-line-column 80)
 (setq whitespace-style
       '(face lines-tail spaces tabs newline space-mark tab-mark newline-mark))
 
@@ -317,6 +297,20 @@
 
 ;; Emacs Speaks Statistics
 (require 'ess-site)
+(setq ess-eldoc-show-on-symbol t)
+(setq ess-describe-at-point-method 'tooltip)
+(require 'ess-R-data-view)
+(require 'ess-R-object-popup)
+(define-key ess-mode-map "\C-c\C-g" 'ess-R-object-popup)
+(setq ess-use-ido t)
+
+(add-to-list 'auto-mode-alist '("\\.rd\\'" . Rd-mode))
+
+(setq ess-use-eldoc t)
+(setq ess-eldoc-show-on-symbol t)
+(setq ess-eldoc-abbreviation-style 'normal)
+
+(setq inferior-R-args "--no-save --no-restore")
 
 ;; Lisp
 (defun enable-lisp-utils ()
@@ -334,8 +328,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Writing & Blogging
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(setq sentence-end-double-space nil)
-
 ;; I am dyslectic
 (when (file-exists-p "/usr/local/Cellar/languagetool/2.3/libexec/languagetool-commandline.jar")
   (require 'langtool)
@@ -368,15 +360,35 @@
 
 ;; org-mode
 (require 'org)
+(when (not (version= (org-version) "8.2.7a"))
+  (display-warning
+   'org-mode
+   (concat
+    "Insufficient requirements. Expected 8.2.7a. Found " (org-version))
+   :emergency))
+
 (require 'ox-publish)
 (require 'ox-latex)
 (require 'ox-bibtex)
 (setq org-src-fontify-natively t
       org-export-with-smart-quotes t
-      org-confirm-babel-evaluate nil ;; yeah don't do anything stupid
+      org-fontify-whole-heading-line t
+      org-confirm-babel-evaluate nil
       org-export-with-section-numbers nil
       org-export-babel-evaluate nil
+      org-startup-with-inline-images (display-graphic-p)
       org-html-head-include-default-style nil)
+
+(eval-after-load "org"
+  '(mapc
+    (lambda (face)
+      (set-face-attribute
+       face nil
+       :inherit
+       (my-adjoin-to-list-or-symbol
+        'fixed-pitch
+        (face-attribute face :inherit))))
+    (list 'org-code 'org-block 'org-table 'org-block-background)))
 
 (setq org-todo-keywords
       '((sequence "TODO" "IN PROGRESS" "VERIFY" "|" "SUSPENDED" "DONE")))
@@ -404,7 +416,7 @@
       (expand-file-name "/usr/local/Cellar/plantuml/7994/plantuml.7994.jar"))
 
 ;; LaTeX-org-export
-(setq org-latex-pdf-process (list "make; latexmk -f -gg --bibtex --pdf --latexoption=-shell-escape %f"))
+(setq org-latex-pdf-process (list "make; latexmk -gg --bibtex --pdf --latexoption=-shell-escape %f"))
 (setq org-latex-listings 't)
 
 (add-to-list 'org-latex-packages-alist '("" "listings"))
@@ -460,8 +472,6 @@
    browse-url-browser-function 'w3m-browse-url
    w3m-confirm-leaving-secure-page nil
    w3m-use-cookies t
-   ;; Change w3m user-agent to Android.
-   w3m-user-agent "Mozilla/5.0 (Linux; U; Android 2.0.1; en-us; Droid Build/ESD56) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17"
    ;; Set homepage
    w3m-home-page "duckduckgo.com/lite")
 
