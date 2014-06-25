@@ -9,6 +9,7 @@ ZSH_THEME="minimal"
 
 export DOCKER_HOST=tcp://localhost:4243
 export TERM="xterm-256color"
+export EDITOR=vim
 
 # pip should only run if there is a virtualenv currently activated
 export PIP_REQUIRE_VIRTUALENV=true
@@ -18,8 +19,6 @@ export PIP_DOWNLOAD_CACHE=$HOME/.pip/cache
 #Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-
-alias emacs="/usr/local/Cellar/emacs-mac/emacs-24.3-mac-4.5/bin/emacs -nw"
 
 # Set to this to use case-sensitive completion
 CASE_SENSITIVE="true"
@@ -34,16 +33,24 @@ DISABLE_AUTO_UPDATE="true"
 DISABLE_AUTO_TITLE="true"
 
 # Uncomment following line if you want red dots to be displayed while waiting for completion
-COMPLETION_WAITING_DOTS="true"
+# COMPLETION_WAITING_DOTS="true"
+#
+DISABLE_CORRECTION="true"
+
+REPORTTIME=5
 
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
-plugins=(git vi-mode history-substring-search)
+plugins=(git vi-mode brew osx history history-substring-search)
+
+bindkey '^[[A' history-substring-search-up
+bindkey '^[[B' history-substring-search-down
+bindkey -M vicmd 'k' history-substring-search-up
+bindkey -M vicmd 'j' history-substring-search-down
 
 source $ZSH/oh-my-zsh.sh
 
-alias fact="elinks -dump randomfunfacts.com | sed -n '/^| /p' | tr -d \|"
 alias bibtex2html="export TMPDIR=. && /usr/local/bin/bibtex2html"
 
 # Customize to your needs...
@@ -54,8 +61,4 @@ if [[ -a ~/.secrets ]] then
   source ~/.secrets
 fi
 
-[[ -s "/usr/local/rvm/scripts/rvm" ]] && . "/usr/local/rvm/scripts/rvm"
-
-PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
-PATH=$PATH:/usr/local/texlive/2013/bin/universal-darwin # Add pdflatex
 PYTHONPATH=/usr/local/lib/python2.7/site-packages:$PYTHONPATH
