@@ -31,8 +31,6 @@
                       ido-ubiquitous
                       smex
                       browse-kill-ring
-                      ;; web-browser
-                      w3m
                       ;; Themes
                       leuven-theme
                       ;; Project management
@@ -165,9 +163,7 @@
   "ws" 'whitespace-mode
   "pf" 'projectile-find-file
   "ps" 'projectile-switch-project
-  "pg" 'projectile-grep
-  "id" 'duckduckgo-search ;; InternetDuckduckgo
-  "iw" 'wikipedia-search)
+  "pg" 'projectile-grep)
 
 (require 'undo-tree)
 (global-undo-tree-mode 1)
@@ -176,16 +172,24 @@
 ;;; Customization
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ido
-(setq ido-everywhere nil
+(require 'ido)
+(require 'ido-ubiquitous)
+(require 'flx-ido)
+
+(setq ido-enable-prefix nil
       ido-enable-flex-matching t
       ido-create-new-buffer 'always
       ido-use-filename-at-point 'guess
-      ido-use-faces t)
-(ido-mode 'buffer)
+      ido-max-prospects 10
+      ido-default-file-method 'selected-window
+      ido-auto-merge-work-directories-length -1)
+(ido-mode +1)
+(ido-ubiquitous-mode +1)
 
-;; ido support pretty much everwhere
-(require 'ido-ubiquitous)
-(ido-ubiquitous)
+;;; smarter fuzzy matching for ido
+(flx-ido-mode +1)
+;; disable ido faces to see flx highlights
+(setq ido-use-faces nil)
 
 ;; http://emacs.wordpress.com/2007/01/28/simple-window-configuration-management/
 (winner-mode 1)
@@ -301,7 +305,6 @@
 (setq ess-describe-at-point-method 'tooltip)
 (require 'ess-R-data-view)
 (require 'ess-R-object-popup)
-(define-key ess-mode-map "\C-c\C-g" 'ess-R-object-popup)
 (setq ess-use-ido t)
 
 (add-to-list 'auto-mode-alist '("\\.rd\\'" . Rd-mode))
@@ -419,7 +422,6 @@
 (setq org-latex-pdf-process (list "make; latexmk -gg --bibtex --pdf --latexoption=-shell-escape %f"))
 (setq org-latex-listings 't)
 
-(add-to-list 'org-latex-packages-alist '("" "listings"))
 (add-to-list 'org-latex-packages-alist '("" "times"))
 (add-to-list 'org-latex-packages-alist '("protrusion=true,expansion=true" "microtype"))
 
@@ -460,43 +462,6 @@
         ("blog" :components ("org-joelkuiper" "org-static-joelkuiper"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Browsing
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Web browsing http://beatofthegeek.com/2014/02/my-setup-for-using-emacs-as-web-browser.html
-;; change default browser for 'browse-url' to w3m
-(when (executable-find "w3m")
-  (setq w3m-command (executable-find "w3m"))
-  (require 'w3m)
-
-  (setq
-   browse-url-browser-function 'w3m-browse-url
-   w3m-confirm-leaving-secure-page nil
-   w3m-use-cookies t
-   ;; Set homepage
-   w3m-home-page "duckduckgo.com/lite")
-
-  (defun wikipedia-search (search-term)
-    "Search for SEARCH-TERM on wikipedia"
-    (interactive
-     (let ((term (if mark-active
-                     (buffer-substring (region-beginning) (region-end))
-                   (word-at-point))))
-       (list (read-string (format "Wikipedia (%s):" term) nil nil term))))
-    (browse-url
-     (concat
-      "http://en.m.wikipedia.org/w/index.php?search=" search-term)))
-
-  (defun duckduckgo-search (search-term)
-    "Search for SEARCH-TERM"
-    (interactive
-     (let ((term (if mark-active
-                     (buffer-substring (region-beginning) (region-end))
-                   (word-at-point))))
-       (list (read-string (format "DuckDuckGo (%s):" term) nil nil term))))
-    (browse-url
-     (concat "https://duckduckgo.com/lite/?q=" search-term))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customizations (from M-x customze-*)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (custom-set-variables
@@ -504,12 +469,6 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   (quote
-    ("75c9f0b0499ecdd0c856939a5de052742d85af81814e84faa666522c2bba7e85"
-		 "0e121ff9bef6937edad8dfcff7d88ac9219b5b4f1570fd1702e546a80dba0832"
-		 "60f04e478dedc16397353fb9f33f0d895ea3dab4f581307fbf0aa2f07e658a40"
-		 "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" default)))
  '(js2-basic-offset 2)
  '(safe-local-variable-values (quote ((js-indent-level . 2)))))
 
