@@ -53,11 +53,12 @@ source $ZSH/oh-my-zsh.sh
 alias bibtex2html="export TMPDIR=. && /usr/local/bin/bibtex2html"
 
 # Customize to your needs...
-export PATH="/sbin/:/usr/sbin/:/usr/local/bin:/usr/local/sbin:/usr/local/share:$HOME/bin:/usr/bin:/opt/bin:$PATH"
+export PATH="/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/share:$HOME/bin:/usr/bin:/opt/bin:$PATH"
 
 # Put secret configuration settings in ~/.secrets
 if [[ -a ~/.secrets ]] then
   source ~/.secrets
 fi
 
+PATH=$PATH:/usr/local/texlive/2014/bin/universal-darwin # Add pdflatex
 PYTHONPATH=/usr/local/lib/python2.7/site-packages:$PYTHONPATH
