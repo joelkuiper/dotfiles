@@ -25,12 +25,10 @@
 (defvar my-packages '(;; Core
                       evil evil-leader
                       key-chord
-                      auto-complete
                       exec-path-from-shell
                       flx-ido
                       ido-ubiquitous
                       smex
-                      browse-kill-ring
                       ;; Themes
                       leuven-theme
                       ;; Project management
@@ -40,7 +38,7 @@
                       org-plus-contrib htmlize
                       langtool ;; Spellcheck
                       ;; Language support
-                      ess ess-R-data-view ess-R-object-popup ;; R
+                      ess ;; R
                       cider ;; Clojure
                       web-mode js2-mode ;; Web development
                       highlight paredit evil-paredit pretty-mode ;; LISP
@@ -154,8 +152,6 @@
   "g"  'magit-status
   "f"  'find-file
   "sh" 'eshell ; SHell
-  "y"  'browse-kill-ring
-  "r"  'org-capture ; Remember
   "bs" 'switch-to-buffer ; BufferSwitch
   "br" 'reload-buffer ; BufferReload
   "bk" 'ido-kill-buffer
@@ -217,10 +213,10 @@
     (require 'cl-lib)
     (cl-adjoin element list)))
 
-
 (show-paren-mode t)
 
 (require 'pretty-mode)
+(pretty-activate-groups '(:greek :undefined))
 (global-pretty-mode t)
 
 ;; No bell
@@ -263,18 +259,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Programming
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(require 'auto-complete-config)
-(ac-config-default)
-(setq ac-auto-start 4)
-
 ;; Whitespace
-(setq
- indent-tabs-mode nil
- tab-width 2
- tab-always-indent 'complete ;try to complete before identing
- )
-
-(electric-indent-mode +1)
+(set-default 'tab-width 2)
+(set-default 'indicate-empty-lines t)
+(set-default 'indent-tabs-mode nil)
 
 ;; Also highlight long lines in whitespace-mode
 (require 'whitespace)
@@ -297,23 +285,12 @@
 (add-to-list 'auto-mode-alist '(".emacs" . emacs-lisp-mode))
 (add-to-list 'auto-mode-alist '("\\.js.?" . js2-mode))
 (add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
-(add-to-list 'interpreter-mode-alist '("python" . python-mode))
+(add-to-list 'auto-mode-alist '("\\.rd\\'" . Rd-mode))
+
 
 ;; Emacs Speaks Statistics
 (require 'ess-site)
-(setq ess-eldoc-show-on-symbol t)
-(setq ess-describe-at-point-method 'tooltip)
-(require 'ess-R-data-view)
-(require 'ess-R-object-popup)
 (setq ess-use-ido t)
-
-(add-to-list 'auto-mode-alist '("\\.rd\\'" . Rd-mode))
-
-(setq ess-use-eldoc t)
-(setq ess-eldoc-show-on-symbol t)
-(setq ess-eldoc-abbreviation-style 'normal)
-
-(setq inferior-R-args "--no-save --no-restore")
 
 ;; Lisp
 (defun enable-lisp-utils ()
@@ -363,11 +340,11 @@
 
 ;; org-mode
 (require 'org)
-(when (not (version= (org-version) "8.2.7a"))
+(when (not (version= (org-version) "8.2.7b"))
   (display-warning
    'org-mode
    (concat
-    "Insufficient requirements. Expected 8.2.7a. Found " (org-version))
+    "Insufficient requirements. Expected 8.2.7b. Found " (org-version))
    :emergency))
 
 (require 'ox-publish)
@@ -407,19 +384,12 @@
 
 (org-add-link-type "asset" 'org-custom-link-asset-follow 'org-custom-link-asset-export)
 
-(setq org-directory "~/Dropbox/org")
-(setq org-default-notes-file (concat org-directory "/notes.org"))
-(setq org-capture-templates
-      '(("t" "Todo" entry (file+headline (concat org-directory "/todo.org") "Tasks")
-         "* TODO %?\n  %i\n  %a")
-        ("j" "Journal" entry (file+datetree (concat org-directory "/journal.org"))
-         "* %?\nEntered on %U\n  %i\n  %a")))
 
 (setq org-plantuml-jar-path
       (expand-file-name "/usr/local/Cellar/plantuml/7994/plantuml.7994.jar"))
 
 ;; LaTeX-org-export
-(setq org-latex-pdf-process (list "make; latexmk -gg --bibtex --pdf --latexoption=-shell-escape %f"))
+(setq org-latex-pdf-process (list "make; latexmk --bibtex --pdf --latexoption=-shell-escape %f"))
 (setq org-latex-listings 't)
 
 (add-to-list 'org-latex-packages-alist '("" "times"))
@@ -460,6 +430,14 @@
          :recursive t
          :publishing-function org-publish-attachment)
         ("blog" :components ("org-joelkuiper" "org-static-joelkuiper"))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Start Emacs server
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(require 'server)
+(unless (server-running-p)
+  (server-start))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customizations (from M-x customze-*)
