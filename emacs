@@ -31,6 +31,7 @@
                       smex
                       ;; Themes
                       leuven-theme
+                      pretty-mode
                       ;; Project management
                       magit ;; git
                       projectile
@@ -41,7 +42,7 @@
                       ess ;; R
                       cider ;; Clojure
                       web-mode js2-mode ;; Web development
-                      highlight paredit evil-paredit pretty-mode ;; LISP
+                      highlight paredit evil-paredit rainbow-delimiters;; LISP
                       ))
 
 (defun my-missing-packages ()
@@ -64,8 +65,10 @@
           (delete-window compile-window)))))
 
 ;; Always, always, prefer UTF-8, anything else is insanity
-(set-language-environment "UTF-8")
-(prefer-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8-unix)
+(set-terminal-coding-system 'utf-8-unix)
+(set-keyboard-coding-system 'utf-8-unix)
+(prefer-coding-system 'utf-8-unix)
 (when (display-graphic-p)
   (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
 
@@ -142,6 +145,8 @@
 (key-chord-mode t)
 (key-chord-define evil-insert-state-map "jk" 'evil-normal-state)
 
+(evil-set-initial-state 'magit-mode 'emacs)
+
 (setq evil-shift-width 2)
 (put 'narrow-to-region 'disabled nil) ;narrow to region should be enabled by default
 
@@ -155,13 +160,17 @@
   "bs" 'switch-to-buffer ; BufferSwitch
   "br" 'reload-buffer ; BufferReload
   "bk" 'ido-kill-buffer
+  "k"  'kill-this-buffer
   "u"  'undo-tree-visualize
   "ws" 'whitespace-mode
+  "D"  'dired
   "pf" 'projectile-find-file
   "ps" 'projectile-switch-project
   "pg" 'projectile-grep)
 
 (require 'undo-tree)
+(setq undo-tree-visualizer-diff t)
+(setq undo-tree-visualizer-timestamps t)
 (global-undo-tree-mode 1)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -179,6 +188,7 @@
       ido-max-prospects 10
       ido-default-file-method 'selected-window
       ido-auto-merge-work-directories-length -1)
+(add-to-list 'ido-ignore-files "\\.DS_Store")
 (ido-mode +1)
 (ido-ubiquitous-mode +1)
 
@@ -296,6 +306,7 @@
 (defun enable-lisp-utils ()
   (require 'evil-paredit)
   (local-set-key (kbd "RET") 'newline-and-indent)
+  (rainbow-delimiters-mode)
   (enable-paredit-mode)
   (evil-paredit-mode t))
 
@@ -340,12 +351,12 @@
 
 ;; org-mode
 (require 'org)
-(when (not (version= (org-version) "8.2.7b"))
+(when (not (version= (org-version) "8.2.7c"))
   (display-warning
    'org-mode
    (concat
-    "Insufficient requirements. Expected 8.2.7b. Found " (org-version))
-   :emergency))
+    "Insufficient requirements. Expected 8.2.7c. Found " (org-version))
+   :warning))
 
 (require 'ox-publish)
 (require 'ox-latex)
@@ -431,13 +442,6 @@
          :publishing-function org-publish-attachment)
         ("blog" :components ("org-joelkuiper" "org-static-joelkuiper"))))
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Start Emacs server
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(require 'server)
-(unless (server-running-p)
-  (server-start))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customizations (from M-x customze-*)
