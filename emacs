@@ -29,6 +29,7 @@
                       flx-ido
                       ido-ubiquitous
                       smex
+                      auto-complete
                       ;; Themes
                       leuven-theme
                       pretty-mode
@@ -40,7 +41,7 @@
                       langtool ;; Spellcheck
                       ;; Language support
                       ess ;; R
-                      cider ;; Clojure
+                      ac-cider cider ;; Clojure
                       web-mode js2-mode ;; Web development
                       highlight paredit evil-paredit rainbow-delimiters;; LISP
                       ))
@@ -170,8 +171,8 @@
 
 (require 'undo-tree)
 (setq undo-tree-visualizer-diff t)
-(setq undo-tree-visualizer-timestamps t)
 (global-undo-tree-mode 1)
+(setq-default evil-symbol-word-search t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customization
@@ -315,6 +316,42 @@
                 cider-repl-mode-hook
                 clojure-mode-hook))
   (add-hook hook 'enable-lisp-utils))
+
+
+(add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)
+(setq cider-repl-tab-command 'indent-for-tab-command)
+(setq cider-repl-use-clojure-font-lock t)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Auto complete
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(require 'auto-complete)
+(require 'auto-complete-config)
+(require 'ac-cider)
+(add-hook 'cider-mode-hook 'ac-cider-setup)
+(add-hook 'cider-repl-mode-hook 'ac-cider-setup)
+(eval-after-load "auto-complete"
+  '(add-to-list 'ac-modes 'cider-mode))
+
+(ac-config-default)
+
+;;; I want autocomplete everywhere
+(setq global-auto-complete-mode t
+      ac-quick-help-delay 1)
+
+(add-hook 'flyspell-mode-hook
+          (lambda ()
+            (ac-flyspell-workaround)))
+
+;; Navigation in autocomplete menues gets hijacked by evil
+(define-key ac-completing-map (kbd "C-n") 'ac-next)
+(define-key ac-completing-map (kbd "C-p") 'ac-previous)
+
+;; Let me stop autocompleting the emacs/evil way
+(define-key ac-completing-map (kbd "C-g") 'ac-stop)
+(define-key ac-completing-map (kbd "ESC") 'evil-normal-state)
+(evil-make-intercept-map ac-completing-map)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Writing & Blogging
