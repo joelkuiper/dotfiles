@@ -29,6 +29,7 @@
                       flx-ido
                       ido-ubiquitous
                       smex
+                      expand-region
                       auto-complete
                       ;; Themes
                       leuven-theme
@@ -76,7 +77,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; OSX Specific
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 (when (or (eq system-type 'darwin) (memq window-system '(mac ns)))
   (setq gc-cons-threshold (* 40 1024 1024))
 
@@ -88,6 +88,8 @@
 
   ;; for bibtex2html see: http://foswiki.org/Tasks.Item11919
   (setenv "TMPDIR" ".")
+
+  (setq redisplay-dont-pause t)
 
   ;; BSD ls doesn't support --dired. use brews' GNU core-utils
   (when (executable-find "gls")
@@ -128,7 +130,7 @@
         2))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Evil
+;;; General
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'evil)
 (require 'evil-leader)
@@ -149,30 +151,56 @@
 (evil-set-initial-state 'magit-mode 'emacs)
 
 (setq evil-shift-width 2)
-(put 'narrow-to-region 'disabled nil) ;narrow to region should be enabled by default
+(setq-default evil-symbol-word-search t)
+(put 'narrow-to-region 'disabled nil) ; narrow to region should be enabled by default
+
+(require 'expand-region)
+
+(define-key evil-visual-state-map (kbd "x") 'er/expand-region)
+(define-key evil-visual-state-map (kbd "X") 'er/contract-region)
 
 ;; Leaders
 (evil-leader/set-key
-  "x"  'smex ;; eXecute
-  "e"  'eval-expression
-  "g"  'magit-status
-  "f"  'find-file
-  "sh" 'eshell ; SHell
-  "bs" 'switch-to-buffer ; BufferSwitch
-  "br" 'reload-buffer ; BufferReload
-  "bk" 'ido-kill-buffer
-  "k"  'kill-this-buffer
-  "u"  'undo-tree-visualize
-  "ws" 'whitespace-mode
-  "D"  'dired
-  "pf" 'projectile-find-file
-  "ps" 'projectile-switch-project
-  "pg" 'projectile-grep)
+  "."      'evil-ex
+  "<SPC>"  'er/expand-region
+  "x"      'smex ;; eXecute
+  "e"      'eval-expression
+  "g"      'magit-status
+  "o"      'occur
+  "f"      'find-file
+  "sh"     'ansi-term; SHell
+  "bs"     'switch-to-buffer ; BufferSwitch
+  "br"     'reload-buffer ; BufferReload
+  "bk"     'ido-kill-buffer
+  "k"      'kill-this-buffer
+  "u"      'undo-tree-visualize
+  "ws"     'whitespace-mode
+  "pf"     'projectile-find-file
+  "ps"     'projectile-switch-project
+  "pd"     'projectile-dired
+  "pg"     'projectile-grep)
 
+
+;; Auto complete
+(require 'auto-complete)
+(require 'auto-complete-config)
+(ac-config-default)
+
+;; Navigation in autocomplete menues gets hijacked by evil
+(define-key ac-completing-map (kbd "C-n") 'ac-next)
+(define-key ac-completing-map (kbd "C-p") 'ac-previous)
+;; Let me stop autocompleting the emacs/evil way
+(define-key ac-completing-map (kbd "C-g") 'ac-stop)
+(define-key ac-completing-map (kbd "ESC") 'evil-normal-state)
+(evil-make-intercept-map ac-completing-map)
+
+
+;; Undo tree
 (require 'undo-tree)
 (setq undo-tree-visualizer-diff t)
 (global-undo-tree-mode 1)
-(setq-default evil-symbol-word-search t)
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customization
@@ -257,7 +285,6 @@
 ;; Projectile
 (require 'projectile)
 (projectile-global-mode)
-(setq projectile-show-paths-function 'projectile-hashify-with-relative-paths)
 
 (setq
    version-control t
@@ -317,41 +344,16 @@
                 clojure-mode-hook))
   (add-hook hook 'enable-lisp-utils))
 
-
-(add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)
-(setq cider-repl-tab-command 'indent-for-tab-command)
-(setq cider-repl-use-clojure-font-lock t)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Auto complete
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(require 'auto-complete)
-(require 'auto-complete-config)
 (require 'ac-cider)
+(add-hook 'cider-mode-hook 'ac-flyspell-workaround)
 (add-hook 'cider-mode-hook 'ac-cider-setup)
 (add-hook 'cider-repl-mode-hook 'ac-cider-setup)
 (eval-after-load "auto-complete"
   '(add-to-list 'ac-modes 'cider-mode))
 
-(ac-config-default)
-
-;;; I want autocomplete everywhere
-(setq global-auto-complete-mode t
-      ac-quick-help-delay 1)
-
-(add-hook 'flyspell-mode-hook
-          (lambda ()
-            (ac-flyspell-workaround)))
-
-;; Navigation in autocomplete menues gets hijacked by evil
-(define-key ac-completing-map (kbd "C-n") 'ac-next)
-(define-key ac-completing-map (kbd "C-p") 'ac-previous)
-
-;; Let me stop autocompleting the emacs/evil way
-(define-key ac-completing-map (kbd "C-g") 'ac-stop)
-(define-key ac-completing-map (kbd "ESC") 'evil-normal-state)
-(evil-make-intercept-map ac-completing-map)
-
+(add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)
+(setq cider-repl-tab-command 'indent-for-tab-command)
+(setq cider-repl-use-clojure-font-lock t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Writing & Blogging
@@ -377,7 +379,6 @@
 
 (defun enable-write-utils ()
   (visual-line-mode 1)
-  (electric-indent-mode 1)
   (flyspell-mode 1))
 
 (dolist (hook '(text-mode-hook org-mode-hook latex-mode-hook))
@@ -432,7 +433,6 @@
 
 (org-add-link-type "asset" 'org-custom-link-asset-follow 'org-custom-link-asset-export)
 
-
 (setq org-plantuml-jar-path
       (expand-file-name "/usr/local/Cellar/plantuml/7994/plantuml.7994.jar"))
 
@@ -478,7 +478,6 @@
          :recursive t
          :publishing-function org-publish-attachment)
         ("blog" :components ("org-joelkuiper" "org-static-joelkuiper"))))
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customizations (from M-x customze-*)
