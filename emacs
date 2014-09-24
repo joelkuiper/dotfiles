@@ -30,7 +30,7 @@
                       ido-ubiquitous
                       smex
                       expand-region
-                      auto-complete
+                      flycheck
                       ;; Themes
                       leuven-theme
                       pretty-mode
@@ -41,8 +41,9 @@
                       org-plus-contrib htmlize
                       langtool ;; Spellcheck
                       ;; Language support
+                      auctex
                       ess ;; R
-                      ac-cider cider ;; Clojure
+                      cider ;; Clojure
                       web-mode js2-mode ;; Web development
                       highlight paredit evil-paredit rainbow-delimiters;; LISP
                       ))
@@ -135,6 +136,7 @@
 (require 'evil)
 (require 'evil-leader)
 
+(setq evil-leader/in-all-states 1)
 (global-evil-leader-mode)
 (evil-leader/set-leader ",")
 (evil-mode 1)
@@ -154,10 +156,17 @@
 (setq-default evil-symbol-word-search t)
 (put 'narrow-to-region 'disabled nil) ; narrow to region should be enabled by default
 
+(setq evil-emacs-state-cursor '("red" box))
+(setq evil-normal-state-cursor '("green" box))
+(setq evil-visual-state-cursor '("orange" box))
+(setq evil-insert-state-cursor '("red" bar))
+(setq evil-replace-state-cursor '("red" bar))
+(setq evil-operator-state-cursor '("red" hollow))
+
 (require 'expand-region)
 
-(define-key evil-visual-state-map (kbd "x") 'er/expand-region)
-(define-key evil-visual-state-map (kbd "X") 'er/contract-region)
+(define-key evil-visual-state-map (kbd ".") 'er/expand-region)
+(define-key evil-visual-state-map (kbd ",") 'er/contract-region)
 
 ;; Leaders
 (evil-leader/set-key
@@ -180,27 +189,32 @@
   "pd"     'projectile-dired
   "pg"     'projectile-grep)
 
+(define-key global-map (kbd "RET") 'newline-and-indent)
 
-;; Auto complete
-(require 'auto-complete)
-(require 'auto-complete-config)
-(ac-config-default)
-
-;; Navigation in autocomplete menues gets hijacked by evil
-(define-key ac-completing-map (kbd "C-n") 'ac-next)
-(define-key ac-completing-map (kbd "C-p") 'ac-previous)
-;; Let me stop autocompleting the emacs/evil way
-(define-key ac-completing-map (kbd "C-g") 'ac-stop)
-(define-key ac-completing-map (kbd "ESC") 'evil-normal-state)
-(evil-make-intercept-map ac-completing-map)
+;; esc quits
+(defun minibuffer-keyboard-quit ()
+  "Abort recursive edit.
+   In Delete Selection mode, if the mark is active, just deactivate it;
+   then it takes a second \\[keyboard-quit] to abort the minibuffer."
+  (interactive)
+  (if (and delete-selection-mode transient-mark-mode mark-active)
+      (setq deactivate-mark  t)
+    (when (get-buffer "*Completions*") (delete-windows-on "*Completions*"))
+    (abort-recursive-edit)))
+(define-key evil-normal-state-map [escape] 'keyboard-quit)
+(define-key evil-visual-state-map [escape] 'keyboard-quit)
+(define-key minibuffer-local-map [escape] 'minibuffer-keyboard-quit)
+(define-key minibuffer-local-ns-map [escape] 'minibuffer-keyboard-quit)
+(define-key minibuffer-local-completion-map [escape] 'minibuffer-keyboard-quit)
+(define-key minibuffer-local-must-match-map [escape] 'minibuffer-keyboard-quit)
+(define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
+(global-set-key [escape] 'evil-exit-emacs-state)
 
 
 ;; Undo tree
 (require 'undo-tree)
 (setq undo-tree-visualizer-diff t)
 (global-undo-tree-mode 1)
-
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customization
@@ -243,15 +257,6 @@
 (global-font-lock-mode t)
 (load-theme 'leuven t)
 
-;; From http://yoo2080.wordpress.com/2013/05/30/monospace-font-in-tables-and-source-code-blocks-in-org-mode-proportional-font-in-other-parts/
-(add-hook 'text-mode-hook 'variable-pitch-mode)
-(defun my-adjoin-to-list-or-symbol (element list-or-symbol)
-  (let ((list (if (not (listp list-or-symbol))
-                  (list list-or-symbol)
-                list-or-symbol)))
-    (require 'cl-lib)
-    (cl-adjoin element list)))
-
 (show-paren-mode t)
 
 (require 'pretty-mode)
@@ -267,12 +272,6 @@
   (tool-bar-mode -1)
   (mouse-wheel-mode t))
 
-(set-face-attribute 'variable-pitch nil
-                    :family "DejaVu Sans Condensed"
-                    :height 130
-                    :weight 'normal
-                    :width 'normal)
-
 (set-face-attribute 'default nil
                     :family "DejaVu Sans Mono"
                     :height 120
@@ -286,13 +285,7 @@
 (require 'projectile)
 (projectile-global-mode)
 
-(setq
-   version-control t
-   kept-new-versions 6
-   kept-old-versions 2
-   backup-by-copying t
-   backup-directory-alist '(("." . "~/.emacs.d/saves"))
-   delete-old-versions t)
+(setq make-backup-files nil)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Programming
@@ -314,6 +307,23 @@
             (whitespace-cleanup)
             (delete-trailing-whitespace)))
 
+;; Flycheck
+(require 'flycheck)
+(add-hook 'after-init-hook #'global-flycheck-mode)
+
+(setq flycheck-check-syntax-automatically '(save mode-enabled))
+(setq flycheck-checkers (delq 'emacs-lisp-checkdoc flycheck-checkers))
+(setq flycheck-checkers (delq 'html-tidy flycheck-checkers))
+(setq flycheck-standard-error-navigation nil)
+
+(global-flycheck-mode t)
+
+;; flycheck errors on a tooltip (doesnt work on console)
+(when (display-graphic-p (selected-frame))
+  (eval-after-load 'flycheck
+    '(custom-set-variables
+      '(flycheck-display-errors-function #'flycheck-pos-tip-error-messages))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Languages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -333,7 +343,6 @@
 ;; Lisp
 (defun enable-lisp-utils ()
   (require 'evil-paredit)
-  (local-set-key (kbd "RET") 'newline-and-indent)
   (rainbow-delimiters-mode)
   (enable-paredit-mode)
   (evil-paredit-mode t))
@@ -344,15 +353,7 @@
                 clojure-mode-hook))
   (add-hook hook 'enable-lisp-utils))
 
-(require 'ac-cider)
-(add-hook 'cider-mode-hook 'ac-flyspell-workaround)
-(add-hook 'cider-mode-hook 'ac-cider-setup)
-(add-hook 'cider-repl-mode-hook 'ac-cider-setup)
-(eval-after-load "auto-complete"
-  '(add-to-list 'ac-modes 'cider-mode))
-
 (add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)
-(setq cider-repl-tab-command 'indent-for-tab-command)
 (setq cider-repl-use-clojure-font-lock t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -387,6 +388,15 @@
 (dolist (hook '(change-log-mode-hook log-edit-mode-hook))
   (add-hook hook (lambda () (flyspell-mode -1))))
 
+;; LaTeX
+(setq TeX-parse-self t); Enable parse on load.
+(setq TeX-auto-save t); Enable parse on save.
+(setq-default TeX-master nil)
+
+(setq TeX-PDF-mode t); PDF mode (rather than DVI-mode)
+
+(add-hook 'TeX-mode-hook 'LaTeX-math-mode)
+
 ;; org-mode
 (require 'org)
 (when (not (version= (org-version) "8.2.7c"))
@@ -408,17 +418,6 @@
       org-startup-with-inline-images (display-graphic-p)
       org-html-head-include-default-style nil)
 
-(eval-after-load "org"
-  '(mapc
-    (lambda (face)
-      (set-face-attribute
-       face nil
-       :inherit
-       (my-adjoin-to-list-or-symbol
-        'fixed-pitch
-        (face-attribute face :inherit))))
-    (list 'org-code 'org-block 'org-table 'org-block-background)))
-
 (setq org-todo-keywords
       '((sequence "TODO" "IN PROGRESS" "VERIFY" "|" "SUSPENDED" "DONE")))
 
@@ -437,7 +436,7 @@
       (expand-file-name "/usr/local/Cellar/plantuml/7994/plantuml.7994.jar"))
 
 ;; LaTeX-org-export
-(setq org-latex-pdf-process (list "make; latexmk --bibtex --pdf --latexoption=-shell-escape %f"))
+(setq org-latex-pdf-process (list "make; latexmk --gg --bibtex --pdf --latexoption=-shell-escape %f"))
 (setq org-latex-listings 't)
 
 (add-to-list 'org-latex-packages-alist '("" "times"))

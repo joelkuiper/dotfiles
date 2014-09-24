@@ -116,7 +116,6 @@ set lazyredraw
 set hidden
 set incsearch
 set laststatus=2
-set list
 set encoding=UTF-8
 
 set listchars=tab:▸\ ,eol:¬,extends:❯,precedes:❮
