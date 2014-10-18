@@ -33,13 +33,13 @@
                       flycheck
                       ;; Themes
                       leuven-theme
+                      monokai-theme
                       pretty-mode
                       ;; Project management
                       magit ;; git
                       projectile
                       ;; Writing
                       org-plus-contrib htmlize
-                      langtool ;; Spellcheck
                       ;; Language support
                       auctex
                       ess ;; R
@@ -72,8 +72,7 @@
 (set-terminal-coding-system 'utf-8-unix)
 (set-keyboard-coding-system 'utf-8-unix)
 (prefer-coding-system 'utf-8-unix)
-(when (display-graphic-p)
-  (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; OSX Specific
@@ -103,7 +102,6 @@
 ;;; Util
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (display-time)
-(setq display-time-24hr-format t)
 (setq display-time-day-and-date t)
 
 (require 'smex)
@@ -245,7 +243,6 @@
 
 (setq x-select-enable-clipboard t
       x-select-enable-primary t
-      save-interprogram-paste-before-kill t
       apropos-do-all t
       mouse-yank-at-point t)
 
@@ -255,7 +252,7 @@
 (setq inhibit-splash-screen t)
 
 (global-font-lock-mode t)
-(load-theme 'leuven t)
+(load-theme 'monokai t)
 
 (show-paren-mode t)
 
@@ -274,7 +271,7 @@
 
 (set-face-attribute 'default nil
                     :family "DejaVu Sans Mono"
-                    :height 120
+                    :height 110
                     :weight 'normal
                     :width 'normal)
 
@@ -360,24 +357,6 @@
 ;;; Writing & Blogging
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; I am dyslectic
-(when (file-exists-p "/usr/local/Cellar/languagetool/2.3/libexec/languagetool-commandline.jar")
-  (require 'langtool)
-  (setq langtool-language-tool-jar "/usr/local/Cellar/languagetool/2.3/libexec/languagetool-commandline.jar"
-        langtool-mother-tongue "nl"
-        langtool-disabled-rules '("WHITESPACE_RULE"
-                                  "EN_UNPAIRED_BRACKETS"
-                                  "COMMA_PARENTHESIS_WHITESPACE"
-                                  "EN_QUOTES")))
-
-(when (executable-find "hunspell")
-  (setq-default flyspell-issue-welcome-flag nil
-                ispell-program-name "hunspell"
-                ispell-really-hunspell t)
-  (eval-after-load "flyspell"
-    '(progn
-       (define-key flyspell-mouse-map [down-mouse-3] #'flyspell-correct-word)
-       (define-key flyspell-mouse-map [mouse-3] #'undefined))))
-
 (defun enable-write-utils ()
   (visual-line-mode 1)
   (flyspell-mode 1))
@@ -389,22 +368,12 @@
   (add-hook hook (lambda () (flyspell-mode -1))))
 
 ;; LaTeX
-(setq TeX-parse-self t); Enable parse on load.
-(setq TeX-auto-save t); Enable parse on save.
-(setq-default TeX-master nil)
-
 (setq TeX-PDF-mode t); PDF mode (rather than DVI-mode)
 
 (add-hook 'TeX-mode-hook 'LaTeX-math-mode)
 
 ;; org-mode
 (require 'org)
-(when (not (version= (org-version) "8.2.7c"))
-  (display-warning
-   'org-mode
-   (concat
-    "Insufficient requirements. Expected 8.2.7c. Found " (org-version))
-   :warning))
 
 (require 'ox-publish)
 (require 'ox-latex)
@@ -432,9 +401,6 @@
 
 (org-add-link-type "asset" 'org-custom-link-asset-follow 'org-custom-link-asset-export)
 
-(setq org-plantuml-jar-path
-      (expand-file-name "/usr/local/Cellar/plantuml/7994/plantuml.7994.jar"))
-
 ;; LaTeX-org-export
 (setq org-latex-pdf-process (list "make; latexmk --gg --bibtex --pdf --latexoption=-shell-escape %f"))
 (setq org-latex-listings 't)
@@ -451,8 +417,7 @@
    (plantuml . t)
    (dot . t)
    (python . t)
-   (lisp . t)
-   (ditaa . t)))
+   (lisp . t)))
 
 ;; blogging
 (setq org-publish-project-alist
