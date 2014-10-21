@@ -31,21 +31,21 @@
                       smex
                       expand-region
                       flycheck
-                      ;; Themes
-                      leuven-theme
-                      monokai-theme
                       pretty-mode
+                      ;; Themes
+                      monokai-theme
+                      leuven-theme
                       ;; Project management
-                      magit ;; git
+                      magit ; git
                       projectile
                       ;; Writing
                       org-plus-contrib htmlize
                       ;; Language support
                       auctex
-                      ess ;; R
-                      cider ;; Clojure
-                      web-mode js2-mode ;; Web development
-                      highlight paredit evil-paredit rainbow-delimiters;; LISP
+                      ess ; R
+                      cider ; Clojure
+                      web-mode js2-mode ; Web development
+                      highlight paredit evil-paredit rainbow-delimiters ; Lisp
                       ))
 
 (defun my-missing-packages ()
@@ -112,22 +112,6 @@
   (interactive)
   (revert-buffer t t))
 
-;; emacs striptease http://bzg.fr/emacs-strip-tease.html
-;; A small minor mode to use a big fringe
-(defvar big-fringe-mode nil)
-(define-minor-mode big-fringe-mode
-  "Minor mode to hide the mode-line in the current buffer."
-  :init-value nil
-  :global t
-  :variable big-fringe-mode
-  :group 'editing-basics
-  (if (not big-fringe-mode)
-      (set-fringe-style nil)
-    (set-fringe-mode
-     (/ (- (frame-pixel-width)
-           (* 100 (frame-char-width)))
-        2))))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; General
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -173,7 +157,6 @@
   "x"      'smex ;; eXecute
   "e"      'eval-expression
   "g"      'magit-status
-  "o"      'occur
   "f"      'find-file
   "sh"     'ansi-term; SHell
   "bs"     'switch-to-buffer ; BufferSwitch
@@ -252,7 +235,7 @@
 (setq inhibit-splash-screen t)
 
 (global-font-lock-mode t)
-(load-theme 'monokai t)
+(load-theme 'leuven t)
 
 (show-paren-mode t)
 
@@ -271,9 +254,7 @@
 
 (set-face-attribute 'default nil
                     :family "DejaVu Sans Mono"
-                    :height 110
-                    :weight 'normal
-                    :width 'normal)
+                    :height 100)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Projects
@@ -356,21 +337,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Writing & Blogging
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; I am dyslectic
 (defun enable-write-utils ()
-  (visual-line-mode 1)
-  (flyspell-mode 1))
+  (flyspell-mode t)
+  (visual-line-mode 1))
 
 (dolist (hook '(text-mode-hook org-mode-hook latex-mode-hook))
   (add-hook hook 'enable-write-utils))
-
-(dolist (hook '(change-log-mode-hook log-edit-mode-hook))
-  (add-hook hook (lambda () (flyspell-mode -1))))
-
-;; LaTeX
-(setq TeX-PDF-mode t); PDF mode (rather than DVI-mode)
-
-(add-hook 'TeX-mode-hook 'LaTeX-math-mode)
 
 ;; org-mode
 (require 'org)
