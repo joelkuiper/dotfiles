@@ -33,19 +33,20 @@
                       flycheck
                       pretty-mode
                       ;; Themes
-                      monokai-theme
                       leuven-theme
                       ;; Project management
                       magit ; git
                       projectile
                       ;; Writing
+                      langtool
                       org-plus-contrib htmlize
                       ;; Language support
                       auctex
                       ess ; R
                       cider ; Clojure
                       web-mode js2-mode ; Web development
-                      highlight paredit evil-paredit rainbow-delimiters ; Lisp
+                      highlight paredit evil-paredit rainbow-delimiters aggressive-indent
+ ; Lisp
                       ))
 
 (defun my-missing-packages ()
@@ -322,6 +323,7 @@
 (defun enable-lisp-utils ()
   (require 'evil-paredit)
   (rainbow-delimiters-mode)
+  (aggressive-indent-mode)
   (enable-paredit-mode)
   (evil-paredit-mode t))
 
@@ -343,6 +345,16 @@
 
 (dolist (hook '(text-mode-hook org-mode-hook latex-mode-hook))
   (add-hook hook 'enable-write-utils))
+
+
+(when (file-exists-p "/usr/local/Cellar/languagetool/2.6/libexec/languagetool-commandline.jar")
+  (require 'langtool)
+  (setq langtool-language-tool-jar "/usr/local/Cellar/languagetool/2.6/libexec/languagetool-commandline.jar"
+        langtool-mother-tongue "nl"
+        langtool-disabled-rules '("WHITESPACE_RULE"
+                                  "EN_UNPAIRED_BRACKETS"
+                                  "COMMA_PARENTHESIS_WHITESPACE"
+                                  "EN_QUOTES")))
 
 ;; org-mode
 (require 'org)
