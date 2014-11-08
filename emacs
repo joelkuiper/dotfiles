@@ -23,7 +23,8 @@
 (package-initialize)
 
 (defvar my-packages '(;; Core
-                      evil evil-leader
+                      evil
+                      evil-leader
                       key-chord
                       exec-path-from-shell
                       flx-ido
@@ -31,6 +32,7 @@
                       smex
                       expand-region
                       flycheck
+                      company
                       pretty-mode
                       ;; Themes
                       leuven-theme
@@ -39,14 +41,14 @@
                       projectile
                       ;; Writing
                       langtool
-                      org-plus-contrib htmlize
+                      org-plus-contrib
+                      htmlize
                       ;; Language support
                       auctex
                       ess ; R
                       cider ; Clojure
                       web-mode js2-mode ; Web development
-                      highlight paredit evil-paredit rainbow-delimiters aggressive-indent
- ; Lisp
+                      highlight paredit evil-paredit rainbow-delimiters aggressive-indent ; Lisp
                       ))
 
 (defun my-missing-packages ()
@@ -74,7 +76,6 @@
 (set-keyboard-coding-system 'utf-8-unix)
 (prefer-coding-system 'utf-8-unix)
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; OSX Specific
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -95,7 +96,6 @@
   ;; BSD ls doesn't support --dired. use brews' GNU core-utils
   (when (executable-find "gls")
     (setq
-     dired-use-ls-dired t
      dired-listing-switches "-alh"
      insert-directory-program "gls")))
 
@@ -181,8 +181,7 @@
   (interactive)
   (if (and delete-selection-mode transient-mark-mode mark-active)
       (setq deactivate-mark  t)
-    (when (get-buffer "*Completions*") (delete-windows-on "*Completions*"))
-    (abort-recursive-edit)))
+    (when (get-buffer "*Completions*") (delete-windows-on "*Completions*")) (abort-recursive-edit)))
 (define-key evil-normal-state-map [escape] 'keyboard-quit)
 (define-key evil-visual-state-map [escape] 'keyboard-quit)
 (define-key minibuffer-local-map [escape] 'minibuffer-keyboard-quit)
@@ -269,6 +268,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Programming
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(global-company-mode)
+
 ;; Whitespace
 (set-default 'tab-width 2)
 (set-default 'indicate-empty-lines t)
@@ -346,6 +347,7 @@
 (dolist (hook '(text-mode-hook org-mode-hook latex-mode-hook))
   (add-hook hook 'enable-write-utils))
 
+(setq sentence-end-double-space nil)
 
 (when (file-exists-p "/usr/local/Cellar/languagetool/2.6/libexec/languagetool-commandline.jar")
   (require 'langtool)
