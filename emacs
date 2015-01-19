@@ -274,6 +274,7 @@
 (set-default 'tab-width 2)
 (set-default 'indicate-empty-lines t)
 (set-default 'indent-tabs-mode nil)
+(setq web-mode-markup-indent-offset 2)
 
 ;; Also highlight long lines in whitespace-mode
 (require 'whitespace)
