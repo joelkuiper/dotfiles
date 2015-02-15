@@ -34,8 +34,10 @@
                       flycheck
                       company
                       pretty-mode
+                      ace-jump-mode
                       ;; Themes
                       leuven-theme
+                      moe-theme
                       ;; Project management
                       magit ; git
                       projectile
@@ -153,8 +155,9 @@
 
 ;; Leaders
 (evil-leader/set-key
-  "."      'evil-ex
-  "<SPC>"  'er/expand-region
+  "SPC"    'evil-ace-jump-word-mode
+  "x"      'evil-ex
+  "."      'er/expand-region
   "x"      'smex ;; eXecute
   "e"      'eval-expression
   "f"      'find-file
@@ -448,6 +451,12 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(ansi-color-faces-vector
+   [default default default italic underline success warning error])
+ '(custom-safe-themes
+   (quote
+    ("55d9c10f1ec447face830d2f40fe4ea28516b03ac8061470dd543ad2e1394e2e" default)))
+ '(flycheck-display-errors-function (function flycheck-pos-tip-error-messages))
  '(js2-basic-offset 2)
  '(safe-local-variable-values (quote ((js-indent-level . 2)))))
 
