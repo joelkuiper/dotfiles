@@ -59,6 +59,7 @@ export PATH="/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/share:$HO
 if [[ -a ~/.secrets ]] then
   source ~/.secrets
 fi
+export PATH=~/anaconda/bin:$PATH
 
 PATH=$PATH:/usr/local/texlive/2014/bin/universal-darwin # Add pdflatex
-PYTHONPATH=/usr/local/lib/python2.7/site-packages:$PYTHONPATH
+
