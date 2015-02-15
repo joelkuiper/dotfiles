@@ -157,7 +157,6 @@
   "<SPC>"  'er/expand-region
   "x"      'smex ;; eXecute
   "e"      'eval-expression
-  "g"      'magit-status
   "f"      'find-file
   "sh"     'ansi-term; SHell
   "bs"     'switch-to-buffer ; BufferSwitch
@@ -165,11 +164,19 @@
   "bk"     'ido-kill-buffer
   "k"      'kill-this-buffer
   "u"      'undo-tree-visualize
+  "d"      'vc-diff
   "ws"     'whitespace-mode
   "pf"     'projectile-find-file
   "ps"     'projectile-switch-project
   "pd"     'projectile-dired
   "pg"     'projectile-grep)
+
+
+(evil-leader/set-key
+  "gs" 'magit-status
+  "gb" 'magit-blame-mode
+  "gc" 'magit-commit
+  "gl" 'magit-log)
 
 (define-key global-map (kbd "RET") 'newline-and-indent)
 
@@ -196,6 +203,9 @@
 (require 'undo-tree)
 (setq undo-tree-visualizer-diff t)
 (global-undo-tree-mode 1)
+
+;; Git
+(setq magit-diff-options '("--histogram"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customization
