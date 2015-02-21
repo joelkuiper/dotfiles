@@ -20,6 +20,8 @@
                          ("melpa" . "http://melpa.milkbox.net/packages/")))
 
 (require 'package)
+(require 'cl)
+
 (package-initialize)
 
 (defvar my-packages '(;; Core
@@ -37,10 +39,11 @@
                       ace-jump-mode
                       ;; Themes
                       leuven-theme
-                      moe-theme
                       ;; Project management
                       magit ; git
                       projectile
+                      ggtags
+                      ag
                       ;; Writing
                       langtool
                       org-plus-contrib
@@ -58,6 +61,7 @@
     (dolist (package my-packages missing-packages)
       (or (package-installed-p package)
 (push package missing-packages)))))
+
 
 (let ((missing (my-missing-packages)))
   (when missing
@@ -78,6 +82,12 @@
 (set-keyboard-coding-system 'utf-8-unix)
 (prefer-coding-system 'utf-8-unix)
 
+(when (window-system)
+  (scroll-bar-mode -1)
+  (blink-cursor-mode -1)
+  (tool-bar-mode -1)
+  (mouse-wheel-mode t))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; OSX Specific
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -86,6 +96,9 @@
 
   (require 'exec-path-from-shell)
   (exec-path-from-shell-initialize)
+
+  (setq redisplay-dont-pause t)
+  (setq mouse-wheel-scroll-amount '(0.001))
 
   (setq mac-option-modifier nil
         mac-command-modifier 'meta)
@@ -141,12 +154,18 @@
 (setq-default evil-symbol-word-search t)
 (put 'narrow-to-region 'disabled nil) ; narrow to region should be enabled by default
 
-(setq evil-emacs-state-cursor '("red" box))
-(setq evil-normal-state-cursor '("green" box))
-(setq evil-visual-state-cursor '("orange" box))
-(setq evil-insert-state-cursor '("red" bar))
-(setq evil-replace-state-cursor '("red" bar))
-(setq evil-operator-state-cursor '("red" hollow))
+(lexical-let ((default-color (cons (face-background 'mode-line)
+                                   (face-foreground 'mode-line))))
+  (add-hook 'post-command-hook
+            (lambda ()
+              (let ((color (cond ((minibufferp) default-color)
+                                 ((evil-insert-state-p) '("#e80000" . "#ffffff"))
+                                 ((evil-emacs-state-p) '("#444488" . "#ffffff"))
+                                 ((evil-visual-state-p) '("#ffa500" . "#ffffff"))
+                                 ((buffer-modified-p) '("#006fa0" . "#ffffff"))
+                                 (t default-color))))
+                (set-face-background 'mode-line (car color))
+                (set-face-foreground 'mode-line (cdr color))))))
 
 (require 'expand-region)
 
@@ -156,7 +175,6 @@
 ;; Leaders
 (evil-leader/set-key
   "SPC"    'evil-ace-jump-word-mode
-  "x"      'evil-ex
   "."      'er/expand-region
   "x"      'smex ;; eXecute
   "e"      'eval-expression
@@ -169,17 +187,15 @@
   "u"      'undo-tree-visualize
   "d"      'vc-diff
   "ws"     'whitespace-mode
+  "gs"     'magit-status
+  "gb"     'magit-blame-mode
+  "gc"     'magit-commit
+  "gl"     'magit-log
+  "pt"     'projectile-find-tag
   "pf"     'projectile-find-file
   "ps"     'projectile-switch-project
   "pd"     'projectile-dired
-  "pg"     'projectile-grep)
-
-
-(evil-leader/set-key
-  "gs" 'magit-status
-  "gb" 'magit-blame-mode
-  "gc" 'magit-commit
-  "gl" 'magit-log)
+  "pg"     'projectile-ag)
 
 (define-key global-map (kbd "RET") 'newline-and-indent)
 
@@ -191,7 +207,8 @@
   (interactive)
   (if (and delete-selection-mode transient-mark-mode mark-active)
       (setq deactivate-mark  t)
-    (when (get-buffer "*Completions*") (delete-windows-on "*Completions*")) (abort-recursive-edit)))
+    (when (get-buffer "*Completions*") (delete-windows-on "*Completions*"))
+    (abort-recursive-edit)))
 (define-key evil-normal-state-map [escape] 'keyboard-quit)
 (define-key evil-visual-state-map [escape] 'keyboard-quit)
 (define-key minibuffer-local-map [escape] 'minibuffer-keyboard-quit)
@@ -201,14 +218,9 @@
 (define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
 (global-set-key [escape] 'evil-exit-emacs-state)
 
-
 ;; Undo tree
 (require 'undo-tree)
-(setq undo-tree-visualizer-diff t)
 (global-undo-tree-mode 1)
-
-;; Git
-(setq magit-diff-options '("--histogram"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customization
@@ -238,9 +250,7 @@
 (winner-mode 1)
 
 (setq x-select-enable-clipboard t
-      x-select-enable-primary t
-      apropos-do-all t
-      mouse-yank-at-point t)
+      x-select-enable-primary t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Visual
@@ -248,6 +258,7 @@
 (setq inhibit-splash-screen t)
 
 (global-font-lock-mode t)
+
 (load-theme 'leuven t)
 
 (show-paren-mode t)
@@ -259,15 +270,11 @@
 ;; No bell
 (setq ring-bell-function 'ignore)
 
-(when (window-system)
-  (scroll-bar-mode -1)
-  (blink-cursor-mode -1)
-  (tool-bar-mode -1)
-  (mouse-wheel-mode t))
-
-(set-face-attribute 'default nil
-                    :family "DejaVu Sans Mono"
-                    :height 100)
+(when window-system
+  (set-face-attribute 'default nil
+                      :family "DejaVu Sans Mono"
+                      :height 100
+                      :width 'normal))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Projects
@@ -277,6 +284,10 @@
 (projectile-global-mode)
 
 (setq make-backup-files nil)
+(setq vc-make-backup-files nil)
+
+(setq backup-directory-alist `((".*" . ,temporary-file-directory)))
+(setq auto-save-file-name-transforms `((".*" ,temporary-file-directory t)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Programming
@@ -307,16 +318,9 @@
 
 (setq flycheck-check-syntax-automatically '(save mode-enabled))
 (setq flycheck-checkers (delq 'emacs-lisp-checkdoc flycheck-checkers))
-(setq flycheck-checkers (delq 'html-tidy flycheck-checkers))
 (setq flycheck-standard-error-navigation nil)
 
 (global-flycheck-mode t)
-
-;; flycheck errors on a tooltip (doesnt work on console)
-(when (display-graphic-p (selected-frame))
-  (eval-after-load 'flycheck
-    '(custom-set-variables
-      '(flycheck-display-errors-function #'flycheck-pos-tip-error-messages))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Languages
@@ -328,7 +332,6 @@
 (add-to-list 'auto-mode-alist '("\\.js.?" . js2-mode))
 (add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
 (add-to-list 'auto-mode-alist '("\\.rd\\'" . Rd-mode))
-
 
 ;; Emacs Speaks Statistics
 (require 'ess-site)
@@ -363,9 +366,9 @@
 
 (setq sentence-end-double-space nil)
 
-(when (file-exists-p "/usr/local/Cellar/languagetool/2.6/libexec/languagetool-commandline.jar")
+(when (file-exists-p "/usr/local/Cellar/languagetool/2.8/libexec/languagetool-commandline.jar")
   (require 'langtool)
-  (setq langtool-language-tool-jar "/usr/local/Cellar/languagetool/2.6/libexec/languagetool-commandline.jar"
+  (setq langtool-language-tool-jar "/usr/local/Cellar/languagetool/2.8/libexec/languagetool-commandline.jar"
         langtool-mother-tongue "nl"
         langtool-disabled-rules '("WHITESPACE_RULE"
                                   "EN_UNPAIRED_BRACKETS"
@@ -453,10 +456,11 @@
  ;; If there is more than one, they won't work right.
  '(ansi-color-faces-vector
    [default default default italic underline success warning error])
+ '(ansi-color-names-vector
+   ["#303030" "#ff4b4b" "#d7ff5f" "#fce94f" "#5fafd7" "#d18aff" "#afd7ff" "#c6c6c6"])
  '(custom-safe-themes
    (quote
-    ("55d9c10f1ec447face830d2f40fe4ea28516b03ac8061470dd543ad2e1394e2e" default)))
- '(flycheck-display-errors-function (function flycheck-pos-tip-error-messages))
+    ("a3a2d8d41fce8dc3b48af3a5b083ccae94c38ea82ca19ab1336bc40859402313" "55d9c10f1ec447face830d2f40fe4ea28516b03ac8061470dd543ad2e1394e2e" default)))
  '(js2-basic-offset 2)
  '(safe-local-variable-values (quote ((js-indent-level . 2)))))
 

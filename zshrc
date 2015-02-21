@@ -12,9 +12,6 @@ export TERM="xterm-256color"
 export EDITOR=vim
 export NODE_PATH=$NODE_PATH:/usr/local/lib/node_modules
 
-# cache pip-installed packages to avoid re-downloading
-export PIP_DOWNLOAD_CACHE=$HOME/.pip/cache
-
 #Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
@@ -59,7 +56,8 @@ export PATH="/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/share:$HO
 if [[ -a ~/.secrets ]] then
   source ~/.secrets
 fi
-export PATH=~/anaconda/bin:$PATH
 
 PATH=$PATH:/usr/local/texlive/2014/bin/universal-darwin # Add pdflatex
+PATH=~/anaconda/bin:$PATH # add Anaconda
 
+export JAVA_HOME=$(/usr/libexec/java_home)
