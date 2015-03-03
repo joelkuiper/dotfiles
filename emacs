@@ -12,6 +12,7 @@
       user-mail-address "me@joelkuiper.eu")
 
 (load-file "~/.emacs.secrets")
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Packaging setup.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -37,8 +38,11 @@
                       company
                       pretty-mode
                       ace-jump-mode
+                      neotree
                       ;; Themes
+                      solarized-theme
                       leuven-theme
+                      monokai-theme
                       ;; Project management
                       magit ; git
                       projectile
@@ -82,11 +86,17 @@
 (set-keyboard-coding-system 'utf-8-unix)
 (prefer-coding-system 'utf-8-unix)
 
+
 (when (window-system)
-  (scroll-bar-mode -1)
-  (blink-cursor-mode -1)
-  (tool-bar-mode -1)
-  (mouse-wheel-mode t))
+  (set-fringe-mode 2)
+  (unless (eq tool-bar-mode -1)
+    (tool-bar-mode -1))
+  (unless (eq scroll-bar-mode -1)
+    (scroll-bar-mode -1))
+  ;; tooltips in echo-area
+  (unless (eq tooltip-mode -1)
+    (tooltip-mode -1)))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; OSX Specific
@@ -97,7 +107,6 @@
   (require 'exec-path-from-shell)
   (exec-path-from-shell-initialize)
 
-  (setq redisplay-dont-pause t)
   (setq mouse-wheel-scroll-amount '(0.001))
 
   (setq mac-option-modifier nil
@@ -106,7 +115,6 @@
   ;; for bibtex2html see: http://foswiki.org/Tasks.Item11919
   (setenv "TMPDIR" ".")
 
-  (setq redisplay-dont-pause t)
 
   ;; BSD ls doesn't support --dired. use brews' GNU core-utils
   (when (executable-find "gls")
@@ -173,6 +181,7 @@
   "k"      'kill-this-buffer
   "u"      'undo-tree-visualize
   "d"      'vc-diff
+  "t"      'neotree-toggle
   "ws"     'whitespace-mode
   "gs"     'magit-status
   "gb"     'magit-blame-mode
@@ -209,6 +218,43 @@
 (require 'undo-tree)
 (global-undo-tree-mode 1)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Visual
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(setq inhibit-splash-screen t)
+
+(global-font-lock-mode t)
+
+(load-theme 'solarized-light t)
+
+(show-paren-mode t)
+
+(require 'pretty-mode)
+(pretty-activate-groups '(:greek :undefined))
+(global-pretty-mode t)
+
+;; No bell
+(setq ring-bell-function 'ignore)
+
+(when window-system
+  (set-face-attribute 'default nil
+                      :family "DejaVu Sans Mono"
+                      :height 100
+                      :width 'normal))
+
+(lexical-let ((default-color (cons (face-background 'mode-line)
+                                   (face-foreground 'mode-line))))
+  (add-hook 'post-command-hook
+            (lambda ()
+              (let ((color (cond ((minibufferp) default-color)
+                                 ((evil-insert-state-p) '("#e80000" . "#ffffff"))
+                                 ((evil-emacs-state-p) '("#444488" . "#ffffff"))
+                                 ((evil-visual-state-p) '("#ffa500" . "#ffffff"))
+                                 ((buffer-modified-p) '("#006fa0" . "#ffffff"))
+                                 (t default-color))))
+                (set-face-background 'mode-line (car color))
+                (set-face-foreground 'mode-line (cdr color))))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customization
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -239,42 +285,6 @@
 (setq x-select-enable-clipboard t
       x-select-enable-primary t)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Visual
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(setq inhibit-splash-screen t)
-
-(global-font-lock-mode t)
-
-(load-theme 'leuven t)
-
-(show-paren-mode t)
-
-(require 'pretty-mode)
-(pretty-activate-groups '(:greek :undefined))
-(global-pretty-mode t)
-
-;; No bell
-(setq ring-bell-function 'ignore)
-
-(when window-system
-  (set-face-attribute 'default nil
-                      :family "DejaVu Sans Mono"
-                      :height 100
-                      :width 'normal))
-
-(lexical-let ((default-color (cons (face-background 'mode-line)
-                                   (face-foreground 'mode-line))))
-  (add-hook 'post-command-hook
-            (lambda ()
-              (let ((color (cond ((minibufferp) default-color)
-                                 ((evil-insert-state-p) '("#e80000" . "#ffffff"))
-                                 ((evil-emacs-state-p) '("#444488" . "#ffffff"))
-                                 ((evil-visual-state-p) '("#ffa500" . "#ffffff"))
-                                 ((buffer-modified-p) '("#006fa0" . "#ffffff"))
-                                 (t default-color))))
-                (set-face-background 'mode-line (car color))
-                (set-face-foreground 'mode-line (cdr color))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Projects
@@ -467,6 +477,13 @@
          :recursive t
          :publishing-function org-publish-attachment)
         ("blog" :components ("org-joelkuiper" "org-static-joelkuiper"))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Server
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(require 'server)
+(unless (server-running-p) (server-start))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customizations (from M-x customze-*)
