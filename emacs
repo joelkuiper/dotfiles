@@ -154,19 +154,6 @@
 (setq-default evil-symbol-word-search t)
 (put 'narrow-to-region 'disabled nil) ; narrow to region should be enabled by default
 
-(lexical-let ((default-color (cons (face-background 'mode-line)
-                                   (face-foreground 'mode-line))))
-  (add-hook 'post-command-hook
-            (lambda ()
-              (let ((color (cond ((minibufferp) default-color)
-                                 ((evil-insert-state-p) '("#e80000" . "#ffffff"))
-                                 ((evil-emacs-state-p) '("#444488" . "#ffffff"))
-                                 ((evil-visual-state-p) '("#ffa500" . "#ffffff"))
-                                 ((buffer-modified-p) '("#006fa0" . "#ffffff"))
-                                 (t default-color))))
-                (set-face-background 'mode-line (car color))
-                (set-face-foreground 'mode-line (cdr color))))))
-
 (require 'expand-region)
 
 (define-key evil-visual-state-map (kbd ".") 'er/expand-region)
@@ -276,6 +263,19 @@
                       :height 100
                       :width 'normal))
 
+(lexical-let ((default-color (cons (face-background 'mode-line)
+                                   (face-foreground 'mode-line))))
+  (add-hook 'post-command-hook
+            (lambda ()
+              (let ((color (cond ((minibufferp) default-color)
+                                 ((evil-insert-state-p) '("#e80000" . "#ffffff"))
+                                 ((evil-emacs-state-p) '("#444488" . "#ffffff"))
+                                 ((evil-visual-state-p) '("#ffa500" . "#ffffff"))
+                                 ((buffer-modified-p) '("#006fa0" . "#ffffff"))
+                                 (t default-color))))
+                (set-face-background 'mode-line (car color))
+                (set-face-foreground 'mode-line (cdr color))))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Projects
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -293,6 +293,28 @@
 ;;; Programming
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (global-company-mode)
+(define-key evil-insert-state-map (kbd "<tab>") 'company-complete-common)
+(define-key evil-insert-state-map (kbd "<c-spc>") 'company-complete-common)
+(define-key company-active-map (kbd "<tab>") 'company-complete-common)
+(define-key company-active-map (kbd "C-n") 'company-select-next)
+(define-key company-active-map (kbd "C-p") 'company-select-previous)
+
+(defun company-complete-lambda (arg)
+  "Ignores passed in arg like a lambda and runs company-complete"
+  (company-complete))
+
+(setq
+ ;; never start auto-completion unless I ask for it
+ company-idle-delay nil
+ ;; autocomplete right after '.'
+ company-minimum-prefix-length 0
+ ;; remove echo delay
+ company-echo-delay 0
+ ;; don't complete in certain modes
+ company-global-modes '(not git-commit-mode)
+ ;; make sure evil uses the right completion functions
+ evil-complete-next-func 'company-complete-lambda
+ evil-complete-previous-func 'company-complete-lambda)
 
 ;; Whitespace
 (set-default 'tab-width 2)
@@ -454,13 +476,6 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ansi-color-faces-vector
-   [default default default italic underline success warning error])
- '(ansi-color-names-vector
-   ["#303030" "#ff4b4b" "#d7ff5f" "#fce94f" "#5fafd7" "#d18aff" "#afd7ff" "#c6c6c6"])
- '(custom-safe-themes
-   (quote
-    ("a3a2d8d41fce8dc3b48af3a5b083ccae94c38ea82ca19ab1336bc40859402313" "55d9c10f1ec447face830d2f40fe4ea28516b03ac8061470dd543ad2e1394e2e" default)))
  '(js2-basic-offset 2)
  '(safe-local-variable-values (quote ((js-indent-level . 2)))))
 
