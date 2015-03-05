@@ -128,6 +128,9 @@
 (display-time)
 (setq display-time-day-and-date t)
 
+(require 'nav)
+(nav-disable-overeager-window-splitting)
+
 (require 'smex)
 (smex-initialize)
 
@@ -181,7 +184,7 @@
   "k"      'kill-this-buffer
   "u"      'undo-tree-visualize
   "d"      'vc-diff
-  "t"      'neotree-toggle
+  "t"      'nav-toggle
   "ws"     'whitespace-mode
   "gs"     'magit-status
   "gb"     'magit-blame-mode
@@ -225,7 +228,7 @@
 
 (global-font-lock-mode t)
 
-(load-theme 'solarized-light t)
+(load-theme 'leuven t)
 
 (show-paren-mode t)
 
@@ -237,10 +240,7 @@
 (setq ring-bell-function 'ignore)
 
 (when window-system
-  (set-face-attribute 'default nil
-                      :family "DejaVu Sans Mono"
-                      :height 100
-                      :width 'normal))
+  (set-default-font "DejaVu Sans Mono-10"))
 
 (lexical-let ((default-color (cons (face-background 'mode-line)
                                    (face-foreground 'mode-line))))
