@@ -27,6 +27,7 @@
 
 (defvar my-packages '(;; Core
                       evil
+                      evil-matchit
                       evil-leader
                       key-chord
                       exec-path-from-shell
@@ -38,7 +39,7 @@
                       company
                       pretty-mode
                       ace-jump-mode
-                      neotree
+                      nav
                       ;; Themes
                       solarized-theme
                       leuven-theme
@@ -115,6 +116,8 @@
   ;; for bibtex2html see: http://foswiki.org/Tasks.Item11919
   (setenv "TMPDIR" ".")
 
+  (setq select-enable-clipboard t
+        select-enable-primary t)
 
   ;; BSD ls doesn't support --dired. use brews' GNU core-utils
   (when (executable-find "gls")
@@ -144,6 +147,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'evil)
 (require 'evil-leader)
+(require 'evil-matchit)
+
+(global-evil-matchit-mode 1)
 
 (setq evil-leader/in-all-states 1)
 (global-evil-leader-mode)
@@ -181,7 +187,7 @@
   "bs"     'switch-to-buffer ; BufferSwitch
   "br"     'reload-buffer ; BufferReload
   "bk"     'ido-kill-buffer
-  "k"      'kill-this-buffer
+  "k"      'delete-window
   "u"      'undo-tree-visualize
   "d"      'vc-diff
   "t"      'nav-toggle
@@ -282,10 +288,6 @@
 ;; http://emacs.wordpress.com/2007/01/28/simple-window-configuration-management/
 (winner-mode 1)
 
-(setq x-select-enable-clipboard t
-      x-select-enable-primary t)
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Projects
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -338,7 +340,7 @@
 (setq whitespace-style
       '(face lines-tail spaces tabs newline space-mark tab-mark newline-mark))
 
-;; Cleanup whitespace on save
+;; Cleanup whitespace on save (co-workers love this ;-))
 (add-hook 'before-save-hook
           (lambda ()
             (whitespace-cleanup)
@@ -493,8 +495,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(js2-basic-offset 2)
- '(safe-local-variable-values (quote ((js-indent-level . 2)))))
+ '(package-selected-packages
+   (quote
+    (evil-matchit web-mode solarized-theme smex rainbow-delimiters projectile pretty-mode org-plus-contrib nav monokai-theme magit leuven-theme langtool key-chord js2-mode ido-ubiquitous htmlize highlight ggtags flycheck flx-ido expand-region exec-path-from-shell evil-paredit evil-leader ess company cider auctex aggressive-indent ag ace-jump-mode))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
