@@ -23,22 +23,20 @@ CASE_SENSITIVE="true"
 DISABLE_AUTO_UPDATE="true"
 
 # Uncomment following line if you want to disable colors in ls
-# DISABLE_LS_COLORS="true"
+DISABLE_LS_COLORS="true"
 
 # Uncomment following line if you want to disable autosetting terminal title.
 DISABLE_AUTO_TITLE="true"
 
 # Uncomment following line if you want red dots to be displayed while waiting for completion
 # COMPLETION_WAITING_DOTS="true"
-#
-DISABLE_CORRECTION="true"
 
-REPORTTIME=5
+DISABLE_CORRECTION="true"
 
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
-plugins=(git vi-mode brew osx history history-substring-search)
+plugins=(git git-flow vi-mode brew osx history-substring-search)
 
 bindkey '^[[A' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
@@ -49,15 +47,16 @@ source $ZSH/oh-my-zsh.sh
 
 alias bibtex2html="export TMPDIR=. && /usr/local/bin/bibtex2html"
 
+
+export JAVA_HOME=$(/usr/libexec/java_home)
+
 # Customize to your needs...
 export PATH="/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/share:$HOME/bin:/usr/bin:/opt/bin:$PATH"
+PATH=$PATH:/usr/local/texlive/2014/bin/universal-darwin # add pdflatex
+PATH=~/anaconda/bin:$PATH # add Anaconda
+PATH=$PATH:~/.cabal/bin:~/Library/Haskell/bin # add Haskell
 
 # Put secret configuration settings in ~/.secrets
 if [[ -a ~/.secrets ]] then
   source ~/.secrets
 fi
-
-PATH=$PATH:/usr/local/texlive/2014/bin/universal-darwin # Add pdflatex
-PATH=~/anaconda/bin:$PATH # add Anaconda
-
-export JAVA_HOME=$(/usr/libexec/java_home)

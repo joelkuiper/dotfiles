@@ -20,6 +20,8 @@
   # branch
   b = branch -v # branch (verbose)
 
+  up = !git pull --rebase --prune $@ && git submodule update --init --recursive
+
   # commit
   c = commit -m # commit with message
   ca = commit -am # commit all with message

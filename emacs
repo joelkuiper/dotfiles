@@ -27,7 +27,6 @@
 
 (defvar my-packages '(;; Core
                       evil
-                      evil-matchit
                       evil-leader
                       key-chord
                       exec-path-from-shell
@@ -147,9 +146,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'evil)
 (require 'evil-leader)
-(require 'evil-matchit)
-
-(global-evil-matchit-mode 1)
 
 (setq evil-leader/in-all-states 1)
 (global-evil-leader-mode)
@@ -487,6 +483,16 @@
 (require 'server)
 (unless (server-running-p) (server-start))
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Tramp
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(require 'tramp)
+(setq tramp-auto-save-directory temporary-file-directory)
+(add-to-list 'tramp-remote-path 'tramp-own-remote-path)
+(setq tramp-default-method "ssh")
+(setq tramp-verbose 10)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customizations (from M-x customze-*)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -495,9 +501,11 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(js2-basic-offset 2)
  '(package-selected-packages
    (quote
-    (evil-matchit web-mode solarized-theme smex rainbow-delimiters projectile pretty-mode org-plus-contrib nav monokai-theme magit leuven-theme langtool key-chord js2-mode ido-ubiquitous htmlize highlight ggtags flycheck flx-ido expand-region exec-path-from-shell evil-paredit evil-leader ess company cider auctex aggressive-indent ag ace-jump-mode))))
+    (evil-leader key-chord exec-path-from-shell flx-ido ido-ubiquitous smex expand-region flycheck company pretty-mode ace-jump-mode nav solarized-theme leuven-theme monokai-theme magit projectile ggtags ag langtool org-plus-contrib htmlize auctex ess cider web-mode js2-mode highlight evil-paredit rainbow-delimiters aggressive-indent)))
+ '(safe-local-variable-values (quote ((js-indent-level . 2)))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
