@@ -38,15 +38,13 @@
                       company
                       pretty-mode
                       ace-jump-mode
-                      nav
                       ;; Themes
-                      solarized-theme
-                      leuven-theme
-                      monokai-theme
+                      leuven-theme ; light
+                      material-theme ; dark
+                      powerline
                       ;; Project management
                       magit ; git
                       projectile
-                      ggtags
                       ag
                       ;; Writing
                       langtool
@@ -64,7 +62,7 @@
   (let (missing-packages)
     (dolist (package my-packages missing-packages)
       (or (package-installed-p package)
-(push package missing-packages)))))
+         (push package missing-packages)))))
 
 
 (let ((missing (my-missing-packages)))
@@ -86,9 +84,7 @@
 (set-keyboard-coding-system 'utf-8-unix)
 (prefer-coding-system 'utf-8-unix)
 
-
 (when (window-system)
-  (set-fringe-mode 2)
   (unless (eq tool-bar-mode -1)
     (tool-bar-mode -1))
   (unless (eq scroll-bar-mode -1)
@@ -103,6 +99,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (when (or (eq system-type 'darwin) (memq window-system '(mac ns)))
   (setq gc-cons-threshold (* 40 1024 1024))
+
+  ;; Remove when https://github.com/milkypostman/powerline/issues/54 gets fixed
+  (setq ns-use-srgb-colorspace nil)
 
   (require 'exec-path-from-shell)
   (exec-path-from-shell-initialize)
@@ -129,9 +128,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (display-time)
 (setq display-time-day-and-date t)
-
-(require 'nav)
-(nav-disable-overeager-window-splitting)
 
 (require 'smex)
 (smex-initialize)
@@ -186,7 +182,6 @@
   "k"      'delete-window
   "u"      'undo-tree-visualize
   "d"      'vc-diff
-  "t"      'nav-toggle
   "ws"     'whitespace-mode
   "gs"     'magit-status
   "gb"     'magit-blame-mode
@@ -226,6 +221,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Visual
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(require 'powerline)
+(if (display-graphic-p)
+    (setq-default powerline-default-separator 'wave)
+  (setq-default powerline-default-separator 'utf-8))
+(powerline-default-theme)
+
 (setq inhibit-splash-screen t)
 
 (global-font-lock-mode t)
@@ -242,20 +243,7 @@
 (setq ring-bell-function 'ignore)
 
 (when window-system
-  (set-default-font "DejaVu Sans Mono-10"))
-
-(lexical-let ((default-color (cons (face-background 'mode-line)
-                                   (face-foreground 'mode-line))))
-  (add-hook 'post-command-hook
-            (lambda ()
-              (let ((color (cond ((minibufferp) default-color)
-                                 ((evil-insert-state-p) '("#e80000" . "#ffffff"))
-                                 ((evil-emacs-state-p) '("#444488" . "#ffffff"))
-                                 ((evil-visual-state-p) '("#ffa500" . "#ffffff"))
-                                 ((buffer-modified-p) '("#006fa0" . "#ffffff"))
-                                 (t default-color))))
-                (set-face-background 'mode-line (car color))
-                (set-face-foreground 'mode-line (cdr color))))))
+  (set-default-font "DejaVu Sans Mono 10"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customization
@@ -294,9 +282,6 @@
 (setq make-backup-files nil)
 (setq vc-make-backup-files nil)
 
-(setq backup-directory-alist `((".*" . ,temporary-file-directory)))
-(setq auto-save-file-name-transforms `((".*" ,temporary-file-directory t)))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Programming
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -326,8 +311,8 @@
 
 ;; Whitespace
 (set-default 'tab-width 2)
-(set-default 'indicate-empty-lines t)
 (set-default 'indent-tabs-mode nil)
+(set-default 'indicate-empty-lines t)
 (setq web-mode-markup-indent-offset 2)
 
 ;; Also highlight long lines in whitespace-mode
@@ -501,11 +486,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(js2-basic-offset 2)
  '(package-selected-packages
    (quote
-    (evil-leader key-chord exec-path-from-shell flx-ido ido-ubiquitous smex expand-region flycheck company pretty-mode ace-jump-mode nav solarized-theme leuven-theme monokai-theme magit projectile ggtags ag langtool org-plus-contrib htmlize auctex ess cider web-mode js2-mode highlight evil-paredit rainbow-delimiters aggressive-indent)))
- '(safe-local-variable-values (quote ((js-indent-level . 2)))))
+    (web-mode solarized-theme smex smart-mode-line-powerline-theme rainbow-delimiters projectile pretty-mode org-plus-contrib nav monokai-theme material-theme magit leuven-theme langtool key-chord js2-mode ido-ubiquitous htmlize highlight ggtags flycheck flx-ido expand-region exec-path-from-shell evil-paredit evil-leader ess company cider auctex aggressive-indent ag ace-jump-mode))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
