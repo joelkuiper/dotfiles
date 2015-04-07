@@ -7,7 +7,10 @@ ZSH=$HOME/.oh-my-zsh
 # time that oh-my-zsh is loaded.
 ZSH_THEME="minimal"
 
-export DOCKER_HOST=tcp://localhost:4243
+export DOCKER_HOST=tcp://192.168.59.103:2376
+export DOCKER_CERT_PATH=/Users/joelkuiper/.boot2docker/certs/boot2docker-vm
+export DOCKER_TLS_VERIFY=1
+
 export TERM="xterm-256color"
 export EDITOR=vim
 export NODE_PATH=$NODE_PATH:/usr/local/lib/node_modules
