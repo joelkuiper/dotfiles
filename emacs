@@ -13,6 +13,7 @@
 
 (load-file "~/.emacs.secrets")
 
+(setq vc-follow-symlinks t)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Packaging setup.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -41,7 +42,6 @@
                       ;; Themes
                       leuven-theme ; light
                       material-theme ; dark
-                      powerline
                       ;; Project management
                       magit ; git
                       projectile
@@ -100,9 +100,6 @@
 (when (or (eq system-type 'darwin) (memq window-system '(mac ns)))
   (setq gc-cons-threshold (* 40 1024 1024))
 
-  ;; Remove when https://github.com/milkypostman/powerline/issues/54 gets fixed
-  (setq ns-use-srgb-colorspace nil)
-
   (require 'exec-path-from-shell)
   (exec-path-from-shell-initialize)
 
@@ -136,6 +133,7 @@
   "revert-buffer without confirmation."
   (interactive)
   (revert-buffer t t))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; General
@@ -221,12 +219,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Visual
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(require 'powerline)
-(if (display-graphic-p)
-    (setq-default powerline-default-separator 'wave)
-  (setq-default powerline-default-separator 'utf-8))
-(powerline-default-theme)
-
 (setq inhibit-splash-screen t)
 
 (global-font-lock-mode t)
@@ -286,9 +278,7 @@
 ;;; Programming
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (global-company-mode)
-(define-key evil-insert-state-map (kbd "<tab>") 'company-complete-common)
 (define-key evil-insert-state-map (kbd "<c-spc>") 'company-complete-common)
-(define-key company-active-map (kbd "<tab>") 'company-complete-common)
 (define-key company-active-map (kbd "C-n") 'company-select-next)
 (define-key company-active-map (kbd "C-p") 'company-select-previous)
 
@@ -297,8 +287,6 @@
   (company-complete))
 
 (setq
- ;; never start auto-completion unless I ask for it
- company-idle-delay nil
  ;; autocomplete right after '.'
  company-minimum-prefix-length 0
  ;; remove echo delay
@@ -468,16 +456,6 @@
 (require 'server)
 (unless (server-running-p) (server-start))
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Tramp
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(require 'tramp)
-(setq tramp-auto-save-directory temporary-file-directory)
-(add-to-list 'tramp-remote-path 'tramp-own-remote-path)
-(setq tramp-default-method "ssh")
-(setq tramp-verbose 10)
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customizations (from M-x customze-*)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -486,9 +464,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   (quote
-    (web-mode solarized-theme smex smart-mode-line-powerline-theme rainbow-delimiters projectile pretty-mode org-plus-contrib nav monokai-theme material-theme magit leuven-theme langtool key-chord js2-mode ido-ubiquitous htmlize highlight ggtags flycheck flx-ido expand-region exec-path-from-shell evil-paredit evil-leader ess company cider auctex aggressive-indent ag ace-jump-mode))))
+ )
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
