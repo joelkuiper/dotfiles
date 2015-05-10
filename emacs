@@ -51,6 +51,7 @@
                       org-plus-contrib
                       htmlize
                       ;; Language support
+                      dash-at-point
                       auctex
                       ess ; R
                       cider ; Clojure
@@ -179,7 +180,8 @@
   "bk"     'ido-kill-buffer
   "k"      'delete-window
   "u"      'undo-tree-visualize
-  "d"      'vc-diff
+  "df"     'vc-diff
+  "m"      'dash-at-point ; Manual
   "ws"     'whitespace-mode
   "gs"     'magit-status
   "gb"     'magit-blame-mode
@@ -274,11 +276,15 @@
 (setq make-backup-files nil)
 (setq vc-make-backup-files nil)
 
+
+(set-variable 'magit-emacsclient-executable "/usr/local/Cellar/emacs/HEAD/bin/emacsclient")
+(setq magit-last-seen-setup-instructions "1.4.0"
+      magit-completing-read-function 'magit-ido-completing-read)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Programming
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (global-company-mode)
-(define-key evil-insert-state-map (kbd "<c-spc>") 'company-complete-common)
 (define-key company-active-map (kbd "C-n") 'company-select-next)
 (define-key company-active-map (kbd "C-p") 'company-select-previous)
 
@@ -286,11 +292,15 @@
   "Ignores passed in arg like a lambda and runs company-complete"
   (company-complete))
 
+(setq company-idle-delay 0.2
+      company-minimum-prefix-length 2
+      company-require-match nil
+      company-dabbrev-ignore-case nil
+      company-dabbrev-downcase nil
+      company-tooltip-flip-when-above t
+      company-frontends '(company-pseudo-tooltip-frontend))
+
 (setq
- ;; autocomplete right after '.'
- company-minimum-prefix-length 0
- ;; remove echo delay
- company-echo-delay 0
  ;; don't complete in certain modes
  company-global-modes '(not git-commit-mode)
  ;; make sure evil uses the right completion functions
@@ -464,7 +474,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(package-selected-packages
+   (quote
+    (dash-at-point web-mode smex rainbow-delimiters projectile pretty-mode org-plus-contrib material-theme magit leuven-theme langtool key-chord js2-mode ido-ubiquitous htmlize highlight flycheck flx-ido expand-region exec-path-from-shell evil-paredit evil-leader ess company cider auctex aggressive-indent ag ace-jump-mode))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
