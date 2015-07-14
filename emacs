@@ -53,6 +53,7 @@
                       ;; Language support
                       dash-at-point
                       polymode
+                      coffee-mode
                       ess ; R
                       cider ; Clojure
                       markdown-mode
@@ -81,6 +82,7 @@
           (delete-window compile-window)))))
 
 ;; Always, always, prefer UTF-8, anything else is insanity
+(setq locale-coding-system 'utf-8)
 (set-default-coding-systems 'utf-8-unix)
 (set-terminal-coding-system 'utf-8-unix)
 (set-keyboard-coding-system 'utf-8-unix)
@@ -102,6 +104,8 @@
 (when (or (eq system-type 'darwin) (memq window-system '(mac ns)))
   (setq gc-cons-threshold (* 40 1024 1024))
 
+  (setq redisplay-dont-pause t)
+
   (require 'exec-path-from-shell)
   (exec-path-from-shell-initialize)
 
@@ -114,7 +118,11 @@
   (setenv "TMPDIR" ".")
 
   (setq select-enable-clipboard t
-        select-enable-primary t)
+        select-enable-primary t
+        save-interprogram-paste-before-kill t
+        apropos-do-all t
+        mouse-yank-at-point t)
+
 
   ;; BSD ls doesn't support --dired. use brews' GNU core-utils
   (when (executable-find "gls")
@@ -221,13 +229,14 @@
 (setq inhibit-splash-screen t)
 
 (global-font-lock-mode t)
+(setq font-lock-maximum-decoration 1)
 
 (load-theme 'leuven t)
 
 (show-paren-mode t)
 
 (require 'pretty-mode)
-(pretty-activate-groups '(:greek :undefined))
+(pretty-activate-groups '(:greek :undefined :arrow-tails :parentheses :types))
 (global-pretty-mode t)
 
 ;; No bell
@@ -298,13 +307,26 @@
   "Ignores passed in arg like a lambda and runs company-complete"
   (company-complete))
 
+
 (setq company-idle-delay 0.2
       company-minimum-prefix-length 2
       company-require-match nil
       company-dabbrev-ignore-case nil
       company-dabbrev-downcase nil
       company-tooltip-flip-when-above t
-      company-frontends '(company-pseudo-tooltip-frontend))
+      company-frontends '(company-pseudo-tooltip-frontend)
+      company-clang-prefix-guesser 'company-mode/more-than-prefix-guesser)
+
+;; Fix integration of company and yasnippet
+(define-key company-active-map (kbd "TAB") nil)
+(define-key company-active-map (kbd "<tab>") nil)
+(define-key company-active-map [tab] nil)
+
+(define-key company-active-map (kbd "C-j") 'company-select-next)
+(define-key company-active-map (kbd "C-k") 'company-select-previous)
+(define-key company-active-map (kbd "C-/") 'company-search-candidates)
+(define-key company-active-map (kbd "C-M-/") 'company-filter-candidates)
+(define-key company-active-map (kbd "C-d") 'company-show-doc-buffer)
 
 (setq
  ;; don't complete in certain modes
@@ -346,21 +368,25 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Languages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(add-hook 'prog-mode-hook 'flyspell-prog-mode)
+
 ;; File-types
 (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.org$\\'" . org-mode))
-(add-to-list 'auto-mode-alist '(".emacs" . emacs-lisp-mode))
 (add-to-list 'auto-mode-alist '("\\.js.?" . js2-mode))
 (add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
 (add-to-list 'auto-mode-alist '("\\.rd\\'" . Rd-mode))
+(add-to-list 'auto-mode-alist '(".emacs" . emacs-lisp-mode))
 
 ;; Emacs Speaks Statistics
 (require 'ess-site)
 (setq ess-use-ido t)
 
+;; Poly-R
 (require 'poly-R)
 (require 'poly-markdown)
-;;; MARKDOWN
+
+;;; Markdown
 (add-to-list 'auto-mode-alist '("\\.md" . poly-markdown-mode))
 
 ;;; R modes
@@ -383,7 +409,6 @@
   (add-hook hook 'enable-lisp-utils))
 
 (add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)
-(setq cider-repl-use-clojure-font-lock t)
 
 ;; CoffeeScript
 (eval-after-load "coffee-mode"
@@ -482,12 +507,6 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Server
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(require 'server)
-(unless (server-running-p) (server-start))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customizations (from M-x customze-*)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (custom-set-variables
@@ -495,9 +514,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   (quote
-    (dash-at-point web-mode smex rainbow-delimiters projectile pretty-mode org-plus-contrib material-theme magit leuven-theme langtool key-chord js2-mode ido-ubiquitous htmlize highlight flycheck flx-ido expand-region exec-path-from-shell evil-paredit evil-leader ess company cider auctex aggressive-indent ag ace-jump-mode))))
+ )
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
