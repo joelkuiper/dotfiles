@@ -52,6 +52,8 @@
                       htmlize
                       ;; Language support
                       dash-at-point
+                      polymode
+                      coffee-mode
                       auctex
                       ess ; R
                       cider ; Clojure
@@ -80,6 +82,7 @@
           (delete-window compile-window)))))
 
 ;; Always, always, prefer UTF-8, anything else is insanity
+(setq locale-coding-system 'utf-8)
 (set-default-coding-systems 'utf-8-unix)
 (set-terminal-coding-system 'utf-8-unix)
 (set-keyboard-coding-system 'utf-8-unix)
@@ -101,6 +104,8 @@
 (when (or (eq system-type 'darwin) (memq window-system '(mac ns)))
   (setq gc-cons-threshold (* 40 1024 1024))
 
+  (setq redisplay-dont-pause t)
+
   (require 'exec-path-from-shell)
   (exec-path-from-shell-initialize)
 
@@ -113,7 +118,11 @@
   (setenv "TMPDIR" ".")
 
   (setq select-enable-clipboard t
-        select-enable-primary t)
+        select-enable-primary t
+        save-interprogram-paste-before-kill t
+        apropos-do-all t
+        mouse-yank-at-point t)
+
 
   ;; BSD ls doesn't support --dired. use brews' GNU core-utils
   (when (executable-find "gls")
@@ -224,20 +233,21 @@
 (setq inhibit-splash-screen t)
 
 (global-font-lock-mode t)
+(setq font-lock-maximum-decoration 1)
 
 (load-theme 'leuven t)
 
 (show-paren-mode t)
 
 (require 'pretty-mode)
-(pretty-activate-groups '(:greek :undefined))
+(pretty-activate-groups '(:greek :undefined :arrow-tails :parentheses :types))
 (global-pretty-mode t)
 
 ;; No bell
 (setq ring-bell-function 'ignore)
 
 (when window-system
-  (set-default-font "DejaVu Sans Mono 10"))
+  (set-default-font "PragmataPro 12"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customization
@@ -292,13 +302,26 @@
   "Ignores passed in arg like a lambda and runs company-complete"
   (company-complete))
 
+
 (setq company-idle-delay 0.2
       company-minimum-prefix-length 2
       company-require-match nil
       company-dabbrev-ignore-case nil
       company-dabbrev-downcase nil
       company-tooltip-flip-when-above t
-      company-frontends '(company-pseudo-tooltip-frontend))
+      company-frontends '(company-pseudo-tooltip-frontend)
+      company-clang-prefix-guesser 'company-mode/more-than-prefix-guesser)
+
+;; Fix integration of company and yasnippet
+(define-key company-active-map (kbd "TAB") nil)
+(define-key company-active-map (kbd "<tab>") nil)
+(define-key company-active-map [tab] nil)
+
+(define-key company-active-map (kbd "C-j") 'company-select-next)
+(define-key company-active-map (kbd "C-k") 'company-select-previous)
+(define-key company-active-map (kbd "C-/") 'company-search-candidates)
+(define-key company-active-map (kbd "C-M-/") 'company-filter-candidates)
+(define-key company-active-map (kbd "C-d") 'company-show-doc-buffer)
 
 (setq
  ;; don't complete in certain modes
@@ -338,19 +361,32 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Languages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(add-hook 'prog-mode-hook 'flyspell-prog-mode)
+
 ;; File-types
 (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.org$\\'" . org-mode))
-(add-to-list 'auto-mode-alist '(".emacs" . emacs-lisp-mode))
 (add-to-list 'auto-mode-alist '("\\.js.?" . js2-mode))
 (add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
 (add-to-list 'auto-mode-alist '("\\.rd\\'" . Rd-mode))
+(add-to-list 'auto-mode-alist '(".emacs" . emacs-lisp-mode))
 
 ;; Emacs Speaks Statistics
 (require 'ess-site)
 (setq ess-use-ido t)
 
-;; Lisp
+;; Poly-R
+(require 'poly-R)
+(require 'poly-markdown)
+
+;;; Markdown
+(add-to-list 'auto-mode-alist '("\\.md" . poly-markdown-mode))
+
+;;; R modes
+(add-to-list 'auto-mode-alist '("\\.Snw" . poly-noweb+r-mode))
+(add-to-list 'auto-mode-alist '("\\.Rnw" . poly-noweb+r-mode))
+(add-to-list 'auto-mode-alist '("\\.Rmd" . poly-markdown+r-mode))
+
 (defun enable-lisp-utils ()
   (require 'evil-paredit)
   (rainbow-delimiters-mode)
@@ -365,7 +401,6 @@
   (add-hook hook 'enable-lisp-utils))
 
 (add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)
-(setq cider-repl-use-clojure-font-lock t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Writing & Blogging
@@ -459,12 +494,6 @@
          :publishing-function org-publish-attachment)
         ("blog" :components ("org-joelkuiper" "org-static-joelkuiper"))))
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Server
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(require 'server)
-(unless (server-running-p) (server-start))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customizations (from M-x customze-*)
