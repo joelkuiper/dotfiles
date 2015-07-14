@@ -52,9 +52,10 @@
                       htmlize
                       ;; Language support
                       dash-at-point
-                      auctex
+                      polymode
                       ess ; R
                       cider ; Clojure
+                      markdown-mode
                       web-mode js2-mode ; Web development
                       highlight paredit evil-paredit rainbow-delimiters aggressive-indent ; Lisp
                       ))
@@ -156,8 +157,6 @@
 (key-chord-mode t)
 (key-chord-define evil-insert-state-map "jk" 'evil-normal-state)
 
-(evil-set-initial-state 'magit-mode 'emacs)
-
 (setq evil-shift-width 2)
 (setq-default evil-symbol-word-search t)
 (put 'narrow-to-region 'disabled nil) ; narrow to region should be enabled by default
@@ -192,8 +191,6 @@
   "ps"     'projectile-switch-project
   "pd"     'projectile-dired
   "pg"     'projectile-ag)
-
-(define-key global-map (kbd "RET") 'newline-and-indent)
 
 ;; esc quits
 (defun minibuffer-keyboard-quit ()
@@ -237,7 +234,11 @@
 (setq ring-bell-function 'ignore)
 
 (when window-system
-  (set-default-font "DejaVu Sans Mono 10"))
+  (set-default-font "PragmataPro 12"))
+
+(set-fontset-font nil 'latin
+                  (font-spec :family "PragmataPro"
+                             :otf '(latn nil (liga))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customization
@@ -273,13 +274,18 @@
 (require 'projectile)
 (projectile-global-mode)
 
-(setq make-backup-files nil)
-(setq vc-make-backup-files nil)
+(setq backup-directory-alist `(("." . "~/.saves")))
+(setq backup-by-copying t)
+(setq backup-directory-alist
+      `((".*" . ,temporary-file-directory)))
+(setq auto-save-file-name-transforms
+      `((".*" ,temporary-file-directory t)))
 
-
-(set-variable 'magit-emacsclient-executable "/usr/local/Cellar/emacs/HEAD/bin/emacsclient")
-(setq magit-last-seen-setup-instructions "1.4.0"
-      magit-completing-read-function 'magit-ido-completing-read)
+;; default state for additional modes
+(dolist (mode '(magit-mode
+                magit-popup-mode
+                magit-popup-sequence-mode))
+  (add-to-list 'evil-emacs-state-modes mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Programming
@@ -308,10 +314,10 @@
  evil-complete-previous-func 'company-complete-lambda)
 
 ;; Whitespace
-(set-default 'tab-width 2)
-(set-default 'indent-tabs-mode nil)
-(set-default 'indicate-empty-lines t)
-(setq web-mode-markup-indent-offset 2)
+(setq-default indent-tabs-mode  nil
+              web-mode-markup-indent-offset 2
+              default-tab-width 2
+              c-basic-offset 2)
 
 ;; Also highlight long lines in whitespace-mode
 (require 'whitespace)
@@ -324,6 +330,8 @@
           (lambda ()
             (whitespace-cleanup)
             (delete-trailing-whitespace)))
+
+(add-hook 'prog-mode-hook (lambda () (setq show-trailing-whitespace 1)))
 
 ;; Flycheck
 (require 'flycheck)
@@ -350,6 +358,16 @@
 (require 'ess-site)
 (setq ess-use-ido t)
 
+(require 'poly-R)
+(require 'poly-markdown)
+;;; MARKDOWN
+(add-to-list 'auto-mode-alist '("\\.md" . poly-markdown-mode))
+
+;;; R modes
+(add-to-list 'auto-mode-alist '("\\.Snw" . poly-noweb+r-mode))
+(add-to-list 'auto-mode-alist '("\\.Rnw" . poly-noweb+r-mode))
+(add-to-list 'auto-mode-alist '("\\.Rmd" . poly-markdown+r-mode))
+
 ;; Lisp
 (defun enable-lisp-utils ()
   (require 'evil-paredit)
@@ -366,6 +384,11 @@
 
 (add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)
 (setq cider-repl-use-clojure-font-lock t)
+
+;; CoffeeScript
+(eval-after-load "coffee-mode"
+  '(progn
+     (define-key coffee-mode-map (kbd "<return>") 'coffee-newline-and-indent)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Writing & Blogging
@@ -403,9 +426,6 @@
       org-startup-with-inline-images (display-graphic-p)
       org-html-head-include-default-style nil)
 
-(setq org-todo-keywords
-      '((sequence "TODO" "IN PROGRESS" "VERIFY" "|" "SUSPENDED" "DONE")))
-
 (defun org-custom-link-asset-follow (path)
   (org-open-file-with-emacs
    (format "./assets/%s" path)))
@@ -431,6 +451,7 @@
    (clojure . t)
    (emacs-lisp . t)
    (plantuml . t)
+   (ditaa . t)
    (dot . t)
    (python . t)
    (lisp . t)))
