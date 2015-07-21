@@ -38,7 +38,7 @@
                       flycheck
                       company
                       pretty-mode
-                      ace-jump-mode
+                      avy
                       ;; Themes
                       leuven-theme ; light
                       material-theme ; dark
@@ -103,8 +103,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (when (or (eq system-type 'darwin) (memq window-system '(mac ns)))
   (setq gc-cons-threshold (* 40 1024 1024))
-
-  (setq redisplay-dont-pause t)
 
   (require 'exec-path-from-shell)
   (exec-path-from-shell-initialize)
@@ -174,9 +172,30 @@
 (define-key evil-visual-state-map (kbd ".") 'er/expand-region)
 (define-key evil-visual-state-map (kbd ",") 'er/contract-region)
 
+(setq evil-cross-lines t)
+
+
+(defun shift-left-visual ()
+  "Shift left and restore visual selection."
+  (interactive)
+  (evil-shift-left (region-beginning) (region-end))
+  (evil-normal-state)
+  (evil-visual-restore))
+
+(defun shift-right-visual ()
+  "Shift right and restore visual selection."
+  (interactive)
+  (evil-shift-right (region-beginning) (region-end))
+  (evil-normal-state)
+  (evil-visual-restore))
+
+(define-key evil-visual-state-map (kbd ">") 'shift-right-visual)
+(define-key evil-visual-state-map (kbd "<") 'shift-left-visual)
+
+
 ;; Leaders
 (evil-leader/set-key
-  "SPC"    'evil-ace-jump-word-mode
+  "SPC"    'avy-goto-char
   "."      'er/expand-region
   "x"      'smex ;; eXecute
   "e"      'eval-expression
@@ -242,12 +261,10 @@
 ;; No bell
 (setq ring-bell-function 'ignore)
 
-(when window-system
-  (set-default-font "PragmataPro 12"))
-
 (set-fontset-font nil 'latin
                   (font-spec :family "PragmataPro"
                              :otf '(latn nil (liga))))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customization
@@ -306,7 +323,6 @@
 (defun company-complete-lambda (arg)
   "Ignores passed in arg like a lambda and runs company-complete"
   (company-complete))
-
 
 (setq company-idle-delay 0.2
       company-minimum-prefix-length 2
