@@ -420,6 +420,7 @@
 
 (dolist (hook '(emacs-lisp-mode-hook
                 lisp-mode-hook
+                ielm-mode-hook
                 cider-repl-mode-hook
                 clojure-mode-hook))
   (add-hook hook 'enable-lisp-utils))
@@ -530,7 +531,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(package-selected-packages
+   (quote
+    (web-mode smex rainbow-delimiters projectile pretty-mode polymode org-plus-contrib material-theme markdown-mode magit leuven-theme less-css-mode langtool key-chord js2-mode ido-ubiquitous htmlize highlight flycheck flx-ido expand-region exec-path-from-shell evil-paredit evil-leader ess dash-at-point company coffee-mode cider avy auctex aggressive-indent ag ace-jump-mode))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
