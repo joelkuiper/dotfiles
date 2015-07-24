@@ -102,12 +102,8 @@
 ;;; OSX Specific
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (when (or (eq system-type 'darwin) (memq window-system '(mac ns)))
-  (setq gc-cons-threshold (* 40 1024 1024))
-
   (require 'exec-path-from-shell)
   (exec-path-from-shell-initialize)
-
-  (setq mouse-wheel-scroll-amount '(0.001))
 
   (setq mac-option-modifier nil
         mac-command-modifier 'meta)
@@ -173,8 +169,6 @@
 (define-key evil-visual-state-map (kbd ",") 'er/contract-region)
 
 (setq evil-cross-lines t)
-
-
 (defun shift-left-visual ()
   "Shift left and restore visual selection."
   (interactive)
@@ -195,7 +189,7 @@
 
 ;; Leaders
 (evil-leader/set-key
-  "SPC"    'avy-goto-char
+  "SPC"    'avy-goto-word-1
   "."      'er/expand-region
   "x"      'smex ;; eXecute
   "e"      'eval-expression
@@ -210,9 +204,9 @@
   "m"      'dash-at-point ; Manual
   "ws"     'whitespace-mode
   "gs"     'magit-status
-  "gb"     'magit-blame-mode
+  "gb"     'magit-blame
   "gc"     'magit-commit
-  "gl"     'magit-log
+  "gl"     'magit-log-all
   "pt"     'projectile-find-tag
   "pf"     'projectile-find-file
   "ps"     'projectile-switch-project
@@ -248,10 +242,8 @@
 (setq inhibit-splash-screen t)
 
 (global-font-lock-mode t)
-(setq font-lock-maximum-decoration 1)
 
 (load-theme 'leuven t)
-
 (show-paren-mode t)
 
 (require 'pretty-mode)
@@ -278,7 +270,6 @@
       ido-enable-flex-matching t
       ido-create-new-buffer 'always
       ido-use-filename-at-point 'guess
-      ido-max-prospects 10
       ido-default-file-method 'selected-window
       ido-auto-merge-work-directories-length -1)
 (add-to-list 'ido-ignore-files "\\.DS_Store")
@@ -316,6 +307,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Programming
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(require 'company)
 (global-company-mode)
 (define-key company-active-map (kbd "C-n") 'company-select-next)
 (define-key company-active-map (kbd "C-p") 'company-select-previous)
@@ -327,13 +319,9 @@
 (setq company-idle-delay 0.2
       company-minimum-prefix-length 2
       company-require-match nil
-      company-dabbrev-ignore-case nil
-      company-dabbrev-downcase nil
       company-tooltip-flip-when-above t
-      company-frontends '(company-pseudo-tooltip-frontend)
-      company-clang-prefix-guesser 'company-mode/more-than-prefix-guesser)
+      company-frontends '(company-pseudo-tooltip-frontend))
 
-;; Fix integration of company and yasnippet
 (define-key company-active-map (kbd "TAB") nil)
 (define-key company-active-map (kbd "<tab>") nil)
 (define-key company-active-map [tab] nil)
@@ -495,8 +483,7 @@
    (plantuml . t)
    (ditaa . t)
    (dot . t)
-   (python . t)
-   (lisp . t)))
+   (python . t)))
 
 ;; blogging
 (setq org-publish-project-alist
