@@ -186,6 +186,8 @@
 (define-key evil-visual-state-map (kbd ">") 'shift-right-visual)
 (define-key evil-visual-state-map (kbd "<") 'shift-left-visual)
 
+(define-key evil-motion-state-map (kbd "p") #'avy-goto-word-1)
+(define-key evil-motion-state-map (kbd "P") #'avy-goto-line)
 
 ;; Leaders
 (evil-leader/set-key
