@@ -58,6 +58,7 @@
                       ess ; R
                       cider ; Clojure
                       markdown-mode
+                      json-mode
                       web-mode js2-mode ; Web development
                       highlight paredit evil-paredit rainbow-delimiters aggressive-indent ; Lisp
                       ))
@@ -196,6 +197,7 @@
 (evil-leader/set-key
   "SPC"    'avy-goto-word-1
   "."      'er/expand-region
+  ","      'er/contract-region
   "x"      'smex ;; eXecute
   "e"      'eval-expression
   "f"      'find-file
@@ -523,16 +525,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ansi-color-faces-vector
-   [default default default italic underline success warning error])
- '(ansi-color-names-vector
-   ["black" "red3" "ForestGreen" "yellow3" "blue" "magenta3" "DeepSkyBlue" "gray50"])
- '(custom-safe-themes
-   (quote
-    ("9e7cc7f1db252d6fe0c7cc25d72d768712a97cda1f77bf63f0c1fd7be5dee7f4" default)))
- '(package-selected-packages
-   (quote
-    (evil-matchit web-mode smex rainbow-delimiters projectile pretty-mode polymode org-plus-contrib material-theme markdown-mode magit leuven-theme less-css-mode langtool key-chord js2-mode ido-ubiquitous htmlize highlight flycheck flx-ido expand-region exec-path-from-shell evil-paredit evil-leader ess dash-at-point company coffee-mode cider avy auctex aggressive-indent ag ace-jump-mode))))
+ )
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
