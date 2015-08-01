@@ -59,6 +59,7 @@
                       cider ; Clojure
                       markdown-mode
                       json-mode
+                      company-tern
                       web-mode js2-mode ; Web development
                       highlight paredit evil-paredit rainbow-delimiters aggressive-indent ; Lisp
                       ))
@@ -116,7 +117,6 @@
   (setq select-enable-clipboard t
         select-enable-primary t
         save-interprogram-paste-before-kill t
-        apropos-do-all t
         mouse-yank-at-point t)
 
 
@@ -140,7 +140,6 @@
   (interactive)
   (revert-buffer t t))
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; General
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -160,8 +159,9 @@
 
 (my-move-key evil-motion-state-map evil-normal-state-map (kbd "RET"))
 (my-move-key evil-motion-state-map evil-normal-state-map " ")
-(key-chord-mode t)
-(key-chord-define evil-insert-state-map "jk" 'evil-normal-state)
+
+;(key-chord-mode t)
+;(key-chord-define evil-insert-state-map "jk" 'evil-normal-state)
 
 (setq evil-shift-width 2)
 (setq-default evil-symbol-word-search t)
@@ -195,7 +195,7 @@
 
 ;; Leaders
 (evil-leader/set-key
-  "SPC"    'avy-goto-word-1
+  "SPC"    'avy-goto-subword-1
   "."      'er/expand-region
   ","      'er/contract-region
   "x"      'smex ;; eXecute
@@ -305,12 +305,6 @@
 (setq auto-save-file-name-transforms
       `((".*" ,temporary-file-directory t)))
 
-;; default state for additional modes
-(dolist (mode '(magit-mode
-                magit-popup-mode
-                magit-popup-sequence-mode))
-  (add-to-list 'evil-emacs-state-modes mode))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Programming
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -325,19 +319,8 @@
 
 (setq company-idle-delay 0.2
       company-minimum-prefix-length 2
-      company-require-match nil
       company-tooltip-flip-when-above t
       company-frontends '(company-pseudo-tooltip-frontend))
-
-(define-key company-active-map (kbd "TAB") nil)
-(define-key company-active-map (kbd "<tab>") nil)
-(define-key company-active-map [tab] nil)
-
-(define-key company-active-map (kbd "C-j") 'company-select-next)
-(define-key company-active-map (kbd "C-k") 'company-select-previous)
-(define-key company-active-map (kbd "C-/") 'company-search-candidates)
-(define-key company-active-map (kbd "C-M-/") 'company-filter-candidates)
-(define-key company-active-map (kbd "C-d") 'company-show-doc-buffer)
 
 (setq
  ;; don't complete in certain modes
@@ -348,9 +331,7 @@
 
 ;; Whitespace
 (setq-default indent-tabs-mode  nil
-              web-mode-markup-indent-offset 2
-              default-tab-width 2
-              c-basic-offset 2)
+              default-tab-width 2)
 
 ;; Also highlight long lines in whitespace-mode
 (require 'whitespace)
@@ -386,8 +367,20 @@
 (add-to-list 'auto-mode-alist '("\\.org$\\'" . org-mode))
 (add-to-list 'auto-mode-alist '("\\.js.?" . js2-mode))
 (add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
-(add-to-list 'auto-mode-alist '("\\.rd\\'" . Rd-mode))
 (add-to-list 'auto-mode-alist '(".emacs" . emacs-lisp-mode))
+
+;; Web stuff
+(defun web-mode-hook ()
+  "Hooks for Web mode."
+  (setq web-mode-html-offset 2)
+  (setq web-mode-css-offset 2)
+  (setq web-mode-script-offset 2)
+  (toggle-truncate-lines t))
+
+(add-hook 'web-mode-hook 'web-mode-hook)
+
+(when (when (executable-find "tern"))
+  (add-hook 'js2-mode-hook 'tern-mode))
 
 ;; Emacs Speaks Statistics
 (require 'ess-site)
@@ -525,7 +518,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(package-selected-packages
+   (quote
+    (evil-leader evil-matchit key-chord exec-path-from-shell flx-ido ido-ubiquitous smex expand-region flycheck pretty-mode avy leuven-theme material-theme magit projectile ag langtool org-plus-contrib htmlize dash-at-point polymode coffee-mode ess cider markdown-mode json-mode company-tern web-mode js2-mode highlight evil-paredit rainbow-delimiters aggressive-indent))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
