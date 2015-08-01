@@ -152,16 +152,6 @@
 (evil-leader/set-leader ",")
 (evil-mode 1)
 
-;; remap SPC and RET so that they won't be active in evil mode (since they just duplicate j and l)
-(defun my-move-key (keymap-from keymap-to key)
-	"Moves key binding from one keymap to another, deleting from the old location. "
-	(define-key keymap-to key (lookup-key keymap-from key))
-	(define-key keymap-from key nil))
-(my-move-key evil-motion-state-map evil-normal-state-map (kbd "RET"))
-(my-move-key evil-motion-state-map evil-normal-state-map " ")
-
-(define-key evil-insert-state-map (kbd "RET") 'newline-and-indent)
-
 (key-chord-mode t)
 (key-chord-define evil-insert-state-map "jk" 'evil-normal-state)
 
@@ -210,13 +200,13 @@
   "x"      'smex ;; eXecute
   "e"      'eval-expression
   "f"      'find-file
-  "sh"     'ansi-term; SHell
+  "sh"     'term; SHell
   "bs"     'switch-to-buffer ; BufferSwitch
   "br"     'reload-buffer ; BufferReload
   "bk"     'ido-kill-buffer
   "k"      'delete-window
   "u"      'undo-tree-visualize
-  "df"     'vc-diff
+  "d"      'vc-diff
   "m"      'dash-at-point ; Manual
   "ws"     'whitespace-mode
   "gs"     'magit-status
