@@ -260,10 +260,7 @@
 ;; No bell
 (setq ring-bell-function 'ignore)
 
-(set-fontset-font nil 'latin
-                  (font-spec :family "PragmataPro"
-                             :otf '(latn nil (liga))))
-
+(add-to-list 'default-frame-alist '(font . "PragmataPro 12"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customization
@@ -403,6 +400,7 @@
   (require 'evil-paredit)
   (rainbow-delimiters-mode)
   (aggressive-indent-mode)
+  (evil-matchit-mode -1)
   (enable-paredit-mode)
   (evil-paredit-mode t))
 
@@ -510,17 +508,22 @@
         ("blog" :components ("org-joelkuiper" "org-static-joelkuiper"))))
 
 
+(server-start)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customizations (from M-x customze-*)
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(display-time-mode t)
  '(package-selected-packages
    (quote
-    (evil-leader evil-matchit key-chord exec-path-from-shell flx-ido ido-ubiquitous smex expand-region flycheck pretty-mode avy leuven-theme material-theme magit projectile ag langtool org-plus-contrib htmlize dash-at-point polymode coffee-mode ess cider markdown-mode json-mode company-tern web-mode js2-mode highlight evil-paredit rainbow-delimiters aggressive-indent))))
+    (evil-leader evil-matchit key-chord exec-path-from-shell flx-ido ido-ubiquitous smex expand-region flycheck pretty-mode avy leuven-theme material-theme magit projectile ag langtool org-plus-contrib htmlize dash-at-point polymode coffee-mode ess cider markdown-mode json-mode company-tern web-mode js2-mode highlight evil-paredit rainbow-delimiters aggressive-indent)))
+ '(show-paren-mode t)
+ '(tool-bar-mode nil))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
