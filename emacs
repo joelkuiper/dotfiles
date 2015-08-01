@@ -13,7 +13,6 @@
 
 (load-file "~/.emacs.secrets")
 
-(setq vc-follow-symlinks t)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Packaging setup.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -152,25 +151,25 @@
 (global-evil-leader-mode)
 (evil-leader/set-leader ",")
 (evil-mode 1)
-(defun my-move-key (keymap-from keymap-to key)
-  "Moves key binding from one keymap to another, deleting from the old location"
-  (define-key keymap-to key (lookup-key keymap-from key))
-  (define-key keymap-from key nil))
 
+;; remap SPC and RET so that they won't be active in evil mode (since they just duplicate j and l)
+(defun my-move-key (keymap-from keymap-to key)
+	"Moves key binding from one keymap to another, deleting from the old location. "
+	(define-key keymap-to key (lookup-key keymap-from key))
+	(define-key keymap-from key nil))
 (my-move-key evil-motion-state-map evil-normal-state-map (kbd "RET"))
 (my-move-key evil-motion-state-map evil-normal-state-map " ")
 
-;(key-chord-mode t)
-;(key-chord-define evil-insert-state-map "jk" 'evil-normal-state)
+(define-key evil-insert-state-map (kbd "RET") 'newline-and-indent)
+
+(key-chord-mode t)
+(key-chord-define evil-insert-state-map "jk" 'evil-normal-state)
 
 (setq evil-shift-width 2)
 (setq-default evil-symbol-word-search t)
 (put 'narrow-to-region 'disabled nil) ; narrow to region should be enabled by default
 
 (require 'expand-region)
-
-(define-key evil-visual-state-map (kbd ".") 'er/expand-region)
-(define-key evil-visual-state-map (kbd ",") 'er/contract-region)
 
 (setq evil-cross-lines t)
 (defun shift-left-visual ()
@@ -193,11 +192,21 @@
 (define-key evil-motion-state-map (kbd "p") #'avy-goto-word-1)
 (define-key evil-motion-state-map (kbd "P") #'avy-goto-line)
 
+(define-key evil-visual-state-map (kbd ".") 'er/expand-region)
+; (define-key evil-visual-state-map (kbd ",") 'er/contract-region)
+
+;; move between windows like a civilized fucking human being
+(define-key evil-normal-state-map (kbd "C-l") 'windmove-right)
+(define-key evil-normal-state-map (kbd "C-h") 'windmove-left)
+(define-key evil-normal-state-map (kbd "C-j") 'windmove-down)
+(define-key evil-normal-state-map (kbd "C-k") 'windmove-up)
+
 ;; Leaders
 (evil-leader/set-key
   "SPC"    'avy-goto-subword-1
   "."      'er/expand-region
   ","      'er/contract-region
+  "/"      'comment-or-uncomment-region
   "x"      'smex ;; eXecute
   "e"      'eval-expression
   "f"      'find-file
@@ -307,8 +316,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'company)
 (global-company-mode)
-(define-key company-active-map (kbd "C-n") 'company-select-next)
-(define-key company-active-map (kbd "C-p") 'company-select-previous)
+(define-key company-active-map (kbd "C-n") 'company-select-next-or-abort)
+(define-key company-active-map (kbd "C-p") 'company-select-previous-or-abort)
 
 (defun company-complete-lambda (arg)
   "Ignores passed in arg like a lambda and runs company-complete"
@@ -507,8 +516,6 @@
          :publishing-function org-publish-attachment)
         ("blog" :components ("org-joelkuiper" "org-static-joelkuiper"))))
 
-
-(server-start)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customizations (from M-x customze-*)
