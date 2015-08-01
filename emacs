@@ -376,16 +376,17 @@
 (add-to-list 'auto-mode-alist '(".emacs" . emacs-lisp-mode))
 
 ;; Web stuff
-(defun web-mode-hook ()
+(defun web-mode-util ()
   "Hooks for Web mode."
   (setq web-mode-html-offset 2)
   (setq web-mode-css-offset 2)
   (setq web-mode-script-offset 2)
   (toggle-truncate-lines t))
 
-(add-hook 'web-mode-hook 'web-mode-hook)
+(add-hook 'web-mode-hook 'web-mode-util)
 
 (when (when (executable-find "tern"))
+  (add-to-list 'company-backends 'company-tern)
   (add-hook 'js2-mode-hook 'tern-mode))
 
 ;; Emacs Speaks Statistics
@@ -398,6 +399,7 @@
 
 ;;; Markdown
 (add-to-list 'auto-mode-alist '("\\.md" . poly-markdown-mode))
+(add-to-list 'auto-mode-alist '("\\.markdown" . poly-markdown-mode))
 
 ;;; R modes
 (add-to-list 'auto-mode-alist '("\\.Snw" . poly-noweb+r-mode))
@@ -525,12 +527,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(display-time-mode t)
- '(package-selected-packages
-   (quote
-    (evil-leader evil-matchit key-chord exec-path-from-shell flx-ido ido-ubiquitous smex expand-region flycheck pretty-mode avy leuven-theme material-theme magit projectile ag langtool org-plus-contrib htmlize dash-at-point polymode coffee-mode ess cider markdown-mode json-mode company-tern web-mode js2-mode highlight evil-paredit rainbow-delimiters aggressive-indent)))
- '(show-paren-mode t)
- '(tool-bar-mode nil))
+ )
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
