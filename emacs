@@ -467,9 +467,8 @@
 (setq sentence-end-double-space nil)
 
 (when (file-exists-p "/usr/local/Cellar/languagetool/2.8/libexec/languagetool-commandline.jar")
-  (require 'langtool)
   (setq langtool-language-tool-jar "/usr/local/Cellar/languagetool/2.8/libexec/languagetool-commandline.jar"
-        langtool-mother-tongue "nl"
+        langtool-default-language "en-US"
         langtool-disabled-rules '("WHITESPACE_RULE"
                                   "EN_UNPAIRED_BRACKETS"
                                   "COMMA_PARENTHESIS_WHITESPACE"
