@@ -230,6 +230,7 @@
                     (help-mode . emacs)
                     (term-mode . emacs)))
   (evil-set-initial-state `,(car mode-map) `,(cdr mode-map)))
+(add-hook 'with-editor-mode-hook 'evil-insert-state)
 
 ;; esc quits
 (defun minibuffer-keyboard-quit ()
