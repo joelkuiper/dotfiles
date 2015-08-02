@@ -156,12 +156,8 @@
 (key-chord-define evil-insert-state-map "jk" 'evil-normal-state)
 
 (setq evil-shift-width 2)
-(setq-default evil-symbol-word-search t)
-(put 'narrow-to-region 'disabled nil) ; narrow to region should be enabled by default
 
 (require 'expand-region)
-
-(setq evil-cross-lines t)
 (defun shift-left-visual ()
   "Shift left and restore visual selection."
   (interactive)
@@ -190,6 +186,10 @@
 (define-key evil-normal-state-map (kbd "C-h") 'windmove-left)
 (define-key evil-normal-state-map (kbd "C-j") 'windmove-down)
 (define-key evil-normal-state-map (kbd "C-k") 'windmove-up)
+(define-key evil-normal-state-map (kbd "C-<right>") 'windmove-right)
+(define-key evil-normal-state-map (kbd "C-<left>") 'windmove-left)
+(define-key evil-normal-state-map (kbd "C-<down>") 'windmove-down)
+(define-key evil-normal-state-map (kbd "C-<up>") 'windmove-up)
 
 ;; Leaders
 (evil-leader/set-key
@@ -200,6 +200,7 @@
   "x"      'smex ;; eXecute
   "e"      'eval-expression
   "f"      'find-file
+  "q"      'kill-this-buffer
   "sh"     'term; SHell
   "bs"     'switch-to-buffer ; BufferSwitch
   "br"     'reload-buffer ; BufferReload
@@ -218,6 +219,17 @@
   "ps"     'projectile-switch-project
   "pd"     'projectile-dired
   "pg"     'projectile-ag)
+
+;; modes to map to different default states
+(dolist (mode-map '((ag-mode . emacs)
+                    (cider-repl-mode . emacs)
+                    (eshell-mode . emacs)
+                    (fundamental-mode . emacs)
+                    (git-commit-mode . insert)
+                    (git-rebase-mode . emacs)
+                    (help-mode . emacs)
+                    (term-mode . emacs)))
+  (evil-set-initial-state `,(car mode-map) `,(cdr mode-map)))
 
 ;; esc quits
 (defun minibuffer-keyboard-quit ()
@@ -238,9 +250,26 @@
 (define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
 (global-set-key [escape] 'evil-exit-emacs-state)
 
+;; magic to change the mode-line color according to state
+(lexical-let ((default-color (cons (face-background 'mode-line)
+                                   (face-foreground 'mode-line))))
+  (add-hook 'post-command-hook
+            (lambda ()
+              (let ((color (cond ((minibufferp) default-color)
+                                 ((evil-insert-state-p) '("#e80000" . "#ffffff"))
+                                 ((evil-emacs-state-p)  '("#af00d7" . "#ffffff"))
+                                 ((evil-visual-state-p)  '("SteelBlue4" . "#ffffff"))
+                                 ((evil-operator-state-p)  '("DarkSeaGreen4" . "#ffffff"))
+                                 ((buffer-modified-p)   '("#006fa0" . "#ffffff"))
+                                 (t default-color))))
+                (set-face-background 'mode-line (car color))
+                (set-face-foreground 'mode-line (cdr color))))))
+
 ;; Undo tree
 (require 'undo-tree)
 (global-undo-tree-mode 1)
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Visual
@@ -313,10 +342,8 @@
   "Ignores passed in arg like a lambda and runs company-complete"
   (company-complete))
 
-(setq company-idle-delay 0.2
-      company-minimum-prefix-length 2
-      company-tooltip-flip-when-above t
-      company-frontends '(company-pseudo-tooltip-frontend))
+(setq company-minimum-prefix-length 2
+      company-tooltip-flip-when-above t)
 
 (setq
  ;; don't complete in certain modes
@@ -359,21 +386,24 @@
 (add-hook 'prog-mode-hook 'flyspell-prog-mode)
 
 ;; File-types
-(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.org$\\'" . org-mode))
 (add-to-list 'auto-mode-alist '("\\.js.?" . js2-mode))
 (add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
 (add-to-list 'auto-mode-alist '(".emacs" . emacs-lisp-mode))
+(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.css\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.scss\\'" . web-mode))
+
 
 ;; Web stuff
-(defun web-mode-util ()
+(defun custom-web-mode-hook ()
   "Hooks for Web mode."
   (setq web-mode-html-offset 2)
   (setq web-mode-css-offset 2)
   (setq web-mode-script-offset 2)
   (toggle-truncate-lines t))
 
-(add-hook 'web-mode-hook 'web-mode-util)
+(add-hook 'web-mode-hook 'custom-web-mode-hook)
 
 (when (when (executable-find "tern"))
   (add-to-list 'company-backends 'company-tern)
@@ -426,7 +456,11 @@
   (flyspell-mode t)
   (visual-line-mode 1))
 
-(dolist (hook '(text-mode-hook org-mode-hook latex-mode-hook))
+(dolist (hook '(text-mode-hook
+                org-mode-hook
+                markdown-mode-hook
+                poly-markdown-mode
+                latex-mode-hook))
   (add-hook hook 'enable-write-utils))
 
 (setq sentence-end-double-space nil)
@@ -517,7 +551,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(package-selected-packages
+   (quote
+    (web-mode smex rainbow-delimiters projectile pretty-mode polymode org-plus-contrib material-theme markdown-mode magit leuven-theme langtool key-chord json-mode js2-mode ido-ubiquitous htmlize highlight flycheck flx-ido expand-region exec-path-from-shell evil-paredit evil-matchit evil-leader ess dash-at-point company-tern coffee-mode cider avy aggressive-indent ag))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
