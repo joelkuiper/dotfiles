@@ -29,7 +29,6 @@
                       evil
                       evil-leader
                       evil-matchit
-                      key-chord
                       exec-path-from-shell
                       flx-ido
                       ido-ubiquitous
@@ -56,7 +55,6 @@
                       coffee-mode
                       ess ; R
                       cider ; Clojure
-                      markdown-mode
                       json-mode
                       company-tern
                       web-mode js2-mode ; Web development
@@ -152,9 +150,6 @@
 (evil-leader/set-leader ",")
 (evil-mode 1)
 
-(key-chord-mode t)
-(key-chord-define evil-insert-state-map "jk" 'evil-normal-state)
-
 (setq evil-shift-width 2)
 
 (require 'expand-region)
@@ -249,7 +244,6 @@
 (define-key minibuffer-local-completion-map [escape] 'minibuffer-keyboard-quit)
 (define-key minibuffer-local-must-match-map [escape] 'minibuffer-keyboard-quit)
 (define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
-(global-set-key [escape] 'evil-exit-emacs-state)
 
 ;; magic to change the mode-line color according to state
 (lexical-let ((default-color (cons (face-background 'mode-line)
@@ -343,8 +337,11 @@
   "Ignores passed in arg like a lambda and runs company-complete"
   (company-complete))
 
-(setq company-minimum-prefix-length 2
-      company-tooltip-flip-when-above t)
+(setq company-idle-delay 0.2
+      company-minimum-prefix-length 2
+      company-require-match nil
+      company-frontends '(company-pseudo-tooltip-frontend)
+      company-clang-prefix-guesser 'company-mode/more-than-prefix-guesser)
 
 (setq
  ;; don't complete in certain modes
@@ -394,6 +391,7 @@
 (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.css\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.scss\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.less\\'" . web-mode))
 
 
 ;; Web stuff
@@ -460,7 +458,6 @@
 (dolist (hook '(text-mode-hook
                 org-mode-hook
                 markdown-mode-hook
-                poly-markdown-mode
                 latex-mode-hook))
   (add-hook hook 'enable-write-utils))
 
@@ -483,9 +480,7 @@
 (setq org-src-fontify-natively t
       org-export-with-smart-quotes t
       org-fontify-whole-heading-line t
-      org-confirm-babel-evaluate nil
       org-export-with-section-numbers nil
-      org-export-babel-evaluate nil
       org-startup-with-inline-images (display-graphic-p)
       org-html-head-include-default-style nil)
 
@@ -508,15 +503,15 @@
 (add-to-list 'org-latex-packages-alist '("protrusion=true,expansion=true" "microtype"))
 
 ;; active Babel languages
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((R . t)
-   (clojure . t)
-   (emacs-lisp . t)
-   (plantuml . t)
-   (ditaa . t)
-   (dot . t)
-   (python . t)))
+;; (org-babel-do-load-languages
+;;  'org-babel-load-languages
+;;  '((R . t)
+;;    (clojure . t)
+;;    (emacs-lisp . t)
+;;    (plantuml . t)
+;;    (ditaa . t)
+;;    (dot . t)
+;;    (python . t)))
 
 ;; blogging
 (setq org-publish-project-alist
