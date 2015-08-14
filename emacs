@@ -11,6 +11,10 @@
 (setq user-full-name "Joël Kuiper"
       user-mail-address "me@joelkuiper.eu")
 
+(setq calendar-location-name "Groningen, Groningen, NL") 
+(setq calendar-latitude 53.2166667)
+(setq calendar-longitude 6.55)
+
 (load-file "~/.emacs.secrets")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -39,6 +43,7 @@
                       pretty-mode
                       avy
                       ;; Themes
+                      theme-changer
                       leuven-theme ; light
                       material-theme ; dark
                       ;; Project management
@@ -273,12 +278,17 @@
 
 (global-font-lock-mode t)
 
-(load-theme 'leuven t)
+
+(require 'theme-changer)
+(change-theme 'leuven 'material)
+
 (show-paren-mode t)
 
 (require 'pretty-mode)
 (pretty-activate-groups '(:greek :undefined :arrow-tails :parentheses :types))
 (global-pretty-mode t)
+
+(set-fringe-mode '(1 . 1))
 
 ;; No bell
 (setq ring-bell-function 'ignore)
@@ -546,9 +556,16 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(ansi-color-faces-vector
+   [default default default italic underline success warning error])
+ '(ansi-color-names-vector
+   ["black" "red3" "ForestGreen" "yellow3" "blue" "magenta3" "DeepSkyBlue" "gray50"])
+ '(custom-safe-themes
+   (quote
+    ("21c149e080d562fe9169c8abda51c2f1f9b0a12c89cc2c7a4d9998a758e1cfbd" "d1dbb3c37e11ae8f986ca2d4b6a9d78bb1915fe66f3a6ffab1397cc746c18cba" default)))
  '(package-selected-packages
    (quote
-    (web-mode smex rainbow-delimiters projectile pretty-mode polymode org-plus-contrib material-theme markdown-mode magit leuven-theme langtool key-chord json-mode js2-mode ido-ubiquitous htmlize highlight flycheck flx-ido expand-region exec-path-from-shell evil-paredit evil-matchit evil-leader ess dash-at-point company-tern coffee-mode cider avy aggressive-indent ag))))
+    (theme-changer web-mode smex rainbow-delimiters projectile pretty-mode polymode org-plus-contrib material-theme markdown-mode magit leuven-theme langtool key-chord json-mode js2-mode ido-ubiquitous htmlize highlight flycheck flx-ido expand-region exec-path-from-shell evil-paredit evil-matchit evil-leader ess dash-at-point company-tern coffee-mode cider avy aggressive-indent ag))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
