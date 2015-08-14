@@ -11,7 +11,7 @@
 (setq user-full-name "Joël Kuiper"
       user-mail-address "me@joelkuiper.eu")
 
-(setq calendar-location-name "Groningen, Groningen, NL") 
+(setq calendar-location-name "Groningen, Groningen, NL")
 (setq calendar-latitude 53.2166667)
 (setq calendar-longitude 6.55)
 
@@ -224,7 +224,6 @@
 (dolist (mode-map '((ag-mode . emacs)
                     (cider-repl-mode . emacs)
                     (eshell-mode . emacs)
-                    (fundamental-mode . emacs)
                     (git-commit-mode . insert)
                     (git-rebase-mode . emacs)
                     (help-mode . emacs)
