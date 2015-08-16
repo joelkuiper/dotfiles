@@ -60,6 +60,7 @@
                       coffee-mode
                       ess ; R
                       cider ; Clojure
+                      clojure-mode-extra-font-locking
                       json-mode
                       company-tern
                       web-mode js2-mode ; Web development
@@ -110,23 +111,46 @@
   (require 'exec-path-from-shell)
   (exec-path-from-shell-initialize)
 
-  (setq mac-option-modifier nil
+  (setq mac-option-modifier 'hyper
         mac-command-modifier 'meta)
 
   ;; for bibtex2html see: http://foswiki.org/Tasks.Item11919
   (setenv "TMPDIR" ".")
 
-  (setq select-enable-clipboard t
-        select-enable-primary t
-        save-interprogram-paste-before-kill t
-        mouse-yank-at-point t)
+  (defun copy-from-osx ()
+    "Handle copy/paste intelligently on osx."
+    (let ((pbpaste (purecopy "/usr/bin/pbpaste")))
+      (if (and (eq system-type 'darwin)
+             (file-exists-p pbpaste))
+          (let ((tramp-mode nil)
+                (default-directory "~"))
+            (shell-command-to-string pbpaste)))))
 
+  (defun paste-to-osx (text &optional push)
+    (let ((process-connection-type nil))
+      (let ((proc (start-process "pbcopy" "*Messages*" "/usr/bin/pbcopy")))
+        (process-send-string proc text)
+        (process-send-eof proc))))
+  (setq interprogram-cut-function 'paste-to-osx
+        interprogram-paste-function 'copy-from-osx)
+
+  (setq save-interprogram-paste-before-kill t)
+  (setq x-select-enable-clipboard t)
+  ;; Treat clipboard input as UTF-8 string first; compound text next, etc.
+  (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
 
   ;; BSD ls doesn't support --dired. use brews' GNU core-utils
   (when (executable-find "gls")
     (setq
      dired-listing-switches "-alh"
      insert-directory-program "gls")))
+
+(setq gc-cons-threshold (* 256 1024 1024)) ;; 256 mb
+;; Allow font-lock-mode to do background parsing
+(setq jit-lock-stealth-time 1
+      ;; jit-lock-stealth-load 200
+      jit-lock-chunk-size 1000
+      jit-lock-defer-time 0.05)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Util
@@ -555,16 +579,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ansi-color-faces-vector
-   [default default default italic underline success warning error])
- '(ansi-color-names-vector
-   ["black" "red3" "ForestGreen" "yellow3" "blue" "magenta3" "DeepSkyBlue" "gray50"])
- '(custom-safe-themes
-   (quote
-    ("21c149e080d562fe9169c8abda51c2f1f9b0a12c89cc2c7a4d9998a758e1cfbd" "d1dbb3c37e11ae8f986ca2d4b6a9d78bb1915fe66f3a6ffab1397cc746c18cba" default)))
  '(package-selected-packages
    (quote
-    (theme-changer web-mode smex rainbow-delimiters projectile pretty-mode polymode org-plus-contrib material-theme markdown-mode magit leuven-theme langtool key-chord json-mode js2-mode ido-ubiquitous htmlize highlight flycheck flx-ido expand-region exec-path-from-shell evil-paredit evil-matchit evil-leader ess dash-at-point company-tern coffee-mode cider avy aggressive-indent ag))))
+    (clojure-mode-extra-font-locking web-mode theme-changer smex rainbow-delimiters projectile pretty-mode polymode org-plus-contrib material-theme markdown-mode magit leuven-theme langtool key-chord json-mode js2-mode ido-ubiquitous htmlize highlight flycheck flx-ido expand-region exec-path-from-shell evil-paredit evil-matchit evil-leader ess dash-at-point company-tern coffee-mode cider avy aggressive-indent ag))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
