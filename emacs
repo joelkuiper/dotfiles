@@ -51,6 +51,7 @@
                       projectile
                       ag
                       ;; Writing
+                      adoc-mode
                       langtool
                       org-plus-contrib
                       htmlize
@@ -579,9 +580,38 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(display-time-mode t)
+ '(fci-rule-color "#37474f")
+ '(fringe-mode (quote (nil . 0)) nil (fringe))
+ '(hl-sexp-background-color "#1c1f26")
+ '(indicate-buffer-boundaries (quote left))
  '(package-selected-packages
    (quote
-    (clojure-mode-extra-font-locking web-mode theme-changer smex rainbow-delimiters projectile pretty-mode polymode org-plus-contrib material-theme markdown-mode magit leuven-theme langtool key-chord json-mode js2-mode ido-ubiquitous htmlize highlight flycheck flx-ido expand-region exec-path-from-shell evil-paredit evil-matchit evil-leader ess dash-at-point company-tern coffee-mode cider avy aggressive-indent ag))))
+    (adoc-mode clojure-mode-extra-font-locking web-mode theme-changer smex rainbow-delimiters projectile pretty-mode polymode org-plus-contrib material-theme markdown-mode magit leuven-theme langtool key-chord json-mode js2-mode ido-ubiquitous htmlize highlight flycheck flx-ido expand-region exec-path-from-shell evil-paredit evil-matchit evil-leader ess dash-at-point company-tern coffee-mode cider avy aggressive-indent ag)))
+ '(show-paren-mode t)
+ '(tool-bar-mode nil)
+ '(vc-annotate-background nil)
+ '(vc-annotate-color-map
+   (quote
+    ((20 . "#f36c60")
+     (40 . "#ff9800")
+     (60 . "#fff59d")
+     (80 . "#8bc34a")
+     (100 . "#81d4fa")
+     (120 . "#4dd0e1")
+     (140 . "#b39ddb")
+     (160 . "#f36c60")
+     (180 . "#ff9800")
+     (200 . "#fff59d")
+     (220 . "#8bc34a")
+     (240 . "#81d4fa")
+     (260 . "#4dd0e1")
+     (280 . "#b39ddb")
+     (300 . "#f36c60")
+     (320 . "#ff9800")
+     (340 . "#fff59d")
+     (360 . "#8bc34a"))))
+ '(vc-annotate-very-old-color nil))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
