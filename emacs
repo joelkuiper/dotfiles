@@ -61,10 +61,12 @@
                       coffee-mode
                       ess ; R
                       cider ; Clojure
-                      clojure-mode-extra-font-locking
                       json-mode
+                      less-css-mode
+                      scss-mode
                       company-tern
-                      web-mode js2-mode ; Web development
+                      web-mode js2-mode
+                      clojure-mode-extra-font-locking
                       highlight paredit evil-paredit rainbow-delimiters aggressive-indent ; Lisp
                       ))
 
@@ -419,13 +421,14 @@
 
 ;; File-types
 (add-to-list 'auto-mode-alist '("\\.org$\\'" . org-mode))
+(add-to-list 'auto-mode-alist '("\\.adoc$\\'" . adoc-mode))
 (add-to-list 'auto-mode-alist '("\\.js.?" . js2-mode))
 (add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
 (add-to-list 'auto-mode-alist '(".emacs" . emacs-lisp-mode))
 (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.css\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.scss\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.less\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.css\\'" . css-mode))
+(add-to-list 'auto-mode-alist '("\\.scss\\'" . scss-mode))
+(add-to-list 'auto-mode-alist '("\\.less\\'" . less-css-mode))
 
 
 ;; Web stuff
@@ -537,15 +540,15 @@
 (add-to-list 'org-latex-packages-alist '("protrusion=true,expansion=true" "microtype"))
 
 ;; active Babel languages
-;; (org-babel-do-load-languages
-;;  'org-babel-load-languages
-;;  '((R . t)
-;;    (clojure . t)
-;;    (emacs-lisp . t)
-;;    (plantuml . t)
-;;    (ditaa . t)
-;;    (dot . t)
-;;    (python . t)))
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((R . t)
+   (clojure . t)
+   (emacs-lisp . t)
+   (plantuml . t)
+   (ditaa . t)
+   (dot . t)
+   (python . t)))
 
 ;; blogging
 (setq org-publish-project-alist
@@ -587,7 +590,7 @@
  '(indicate-buffer-boundaries (quote left))
  '(package-selected-packages
    (quote
-    (adoc-mode clojure-mode-extra-font-locking web-mode theme-changer smex rainbow-delimiters projectile pretty-mode polymode org-plus-contrib material-theme markdown-mode magit leuven-theme langtool key-chord json-mode js2-mode ido-ubiquitous htmlize highlight flycheck flx-ido expand-region exec-path-from-shell evil-paredit evil-matchit evil-leader ess dash-at-point company-tern coffee-mode cider avy aggressive-indent ag)))
+    (less-css-mode scss-mode adoc-mode clojure-mode-extra-font-locking web-mode theme-changer smex rainbow-delimiters projectile pretty-mode polymode org-plus-contrib material-theme markdown-mode magit leuven-theme langtool key-chord json-mode js2-mode ido-ubiquitous htmlize highlight flycheck flx-ido expand-region exec-path-from-shell evil-paredit evil-matchit evil-leader ess dash-at-point company-tern coffee-mode cider avy aggressive-indent ag)))
  '(show-paren-mode t)
  '(tool-bar-mode nil)
  '(vc-annotate-background nil)
