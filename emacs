@@ -32,7 +32,6 @@
 (defvar my-packages '(;; Core
                       evil
                       evil-leader
-                      evil-matchit
                       exec-path-from-shell
                       flx-ido
                       ido-ubiquitous
@@ -57,16 +56,15 @@
                       htmlize
                       ;; Language support
                       dash-at-point
-                      polymode
                       coffee-mode
                       ess ; R
                       cider ; Clojure
+                      markdown-mode
                       json-mode
                       less-css-mode
                       scss-mode
                       company-tern
                       web-mode js2-mode
-                      clojure-mode-extra-font-locking
                       highlight paredit evil-paredit rainbow-delimiters aggressive-indent ; Lisp
                       ))
 
@@ -114,7 +112,7 @@
   (require 'exec-path-from-shell)
   (exec-path-from-shell-initialize)
 
-  (setq mac-option-modifier 'hyper
+  (setq mac-option-modifier nil
         mac-command-modifier 'meta)
 
   ;; for bibtex2html see: http://foswiki.org/Tasks.Item11919
@@ -139,8 +137,6 @@
 
   (setq save-interprogram-paste-before-kill t)
   (setq x-select-enable-clipboard t)
-  ;; Treat clipboard input as UTF-8 string first; compound text next, etc.
-  (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
 
   ;; BSD ls doesn't support --dired. use brews' GNU core-utils
   (when (executable-find "gls")
@@ -149,11 +145,6 @@
      insert-directory-program "gls")))
 
 (setq gc-cons-threshold (* 256 1024 1024)) ;; 256 mb
-;; Allow font-lock-mode to do background parsing
-(setq jit-lock-stealth-time 1
-      ;; jit-lock-stealth-load 200
-      jit-lock-chunk-size 1000
-      jit-lock-defer-time 0.05)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Util
@@ -174,8 +165,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'evil)
 (require 'evil-leader)
-(require 'evil-matchit)
-(global-evil-matchit-mode 1)
 
 (setq evil-leader/in-all-states 1)
 (global-evil-leader-mode)
@@ -213,10 +202,6 @@
 (define-key evil-normal-state-map (kbd "C-h") 'windmove-left)
 (define-key evil-normal-state-map (kbd "C-j") 'windmove-down)
 (define-key evil-normal-state-map (kbd "C-k") 'windmove-up)
-(define-key evil-normal-state-map (kbd "C-<right>") 'windmove-right)
-(define-key evil-normal-state-map (kbd "C-<left>") 'windmove-left)
-(define-key evil-normal-state-map (kbd "C-<down>") 'windmove-down)
-(define-key evil-normal-state-map (kbd "C-<up>") 'windmove-up)
 
 ;; Leaders
 (evil-leader/set-key
@@ -234,7 +219,7 @@
   "bk"     'ido-kill-buffer
   "k"      'delete-window
   "u"      'undo-tree-visualize
-  "d"      'vc-diff
+  "d"      'magit-diff
   "m"      'dash-at-point ; Manual
   "ws"     'whitespace-mode
   "gs"     'magit-status
@@ -245,7 +230,12 @@
   "pf"     'projectile-find-file
   "ps"     'projectile-switch-project
   "pd"     'projectile-dired
-  "pg"     'projectile-ag)
+  "pg"     'projectile-ag
+
+  "<left>" 'windmove-left
+  "<right>"'windmove-right
+  "<up>"   'windmove-up
+  "<down>" 'windmove-down)
 
 ;; modes to map to different default states
 (dolist (mode-map '((ag-mode . emacs)
@@ -294,8 +284,6 @@
 ;; Undo tree
 (require 'undo-tree)
 (global-undo-tree-mode 1)
-
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Visual
@@ -373,12 +361,6 @@
   "Ignores passed in arg like a lambda and runs company-complete"
   (company-complete))
 
-(setq company-idle-delay 0.2
-      company-minimum-prefix-length 2
-      company-require-match nil
-      company-frontends '(company-pseudo-tooltip-frontend)
-      company-clang-prefix-guesser 'company-mode/more-than-prefix-guesser)
-
 (setq
  ;; don't complete in certain modes
  company-global-modes '(not git-commit-mode)
@@ -421,7 +403,7 @@
 
 ;; File-types
 (add-to-list 'auto-mode-alist '("\\.org$\\'" . org-mode))
-(add-to-list 'auto-mode-alist '("\\.adoc$\\'" . adoc-mode))
+(add-to-list 'auto-mode-alist '("\\.adoc\\'" . adoc-mode))
 (add-to-list 'auto-mode-alist '("\\.js.?" . js2-mode))
 (add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
 (add-to-list 'auto-mode-alist '(".emacs" . emacs-lisp-mode))
@@ -449,25 +431,11 @@
 (require 'ess-site)
 (setq ess-use-ido t)
 
-;; Poly-R
-(require 'poly-R)
-(require 'poly-markdown)
-
-;;; Markdown
-(add-to-list 'auto-mode-alist '("\\.md" . poly-markdown-mode))
-(add-to-list 'auto-mode-alist '("\\.markdown" . poly-markdown-mode))
-
-;;; R modes
-(add-to-list 'auto-mode-alist '("\\.Snw" . poly-noweb+r-mode))
-(add-to-list 'auto-mode-alist '("\\.Rnw" . poly-noweb+r-mode))
-(add-to-list 'auto-mode-alist '("\\.Rmd" . poly-markdown+r-mode))
-
 ;; Lisp
 (defun enable-lisp-utils ()
   (require 'evil-paredit)
   (rainbow-delimiters-mode)
   (aggressive-indent-mode)
-  (evil-matchit-mode -1)
   (enable-paredit-mode)
   (evil-paredit-mode t))
 
@@ -540,15 +508,15 @@
 (add-to-list 'org-latex-packages-alist '("protrusion=true,expansion=true" "microtype"))
 
 ;; active Babel languages
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((R . t)
-   (clojure . t)
-   (emacs-lisp . t)
-   (plantuml . t)
-   (ditaa . t)
-   (dot . t)
-   (python . t)))
+;; (org-babel-do-load-languages
+;;  'org-babel-load-languages
+;;  '((R . t)
+;;    (clojure . t)
+;;    (emacs-lisp . t)
+;;    (plantuml . t)
+;;    (ditaa . t)
+;;    (dot . t)
+;;    (python . t)))
 
 ;; blogging
 (setq org-publish-project-alist
@@ -583,38 +551,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(display-time-mode t)
- '(fci-rule-color "#37474f")
- '(fringe-mode (quote (nil . 0)) nil (fringe))
- '(hl-sexp-background-color "#1c1f26")
- '(indicate-buffer-boundaries (quote left))
  '(package-selected-packages
    (quote
-    (less-css-mode scss-mode adoc-mode clojure-mode-extra-font-locking web-mode theme-changer smex rainbow-delimiters projectile pretty-mode polymode org-plus-contrib material-theme markdown-mode magit leuven-theme langtool key-chord json-mode js2-mode ido-ubiquitous htmlize highlight flycheck flx-ido expand-region exec-path-from-shell evil-paredit evil-matchit evil-leader ess dash-at-point company-tern coffee-mode cider avy aggressive-indent ag)))
- '(show-paren-mode t)
- '(tool-bar-mode nil)
- '(vc-annotate-background nil)
- '(vc-annotate-color-map
-   (quote
-    ((20 . "#f36c60")
-     (40 . "#ff9800")
-     (60 . "#fff59d")
-     (80 . "#8bc34a")
-     (100 . "#81d4fa")
-     (120 . "#4dd0e1")
-     (140 . "#b39ddb")
-     (160 . "#f36c60")
-     (180 . "#ff9800")
-     (200 . "#fff59d")
-     (220 . "#8bc34a")
-     (240 . "#81d4fa")
-     (260 . "#4dd0e1")
-     (280 . "#b39ddb")
-     (300 . "#f36c60")
-     (320 . "#ff9800")
-     (340 . "#fff59d")
-     (360 . "#8bc34a"))))
- '(vc-annotate-very-old-color nil))
+    (markdown-mode web-mode theme-changer smex scss-mode rainbow-delimiters projectile pretty-mode org-plus-contrib material-theme magit leuven-theme less-css-mode langtool json-mode js2-mode ido-ubiquitous htmlize highlight flycheck flx-ido expand-region exec-path-from-shell evil-paredit evil-leader ess dash-at-point company-tern coffee-mode cider avy aggressive-indent ag adoc-mode))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
