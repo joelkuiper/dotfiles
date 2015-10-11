@@ -32,6 +32,7 @@
 (defvar my-packages '(;; Core
                       evil
                       evil-leader
+                      evil-mc
                       exec-path-from-shell
                       flx-ido
                       ido-ubiquitous
@@ -96,14 +97,9 @@
 (prefer-coding-system 'utf-8-unix)
 
 (when (window-system)
+  (scroll-bar-mode -1)
   (unless (eq tool-bar-mode -1)
-    (tool-bar-mode -1))
-  (unless (eq scroll-bar-mode -1)
-    (scroll-bar-mode -1))
-  ;; tooltips in echo-area
-  (unless (eq tooltip-mode -1)
-    (tooltip-mode -1)))
-
+    (tool-bar-mode -1)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; OSX Specific
@@ -112,31 +108,14 @@
   (require 'exec-path-from-shell)
   (exec-path-from-shell-initialize)
 
-  (setq mac-option-modifier nil
+  (setq mac-option-modifier 'hyper
         mac-command-modifier 'meta)
+
+  (setq browse-url-browser-function 'browse-url-default-macosx-browser)
+  (setq frame-title-format '(buffer-file-name "%f" ("%b")))
 
   ;; for bibtex2html see: http://foswiki.org/Tasks.Item11919
   (setenv "TMPDIR" ".")
-
-  (defun copy-from-osx ()
-    "Handle copy/paste intelligently on osx."
-    (let ((pbpaste (purecopy "/usr/bin/pbpaste")))
-      (if (and (eq system-type 'darwin)
-             (file-exists-p pbpaste))
-          (let ((tramp-mode nil)
-                (default-directory "~"))
-            (shell-command-to-string pbpaste)))))
-
-  (defun paste-to-osx (text &optional push)
-    (let ((process-connection-type nil))
-      (let ((proc (start-process "pbcopy" "*Messages*" "/usr/bin/pbcopy")))
-        (process-send-string proc text)
-        (process-send-eof proc))))
-  (setq interprogram-cut-function 'paste-to-osx
-        interprogram-paste-function 'copy-from-osx)
-
-  (setq save-interprogram-paste-before-kill t)
-  (setq x-select-enable-clipboard t)
 
   ;; BSD ls doesn't support --dired. use brews' GNU core-utils
   (when (executable-find "gls")
@@ -144,14 +123,11 @@
      dired-listing-switches "-alh"
      insert-directory-program "gls")))
 
-(setq gc-cons-threshold (* 256 1024 1024)) ;; 256 mb
+(setq gc-cons-threshold (* 32 1024 1024)) ;; 32 mb
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Util
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(display-time)
-(setq display-time-day-and-date t)
-
 (require 'smex)
 (smex-initialize)
 
@@ -165,6 +141,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'evil)
 (require 'evil-leader)
+(require 'evil-mc)
+(global-evil-mc-mode  1) ;; enable
 
 (setq evil-leader/in-all-states 1)
 (global-evil-leader-mode)
@@ -195,7 +173,7 @@
 (define-key evil-motion-state-map (kbd "P") #'avy-goto-line)
 
 (define-key evil-visual-state-map (kbd ".") 'er/expand-region)
-; (define-key evil-visual-state-map (kbd ",") 'er/contract-region)
+;; (define-key evil-visual-state-map (kbd ",") 'er/contract-region)
 
 ;; move between windows like a civilized fucking human being
 (define-key evil-normal-state-map (kbd "C-l") 'windmove-right)
@@ -292,22 +270,19 @@
 
 (global-font-lock-mode t)
 
-
 (require 'theme-changer)
 (change-theme 'leuven 'material)
 
 (show-paren-mode t)
 
 (require 'pretty-mode)
-(pretty-activate-groups '(:greek :undefined :arrow-tails :parentheses :types))
+(pretty-activate-groups '(:greek))
 (global-pretty-mode t)
 
 (set-fringe-mode '(1 . 1))
 
 ;; No bell
 (setq ring-bell-function 'ignore)
-
-(add-to-list 'default-frame-alist '(font . "PragmataPro 12"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customization
@@ -368,10 +343,6 @@
  evil-complete-next-func 'company-complete-lambda
  evil-complete-previous-func 'company-complete-lambda)
 
-;; Whitespace
-(setq-default indent-tabs-mode  nil
-              default-tab-width 2)
-
 ;; Also highlight long lines in whitespace-mode
 (require 'whitespace)
 (setq whitespace-line-column 80)
@@ -384,7 +355,34 @@
             (whitespace-cleanup)
             (delete-trailing-whitespace)))
 
-(add-hook 'prog-mode-hook (lambda () (setq show-trailing-whitespace 1)))
+;; Indentation
+(defun my-setup-indent (n)
+  ;; java/c/c++
+  (setq c-basic-offset n)
+  ;; web development
+  (setq coffee-tab-width n) ; coffeescript
+  (setq javascript-indent-level n) ; javascript-mode
+  (setq js-indent-level n) ; js-mode
+  (setq js2-basic-offset n) ; js2-mode, in latest js2-mode, it's alias of js-indent-level
+  (setq web-mode-markup-indent-offset n) ; web-mode, html tag in html file
+  (setq web-mode-css-indent-offset n) ; web-mode, css in html file
+  (setq web-mode-code-indent-offset n) ; web-mode, js code in html file
+  (setq css-indent-offset n) ; css-mode
+  )
+
+(defun my-code-style ()
+  (interactive)
+  (message "Code style!")
+  (setq-default indent-tabs-mode nil
+                default-tab-width 2)
+  (my-setup-indent 2)
+  )
+
+(my-code-style)
+
+(add-hook 'prog-mode-hook (lambda ()
+                            (flyspell-prog-mode)
+                            (setq show-trailing-whitespace 1)))
 
 ;; Flycheck
 (require 'flycheck)
@@ -399,7 +397,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Languages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(add-hook 'prog-mode-hook 'flyspell-prog-mode)
 
 ;; File-types
 (add-to-list 'auto-mode-alist '("\\.org$\\'" . org-mode))
@@ -416,14 +413,11 @@
 ;; Web stuff
 (defun custom-web-mode-hook ()
   "Hooks for Web mode."
-  (setq web-mode-html-offset 2)
-  (setq web-mode-css-offset 2)
-  (setq web-mode-script-offset 2)
   (toggle-truncate-lines t))
 
 (add-hook 'web-mode-hook 'custom-web-mode-hook)
 
-(when (when (executable-find "tern"))
+(when (executable-find "tern")
   (add-to-list 'company-backends 'company-tern)
   (add-hook 'js2-mode-hook 'tern-mode))
 
@@ -551,13 +545,23 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(ansi-color-faces-vector
+   [default default default italic underline success warning error])
+ '(ansi-color-names-vector
+   ["black" "red3" "ForestGreen" "yellow3" "blue" "magenta3" "DeepSkyBlue" "gray50"])
+ '(custom-safe-themes
+   (quote
+    ("4f81886421185048bd186fbccc98d95fca9c8b6a401771b7457d81f749f5df75" "614f8478963ec8caac8809931c9d00f670e4519388c02f71d9d27b66d5741a7f" default)))
+ '(display-time-mode t)
  '(package-selected-packages
    (quote
-    (markdown-mode web-mode theme-changer smex scss-mode rainbow-delimiters projectile pretty-mode org-plus-contrib material-theme magit leuven-theme less-css-mode langtool json-mode js2-mode ido-ubiquitous htmlize highlight flycheck flx-ido expand-region exec-path-from-shell evil-paredit evil-leader ess dash-at-point company-tern coffee-mode cider avy aggressive-indent ag adoc-mode))))
+    (markdown-mode web-mode theme-changer smex scss-mode rainbow-delimiters projectile pretty-mode org-plus-contrib material-theme magit leuven-theme less-css-mode langtool json-mode js2-mode ido-ubiquitous htmlize highlight flycheck flx-ido expand-region exec-path-from-shell evil-paredit evil-leader ess dash-at-point company-tern coffee-mode cider avy aggressive-indent ag adoc-mode)))
+ '(show-paren-mode t)
+ '(tool-bar-mode nil))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(default ((t (:height 120 :width normal :foundry "nil" :family "PragmataPro")))))
