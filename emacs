@@ -187,11 +187,11 @@
   "."      'er/expand-region
   ","      'er/contract-region
   "/"      'comment-or-uncomment-region
-  "x"      'smex ;; eXecute
+  "x"      'smex ; eXecute
   "e"      'eval-expression
   "f"      'find-file
   "q"      'kill-this-buffer
-  "sh"     'term; SHell
+  "sh"     'term ; SHell
   "bs"     'switch-to-buffer ; BufferSwitch
   "br"     'reload-buffer ; BufferReload
   "bk"     'ido-kill-buffer
@@ -278,8 +278,6 @@
 (require 'pretty-mode)
 (pretty-activate-groups '(:greek))
 (global-pretty-mode t)
-
-(set-fringe-mode '(1 . 1))
 
 ;; No bell
 (setq ring-bell-function 'ignore)
