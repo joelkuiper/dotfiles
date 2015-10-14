@@ -16,7 +16,6 @@
 (setq calendar-longitude 6.55)
 
 (load-file "~/.emacs.secrets")
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Packaging setup.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -32,7 +31,6 @@
 (defvar my-packages '(;; Core
                       evil
                       evil-leader
-                      evil-mc
                       exec-path-from-shell
                       flx-ido
                       ido-ubiquitous
@@ -142,8 +140,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'evil)
 (require 'evil-leader)
-(require 'evil-mc)
-(global-evil-mc-mode  1) ;; enable
 
 (setq evil-leader/in-all-states 1)
 (global-evil-leader-mode)
