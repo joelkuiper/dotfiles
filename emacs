@@ -122,8 +122,6 @@
      dired-listing-switches "-alh"
      insert-directory-program "gls")))
 
-(setq gc-cons-threshold (* 32 1024 1024)) ;; 32 mb
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Util
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -172,7 +170,6 @@
 (define-key evil-visual-state-map (kbd ".") 'er/expand-region)
 ;; (define-key evil-visual-state-map (kbd ",") 'er/contract-region)
 
-;; move between windows like a civilized fucking human being
 (define-key evil-normal-state-map (kbd "C-l") 'windmove-right)
 (define-key evil-normal-state-map (kbd "C-h") 'windmove-left)
 (define-key evil-normal-state-map (kbd "C-j") 'windmove-down)
