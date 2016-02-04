@@ -38,8 +38,7 @@
                       expand-region
                       flycheck
                       company
-                      pretty-mode
-                      avy
+                      ;;pretty-mode
                       ;; Themes
                       theme-changer
                       leuven-theme ; light
@@ -54,17 +53,16 @@
                       org-plus-contrib
                       htmlize
                       ;; Language support
-                      dash-at-point
                       coffee-mode
                       ess ; R
                       cider ; Clojure
                       markdown-mode
                       json-mode
                       less-css-mode
-                      scss-mode
                       company-tern
                       web-mode js2-mode
-                      highlight paredit evil-paredit rainbow-delimiters aggressive-indent ; Lisp
+                      flycheck-clojure flycheck-pos-tip
+                      highlight paredit evil-paredit aggressive-indent ; Lisp
                       ))
 
 (defun my-missing-packages ()
@@ -122,8 +120,6 @@
      dired-listing-switches "-alh"
      insert-directory-program "gls")))
 
-(setq gc-cons-threshold (* 32 1024 1024)) ;; 32 mb
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Util
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -166,9 +162,6 @@
 (define-key evil-visual-state-map (kbd ">") 'shift-right-visual)
 (define-key evil-visual-state-map (kbd "<") 'shift-left-visual)
 
-(define-key evil-motion-state-map (kbd "p") #'avy-goto-word-1)
-(define-key evil-motion-state-map (kbd "P") #'avy-goto-line)
-
 (define-key evil-visual-state-map (kbd ".") 'er/expand-region)
 ;; (define-key evil-visual-state-map (kbd ",") 'er/contract-region)
 
@@ -180,7 +173,6 @@
 
 ;; Leaders
 (evil-leader/set-key
-  "SPC"    'avy-goto-subword-1
   "."      'er/expand-region
   ","      'er/contract-region
   "/"      'comment-or-uncomment-region
@@ -195,7 +187,6 @@
   "k"      'delete-window
   "u"      'undo-tree-visualize
   "d"      'magit-diff
-  "m"      'dash-at-point ; Manual
   "ws"     'whitespace-mode
   "gs"     'magit-status
   "gb"     'magit-blame
@@ -214,7 +205,6 @@
 
 ;; modes to map to different default states
 (dolist (mode-map '((ag-mode . emacs)
-                    (cider-repl-mode . emacs)
                     (eshell-mode . emacs)
                     (git-commit-mode . insert)
                     (git-rebase-mode . emacs)
@@ -271,10 +261,6 @@
 (change-theme 'leuven 'material)
 
 (show-paren-mode t)
-
-(require 'pretty-mode)
-(pretty-activate-groups '(:greek))
-(global-pretty-mode t)
 
 ;; No bell
 (setq ring-bell-function 'ignore)
@@ -367,17 +353,16 @@
 
 (defun my-code-style ()
   (interactive)
-  (message "Code style!")
   (setq-default indent-tabs-mode nil
                 default-tab-width 2)
-  (my-setup-indent 2)
-  )
+  (my-setup-indent 2))
 
 (my-code-style)
 
 (add-hook 'prog-mode-hook (lambda ()
                             (flyspell-prog-mode)
-                            (setq show-trailing-whitespace 1)))
+                            ;;(setq show-trailing-whitespace 1)
+                            ))
 
 ;; Flycheck
 (require 'flycheck)
@@ -423,7 +408,6 @@
 ;; Lisp
 (defun enable-lisp-utils ()
   (require 'evil-paredit)
-  (rainbow-delimiters-mode)
   (aggressive-indent-mode)
   (enable-paredit-mode)
   (evil-paredit-mode t))
@@ -431,11 +415,15 @@
 (dolist (hook '(emacs-lisp-mode-hook
                 lisp-mode-hook
                 ielm-mode-hook
-                cider-repl-mode-hook
                 clojure-mode-hook))
   (add-hook hook 'enable-lisp-utils))
 
-(add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)
+;; Clojure
+(eval-after-load 'flycheck '(flycheck-clojure-setup))
+(add-hook 'after-init-hook #'global-flycheck-mode)
+
+(eval-after-load 'flycheck
+  '(setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
 
 ;; CoffeeScript
 (eval-after-load "coffee-mode"
