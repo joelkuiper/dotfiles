@@ -107,7 +107,7 @@
   (require 'exec-path-from-shell)
   (exec-path-from-shell-initialize)
 
-  (setq mac-option-modifier 'hyper
+  (setq mac-option-modifier 'none
         mac-command-modifier 'meta)
 
   (setq browse-url-browser-function 'browse-url-default-macosx-browser)
@@ -203,6 +203,7 @@
   "gl"     'magit-log-all
   "pt"     'projectile-find-tag
   "pf"     'projectile-find-file
+  "pF"     'projectile-find-file-other-window
   "ps"     'projectile-switch-project
   "pd"     'projectile-dired
   "pg"     'projectile-ag
@@ -423,6 +424,7 @@
 ;; Lisp
 (defun enable-lisp-utils ()
   (require 'evil-paredit)
+  (turn-on-eldoc-mode)
   (rainbow-delimiters-mode)
   (aggressive-indent-mode)
   (enable-paredit-mode)
@@ -436,6 +438,13 @@
   (add-hook hook 'enable-lisp-utils))
 
 (add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)
+
+(define-derived-mode clojurescript-mode clojure-mode
+  "Clojurescript"
+  "Extends clojure-mode with Clojurescript-specific settings."
+  (company-mode -1))
+
+(add-to-list 'auto-mode-alist '("\\.cljs\\'" . clojurescript-mode))
 
 ;; CoffeeScript
 (eval-after-load "coffee-mode"
@@ -496,16 +505,18 @@
 (add-to-list 'org-latex-packages-alist '("" "times"))
 (add-to-list 'org-latex-packages-alist '("protrusion=true,expansion=true" "microtype"))
 
-;; active Babel languages
-;; (org-babel-do-load-languages
-;;  'org-babel-load-languages
-;;  '((R . t)
-;;    (clojure . t)
-;;    (emacs-lisp . t)
-;;    (plantuml . t)
-;;    (ditaa . t)
-;;    (dot . t)
-;;    (python . t)))
+
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '(
+   ;;(R . t)
+   (emacs-lisp . t)
+   (python . t)
+   (dot . t)
+   (ditaa . t)
+   (clojure . t)
+   (plantuml . t)
+   ))
 
 ;; blogging
 (setq org-publish-project-alist
@@ -546,7 +557,7 @@
    ["black" "red3" "ForestGreen" "yellow3" "blue" "magenta3" "DeepSkyBlue" "gray50"])
  '(custom-safe-themes
    (quote
-    ("4f81886421185048bd186fbccc98d95fca9c8b6a401771b7457d81f749f5df75" "614f8478963ec8caac8809931c9d00f670e4519388c02f71d9d27b66d5741a7f" default)))
+    ("667e296942c561382fe0a8584c26be0fe7a80416270c3beede8c6d69f2f77ccc" "4f81886421185048bd186fbccc98d95fca9c8b6a401771b7457d81f749f5df75" "614f8478963ec8caac8809931c9d00f670e4519388c02f71d9d27b66d5741a7f" default)))
  '(display-time-mode t)
  '(package-selected-packages
    (quote
