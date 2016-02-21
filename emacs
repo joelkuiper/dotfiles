@@ -109,6 +109,8 @@
   (setq mac-option-modifier 'none
         mac-command-modifier 'meta)
 
+  (mac-auto-operator-composition-mode)
+
   (setq browse-url-browser-function 'browse-url-default-macosx-browser)
   (setq frame-title-format '(buffer-file-name "%f" ("%b")))
 
