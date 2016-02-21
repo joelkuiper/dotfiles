@@ -43,6 +43,7 @@
                       theme-changer
                       leuven-theme ; light
                       material-theme ; dark
+                      tao-theme
                       ;; Project management
                       magit ; git
                       projectile
@@ -62,7 +63,7 @@
                       company-tern
                       web-mode js2-mode
                       flycheck-clojure flycheck-pos-tip
-                      highlight paredit evil-paredit aggressive-indent ; Lisp
+                      rainbow-delimiters highlight paredit evil-paredit aggressive-indent ; Lisp
                       ))
 
 (defun my-missing-packages ()
@@ -231,21 +232,6 @@
 (define-key minibuffer-local-must-match-map [escape] 'minibuffer-keyboard-quit)
 (define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
 
-;; magic to change the mode-line color according to state
-(lexical-let ((default-color (cons (face-background 'mode-line)
-                                   (face-foreground 'mode-line))))
-  (add-hook 'post-command-hook
-            (lambda ()
-              (let ((color (cond ((minibufferp) default-color)
-                                 ((evil-insert-state-p) '("#e80000" . "#ffffff"))
-                                 ((evil-emacs-state-p)  '("#af00d7" . "#ffffff"))
-                                 ((evil-visual-state-p)  '("SteelBlue4" . "#ffffff"))
-                                 ((evil-operator-state-p)  '("DarkSeaGreen4" . "#ffffff"))
-                                 ((buffer-modified-p)   '("#006fa0" . "#ffffff"))
-                                 (t default-color))))
-                (set-face-background 'mode-line (car color))
-                (set-face-foreground 'mode-line (cdr color))))))
-
 ;; Undo tree
 (require 'undo-tree)
 (global-undo-tree-mode 1)
@@ -258,7 +244,7 @@
 (global-font-lock-mode t)
 
 (require 'theme-changer)
-(change-theme 'leuven 'material)
+(change-theme 'tao-yang 'tao-yin)
 
 (show-paren-mode t)
 
@@ -405,12 +391,14 @@
 (require 'ess-site)
 (setq ess-use-ido t)
 
+
 ;; Lisp
 (defun enable-lisp-utils ()
   (require 'evil-paredit)
   (turn-on-eldoc-mode)
   (aggressive-indent-mode)
   (enable-paredit-mode)
+  (rainbow-delimiters-mode)
   (evil-paredit-mode t))
 
 (dolist (hook '(emacs-lisp-mode-hook
@@ -420,18 +408,53 @@
   (add-hook hook 'enable-lisp-utils))
 
 ;; Clojure
-(eval-after-load 'flycheck '(flycheck-clojure-setup))
-(add-hook 'after-init-hook #'global-flycheck-mode)
-
-(eval-after-load 'flycheck
-  '(setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
-
-(define-derived-mode clojurescript-mode clojure-mode
-  "Clojurescript"
-  "Extends clojure-mode with Clojurescript-specific settings."
-  (company-mode -1))
 
 (add-to-list 'auto-mode-alist '("\\.cljs\\'" . clojurescript-mode))
+
+
+(defun fancify-symbols (mode)
+  (dolist (x '((true        т)
+               (false       ғ)
+               (:keys       ӄ)
+               (:strs       ş)
+               (fn          λ)
+               (nil         Ø)
+               (partial     ∂)
+               (with-redefs я)
+               (comp        º)
+               (apply       ζ)
+               (a-fn1       α)
+               (a-fn2       β)
+               (a-fn3       γ)
+               (no-op       ε)))
+
+    (font-lock-add-keywords
+     mode `((,(concat "[\[({[:space:]]"
+                      "\\(" (symbol-name (first x)) "\\)"
+                      "[\])}[:space:]]")
+             (0 (progn (compose-region (match-beginning 1)
+                                       (match-end 1) ,(symbol-name (second x)))
+                       nil)))))
+
+    (font-lock-add-keywords
+     mode `((,(concat "^"
+                      "\\(" (symbol-name (first x)) "\\)"
+                      "[\])}[:space:]]")
+             (0 (progn (compose-region (match-beginning 1)
+                                       (match-end 1) ,(symbol-name (second x)))
+                       nil)))))
+
+    (font-lock-add-keywords
+     mode `((,(concat "[\[({[:space:]]"
+                      "\\(" (symbol-name (first x)) "\\)"
+                      "$")
+             (0 (progn (compose-region (match-beginning 1)
+                                       (match-end 1) ,(symbol-name (second x)))
+                       nil)))))))
+
+
+(dolist (m '(clojure-mode clojurescript-mode clojurec-mode clojurex-mode))
+  (fancify-symbols m))
 
 ;; CoffeeScript
 (eval-after-load "coffee-mode"
