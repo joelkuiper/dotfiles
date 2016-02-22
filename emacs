@@ -25,7 +25,6 @@
 
 (require 'package)
 (require 'cl)
-
 (package-initialize)
 
 (defvar my-packages '(;; Core
@@ -403,17 +402,19 @@
   (rainbow-delimiters-mode)
   (evil-paredit-mode t))
 
-(dolist (hook '(emacs-lisp-mode-hook
-                lisp-mode-hook
-                ielm-mode-hook
-                clojure-mode-hook))
-  (add-hook hook 'enable-lisp-utils))
+
+(defvar lisps '(emacs-lisp-mode
+                lisp-mode
+                ielm-mode
+                clojurescript-mode
+                clojurec-mode
+                clojurex-mode
+                clojure-mode))
+
+(dolist (mode lisps)
+  (add-hook (intern (concat (symbol-name mode) "-hook")) 'enable-lisp-utils))
 
 ;; Clojure
-
-(add-to-list 'auto-mode-alist '("\\.cljs\\'" . clojurescript-mode))
-
-
 (defun fancify-symbols (mode)
   (dolist (x '((true        т)
                (false       ғ)
@@ -453,9 +454,7 @@
              (0 (progn (compose-region (match-beginning 1)
                                        (match-end 1) ,(symbol-name (second x)))
                        nil)))))))
-
-
-(dolist (m '(clojure-mode clojurescript-mode clojurec-mode clojurex-mode))
+(dolist (m lisps)
   (fancify-symbols m))
 
 ;; CoffeeScript
