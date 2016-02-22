@@ -35,7 +35,6 @@
                       ido-ubiquitous
                       smex
                       expand-region
-                      flycheck
                       company
                       ;;pretty-mode
                       ;; Themes
@@ -351,18 +350,7 @@
 
 (add-hook 'prog-mode-hook
           (lambda ()
-            (flyspell-prog-mode)
-            (setq show-trailing-whitespace 1)))
-
-;; Flycheck
-(require 'flycheck)
-(add-hook 'after-init-hook #'global-flycheck-mode)
-
-(setq flycheck-check-syntax-automatically '(save mode-enabled))
-(setq flycheck-checkers (delq 'emacs-lisp-checkdoc flycheck-checkers))
-(setq flycheck-standard-error-navigation nil)
-
-(global-flycheck-mode t)
+            (flyspell-prog-mode)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Languages
@@ -566,8 +554,36 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(ansi-color-names-vector
+   ["#C2C2C2" "#161616" "#252525" "#080808" "#0E0E0E" "#161616" "#080808" "#080808"])
+ '(custom-safe-themes
+   (quote
+    ("40bc0ac47a9bd5b8db7304f8ef628d71e2798135935eb450483db0dbbfff8b11" default)))
  '(display-time-mode t)
- '(tool-bar-mode nil))
+ '(fci-rule-color "#F0F0F0")
+ '(tool-bar-mode nil)
+ '(vc-annotate-background "#D9D9D9")
+ '(vc-annotate-color-map
+   (quote
+    ((20 . "#616161")
+     (40 . "#3C3C3C")
+     (60 . "#3C3C3C")
+     (80 . "#252525")
+     (100 . "#252525")
+     (120 . "#161616")
+     (140 . "#161616")
+     (160 . "#0E0E0E")
+     (180 . "#0E0E0E")
+     (200 . "#0E0E0E")
+     (220 . "#080808")
+     (240 . "#080808")
+     (260 . "#080808")
+     (280 . "#080808")
+     (300 . "#080808")
+     (320 . "#080808")
+     (340 . "#080808")
+     (360 . "#080808"))))
+ '(vc-annotate-very-old-color "#161616"))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
