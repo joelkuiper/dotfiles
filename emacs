@@ -98,8 +98,7 @@
     (tool-bar-mode -1)))
 
 (setq font-lock-support-mode 'jit-lock-mode)
-(setq jit-lock-defer-contextually t
-      jit-lock-stealth-nice 0.5)
+(setq jit-lock-defer-contextually t)
 (setq-default font-lock-multiline t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -350,10 +349,10 @@
 
 (my-code-style)
 
-(add-hook 'prog-mode-hook (lambda ()
-                            (flyspell-prog-mode)
-                            ;;(setq show-trailing-whitespace 1)
-                            ))
+(add-hook 'prog-mode-hook
+          (lambda ()
+            (flyspell-prog-mode)
+            (setq show-trailing-whitespace 1)))
 
 ;; Flycheck
 (require 'flycheck)
