@@ -61,7 +61,6 @@
                       less-css-mode
                       company-tern
                       web-mode js2-mode
-                      flycheck-clojure flycheck-pos-tip
                       rainbow-delimiters highlight paredit evil-paredit aggressive-indent ; Lisp
                       ))
 
