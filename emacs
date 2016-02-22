@@ -97,6 +97,11 @@
   (unless (eq tool-bar-mode -1)
     (tool-bar-mode -1)))
 
+(setq font-lock-support-mode 'jit-lock-mode)
+(setq jit-lock-defer-contextually t
+      jit-lock-stealth-nice 0.5)
+(setq-default font-lock-multiline t)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; OSX Specific
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
