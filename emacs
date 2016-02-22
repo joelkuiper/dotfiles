@@ -398,6 +398,7 @@
   (require 'evil-paredit)
   (turn-on-eldoc-mode)
   (aggressive-indent-mode)
+  (show-paren-mode t)
   (enable-paredit-mode)
   (rainbow-delimiters-mode)
   (evil-paredit-mode t))
@@ -562,18 +563,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ansi-color-faces-vector
-   [default default default italic underline success warning error])
- '(ansi-color-names-vector
-   ["black" "red3" "ForestGreen" "yellow3" "blue" "magenta3" "DeepSkyBlue" "gray50"])
- '(custom-safe-themes
-   (quote
-    ("667e296942c561382fe0a8584c26be0fe7a80416270c3beede8c6d69f2f77ccc" "4f81886421185048bd186fbccc98d95fca9c8b6a401771b7457d81f749f5df75" "614f8478963ec8caac8809931c9d00f670e4519388c02f71d9d27b66d5741a7f" default)))
  '(display-time-mode t)
- '(package-selected-packages
-   (quote
-    (markdown-mode web-mode theme-changer smex scss-mode rainbow-delimiters projectile pretty-mode org-plus-contrib material-theme magit leuven-theme less-css-mode langtool json-mode js2-mode ido-ubiquitous htmlize highlight flycheck flx-ido expand-region exec-path-from-shell evil-paredit evil-leader ess dash-at-point company-tern coffee-mode cider avy aggressive-indent ag adoc-mode)))
- '(show-paren-mode t)
  '(tool-bar-mode nil))
 
 (custom-set-faces
