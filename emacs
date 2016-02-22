@@ -97,7 +97,6 @@
     (tool-bar-mode -1)))
 
 (setq font-lock-support-mode 'jit-lock-mode)
-(setq jit-lock-defer-contextually t)
 (setq-default font-lock-multiline t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -117,6 +116,8 @@
 
   ;; for bibtex2html see: http://foswiki.org/Tasks.Item11919
   (setenv "TMPDIR" ".")
+
+  (setq-default fringes-outside-margins t)
 
   ;; BSD ls doesn't support --dired. use brews' GNU core-utils
   (when (executable-find "gls")
@@ -383,7 +384,6 @@
 (require 'ess-site)
 (setq ess-use-ido t)
 
-
 ;; Lisp
 (defun enable-lisp-utils ()
   (require 'evil-paredit)
@@ -560,30 +560,7 @@
    (quote
     ("40bc0ac47a9bd5b8db7304f8ef628d71e2798135935eb450483db0dbbfff8b11" default)))
  '(display-time-mode t)
- '(fci-rule-color "#F0F0F0")
- '(tool-bar-mode nil)
- '(vc-annotate-background "#D9D9D9")
- '(vc-annotate-color-map
-   (quote
-    ((20 . "#616161")
-     (40 . "#3C3C3C")
-     (60 . "#3C3C3C")
-     (80 . "#252525")
-     (100 . "#252525")
-     (120 . "#161616")
-     (140 . "#161616")
-     (160 . "#0E0E0E")
-     (180 . "#0E0E0E")
-     (200 . "#0E0E0E")
-     (220 . "#080808")
-     (240 . "#080808")
-     (260 . "#080808")
-     (280 . "#080808")
-     (300 . "#080808")
-     (320 . "#080808")
-     (340 . "#080808")
-     (360 . "#080808"))))
- '(vc-annotate-very-old-color "#161616"))
+ '(tool-bar-mode nil))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
