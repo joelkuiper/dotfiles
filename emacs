@@ -1,7 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; personal configuration of emacs + evil
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Version check.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -16,6 +15,7 @@
 (setq calendar-longitude 6.55)
 
 (load-file "~/.emacs.secrets")
+(load-library "url-handlers")
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Packaging setup.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -35,6 +35,7 @@
                       ido-ubiquitous
                       smex
                       expand-region
+                      flycheck
                       company
                       ;;pretty-mode
                       ;; Themes
@@ -96,9 +97,6 @@
   (unless (eq tool-bar-mode -1)
     (tool-bar-mode -1)))
 
-(setq font-lock-support-mode 'jit-lock-mode)
-(setq-default font-lock-multiline t)
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; OSX Specific
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -109,7 +107,7 @@
   (setq mac-option-modifier 'none
         mac-command-modifier 'meta)
 
-  (mac-auto-operator-composition-mode)
+  ;;(mac-auto-operator-composition-mode)
 
   (setq browse-url-browser-function 'browse-url-default-macosx-browser)
   (setq frame-title-format '(buffer-file-name "%f" ("%b")))
@@ -384,12 +382,34 @@
 (require 'ess-site)
 (setq ess-use-ido t)
 
+
+(defun prettify ()
+  (push '("true"        .  ?т) prettify-symbols-alist)
+  (push '("false"       .  ?ғ) prettify-symbols-alist)
+  (push '(":keys"       .  ?ӄ) prettify-symbols-alist)
+  (push '(":strs"       .  ?ş) prettify-symbols-alist)
+  (push '("fn"          .  ?λ) prettify-symbols-alist)
+  (push '("lambda"      .  ?λ) prettify-symbols-alist)
+  (push '("nil"         .  ?Ø) prettify-symbols-alist)
+  (push '("partial"     .  ?∂) prettify-symbols-alist)
+  (push '("with-redefs" .  ?я) prettify-symbols-alist)
+  (push '("comp"        .  ?º) prettify-symbols-alist)
+  (push '("apply"       .  ?ζ) prettify-symbols-alist)
+  (push '("a-fn1"       .  ?α) prettify-symbols-alist)
+  (push '("map"         .  ?↦) prettify-symbols-alist)
+  (push '("a-fn2"       .  ?β) prettify-symbols-alist)
+  (push '("a-fn3"       .  ?γ) prettify-symbols-alist)
+  (push '("no-op"       .  ?ε) prettify-symbols-alist))
+
+
 ;; Lisp
 (defun enable-lisp-utils ()
   (require 'evil-paredit)
   (turn-on-eldoc-mode)
   (aggressive-indent-mode)
   (show-paren-mode t)
+  (prettify)
+  (prettify-symbols-mode t)
   (enable-paredit-mode)
   (rainbow-delimiters-mode)
   (evil-paredit-mode t))
@@ -406,49 +426,6 @@
 (dolist (mode lisps)
   (add-hook (intern (concat (symbol-name mode) "-hook")) 'enable-lisp-utils))
 
-;; Clojure
-(defun fancify-symbols (mode)
-  (dolist (x '((true        т)
-               (false       ғ)
-               (:keys       ӄ)
-               (:strs       ş)
-               (fn          λ)
-               (nil         Ø)
-               (partial     ∂)
-               (with-redefs я)
-               (comp        º)
-               (apply       ζ)
-               (a-fn1       α)
-               (a-fn2       β)
-               (a-fn3       γ)
-               (no-op       ε)))
-
-    (font-lock-add-keywords
-     mode `((,(concat "[\[({[:space:]]"
-                      "\\(" (symbol-name (first x)) "\\)"
-                      "[\])}[:space:]]")
-             (0 (progn (compose-region (match-beginning 1)
-                                       (match-end 1) ,(symbol-name (second x)))
-                       nil)))))
-
-    (font-lock-add-keywords
-     mode `((,(concat "^"
-                      "\\(" (symbol-name (first x)) "\\)"
-                      "[\])}[:space:]]")
-             (0 (progn (compose-region (match-beginning 1)
-                                       (match-end 1) ,(symbol-name (second x)))
-                       nil)))))
-
-    (font-lock-add-keywords
-     mode `((,(concat "[\[({[:space:]]"
-                      "\\(" (symbol-name (first x)) "\\)"
-                      "$")
-             (0 (progn (compose-region (match-beginning 1)
-                                       (match-end 1) ,(symbol-name (second x)))
-                       nil)))))))
-(dolist (m lisps)
-  (fancify-symbols m))
-
 ;; CoffeeScript
 (eval-after-load "coffee-mode"
   '(progn
@@ -457,6 +434,19 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Writing & Blogging
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(require 'flycheck)
+(flycheck-define-checker
+    proselint
+  "A linter for prose."
+  :command ("proselint" source-inplace)
+  :error-patterns
+  ((warning line-start (file-name) ":" line ":" column ": "
+            (id (one-or-more (not (any " "))))
+            (message) line-end))
+  :modes (text-mode markdown-mode gfm-mode org-mode adoc-mode))
+
+(add-to-list 'flycheck-checkers 'proselint)
+
 (defun enable-write-utils ()
   (flyspell-mode t)
   (visual-line-mode 1))
@@ -469,8 +459,8 @@
 
 (setq sentence-end-double-space nil)
 
-(when (file-exists-p "/usr/local/Cellar/languagetool/2.8/libexec/languagetool-commandline.jar")
-  (setq langtool-language-tool-jar "/usr/local/Cellar/languagetool/2.8/libexec/languagetool-commandline.jar"
+(when (file-exists-p "/usr/local/Cellar/languagetool/3.2/libexec/languagetool-commandline.jar")
+  (setq langtool-language-tool-jar "/usr/local/Cellar/languagetool/3.2/libexec/languagetool-commandline.jar"
         langtool-default-language "en-US"
         langtool-disabled-rules '("WHITESPACE_RULE"
                                   "EN_UNPAIRED_BRACKETS"
@@ -554,13 +544,42 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(ansi-color-faces-vector
+   [default bold shadow italic underline bold bold-italic bold])
  '(ansi-color-names-vector
    ["#C2C2C2" "#161616" "#252525" "#080808" "#0E0E0E" "#161616" "#080808" "#080808"])
  '(custom-safe-themes
    (quote
-    ("40bc0ac47a9bd5b8db7304f8ef628d71e2798135935eb450483db0dbbfff8b11" default)))
+    ("990efcb44fdf633d5e3752248a983629ed18712c05833709eddedfc076b9fa53" "e56ee322c8907feab796a1fb808ceadaab5caba5494a50ee83a13091d5b1a10c" "b7b2cd8c45e18e28a14145573e84320795f5385895132a646ff779a141bbda7e" "603a9c7f3ca3253cb68584cb26c408afcf4e674d7db86badcfe649dd3c538656" "40bc0ac47a9bd5b8db7304f8ef628d71e2798135935eb450483db0dbbfff8b11" default)))
  '(display-time-mode t)
- '(tool-bar-mode nil))
+ '(fci-rule-color "#161616")
+ '(hl-sexp-background-color "#1c1f26")
+ '(package-selected-packages
+   (quote
+    (web-mode theme-changer tao-theme sparql-mode smex rainbow-delimiters projectile polymode org-plus-contrib material-theme markdown-mode magit leuven-theme less-css-mode langtool json-mode js2-mode ido-ubiquitous htmlize highlight flycheck flx-ido expand-region exec-path-from-shell evil-paredit evil-leader ess company-tern coffee-mode cider aggressive-indent ag adoc-mode)))
+ '(tool-bar-mode nil)
+ '(vc-annotate-background "#0E0E0E")
+ '(vc-annotate-color-map
+   (quote
+    ((20 . "#616161")
+     (40 . "#9D9D9D")
+     (60 . "#9D9D9D")
+     (80 . "#C2C2C2")
+     (100 . "#C2C2C2")
+     (120 . "#D9D9D9")
+     (140 . "#D9D9D9")
+     (160 . "#E8E8E8")
+     (180 . "#E8E8E8")
+     (200 . "#E8E8E8")
+     (220 . "#F0F0F0")
+     (240 . "#F0F0F0")
+     (260 . "#F0F0F0")
+     (280 . "#F6F6F6")
+     (300 . "#F6F6F6")
+     (320 . "#F6F6F6")
+     (340 . "#F9F9F9")
+     (360 . "#F9F9F9"))))
+ '(vc-annotate-very-old-color "#D9D9D9"))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

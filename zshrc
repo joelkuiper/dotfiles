@@ -7,9 +7,8 @@ ZSH=$HOME/.oh-my-zsh
 # time that oh-my-zsh is loaded.
 ZSH_THEME="minimal"
 
-export DOCKER_HOST=tcp://192.168.59.103:2376
-export DOCKER_CERT_PATH=/Users/joelkuiper/.boot2docker/certs/boot2docker-vm
-export DOCKER_TLS_VERIFY=1
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
 
 export TERM="xterm-256color"
 export EDITOR=vim
@@ -20,7 +19,7 @@ export NODE_PATH=$NODE_PATH:/usr/local/lib/node_modules
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
 # Set to this to use case-sensitive completion
-CASE_SENSITIVE="true"
+# CASE_SENSITIVE="true"
 
 # Comment this out to disable weekly auto-update checks
 DISABLE_AUTO_UPDATE="true"
@@ -63,3 +62,9 @@ PATH=$PATH:~/.cabal/bin:~/Library/Haskell/bin # add Haskell
 if [[ -a ~/.secrets ]] then
   source ~/.secrets
 fi
+
+
+export LD_LIBRARY_PATH=/usr/local/cuda:/usr/local/cuda/lib:$LD_LIBRARY_PATH
+export PATH=/usr/local/cuda/bin/:$PATH
+
+eval $(docker-machine env docker-machine)

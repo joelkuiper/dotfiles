@@ -125,3 +125,7 @@
 [user]
   name = Joel Kuiper
   email = me@joelkuiper.eu
+[filter "lfs"]
+	smudge = git-lfs smudge %f
+	required = true
+	clean = git-lfs clean %f
