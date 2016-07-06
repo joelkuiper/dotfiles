@@ -186,6 +186,7 @@
   "e"      'eval-expression
   "f"      'find-file
   "q"      'quit-window
+  "o"      'occur
   "sh"     'term ; SHell
   "bs"     'switch-to-buffer ; BufferSwitch
   "br"     'reload-buffer ; BufferReload
