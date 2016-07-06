@@ -185,15 +185,15 @@
   "x"      'smex ; eXecute
   "e"      'eval-expression
   "f"      'find-file
-  "q"      'kill-this-buffer
+  "q"      'quit-window
   "sh"     'term ; SHell
   "bs"     'switch-to-buffer ; BufferSwitch
   "br"     'reload-buffer ; BufferReload
   "bk"     'ido-kill-buffer
-  "k"      'delete-window
   "u"      'undo-tree-visualize
-  "d"      'magit-diff
+  "df"     'magit-diff-dwim
   "ws"     'whitespace-mode
+  "gd"     'magit-diff-working-tree
   "gs"     'magit-status
   "gb"     'magit-blame
   "gc"     'magit-commit
@@ -205,6 +205,9 @@
   "pd"     'projectile-dired
   "pg"     'projectile-ag
 
+
+  "|"      'evil-window-vsplit
+  "_"      'evil-window-split
   "<left>" 'windmove-left
   "<right>"'windmove-right
   "<up>"   'windmove-up
@@ -413,7 +416,6 @@
 ;; Lisp
 (defun enable-lisp-utils ()
   (require 'evil-paredit)
-  (turn-on-eldoc-mode)
   (aggressive-indent-mode)
   (show-paren-mode t)
   (prettify)
