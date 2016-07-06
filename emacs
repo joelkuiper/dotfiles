@@ -60,7 +60,6 @@
                       markdown-mode
                       json-mode
                       less-css-mode
-                      company-tern
                       web-mode js2-mode
                       rainbow-delimiters highlight paredit evil-paredit aggressive-indent ; Lisp
                       ))
@@ -69,8 +68,7 @@
   (let (missing-packages)
     (dolist (package my-packages missing-packages)
       (or (package-installed-p package)
-         (push package missing-packages)))))
-
+          (push package missing-packages)))))
 
 (let ((missing (my-missing-packages)))
   (when missing
@@ -214,16 +212,6 @@
   "<up>"   'windmove-up
   "<down>" 'windmove-down)
 
-;; modes to map to different default states
-(dolist (mode-map '((ag-mode . emacs)
-                    (eshell-mode . emacs)
-                    (git-commit-mode . insert)
-                    (git-rebase-mode . emacs)
-                    (help-mode . emacs)
-                    (term-mode . emacs)))
-  (evil-set-initial-state `,(car mode-map) `,(cdr mode-map)))
-(add-hook 'with-editor-mode-hook 'evil-insert-state)
-
 (define-key evil-normal-state-map (kbd "SPC") 'evil-ace-jump-word-mode)
 
 ;; esc quits
@@ -310,17 +298,7 @@
 (global-company-mode)
 (define-key company-active-map (kbd "C-n") 'company-select-next-or-abort)
 (define-key company-active-map (kbd "C-p") 'company-select-previous-or-abort)
-
-(defun company-complete-lambda (arg)
-  "Ignores passed in arg like a lambda and runs company-complete"
-  (company-complete))
-
-(setq
- ;; don't complete in certain modes
- company-global-modes '(not git-commit-mode)
- ;; make sure evil uses the right completion functions
- evil-complete-next-func 'company-complete-lambda
- evil-complete-previous-func 'company-complete-lambda)
+(global-set-key (kbd "TAB") #'company-indent-or-complete-common)
 
 ;; Also highlight long lines in whitespace-mode
 (require 'whitespace)
@@ -424,7 +402,6 @@
   (enable-paredit-mode)
   (rainbow-delimiters-mode)
   (evil-paredit-mode t))
-
 
 (defvar lisps '(emacs-lisp-mode
                 lisp-mode
