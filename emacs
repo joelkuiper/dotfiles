@@ -35,6 +35,7 @@
                       ido-ubiquitous
                       smex
                       expand-region
+                      ace-jump-mode
                       flycheck
                       company
                       ;;pretty-mode
@@ -175,6 +176,9 @@
 
 ;; Leaders
 (evil-leader/set-key
+  "SPC"    'evil-ace-jump-char-mode
+  "S-SPC"  'evil-ace-jump-word-mode
+  "C-SPC"  'evil-ace-jump-line-mode
   "."      'er/expand-region
   ","      'er/contract-region
   "/"      'comment-or-uncomment-region
@@ -215,6 +219,8 @@
                     (term-mode . emacs)))
   (evil-set-initial-state `,(car mode-map) `,(cdr mode-map)))
 (add-hook 'with-editor-mode-hook 'evil-insert-state)
+
+(define-key evil-normal-state-map (kbd "SPC") 'evil-ace-jump-word-mode)
 
 ;; esc quits
 (defun minibuffer-keyboard-quit ()
