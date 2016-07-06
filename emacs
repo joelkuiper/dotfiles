@@ -296,9 +296,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'company)
 (global-company-mode)
-(define-key company-active-map (kbd "C-n") 'company-select-next-or-abort)
-(define-key company-active-map (kbd "C-p") 'company-select-previous-or-abort)
-(global-set-key (kbd "TAB") #'company-indent-or-complete-common)
 
 ;; Also highlight long lines in whitespace-mode
 (require 'whitespace)
@@ -412,7 +409,16 @@
                 clojure-mode))
 
 (dolist (mode lisps)
+  ;; Add hooks
   (add-hook (intern (concat (symbol-name mode) "-hook")) 'enable-lisp-utils))
+
+;; http://timothypratley.blogspot.nl/2014/08/clojure-friendly-word-definitions-in.html
+(require 'clojure-mode)
+(dolist (mode '(clojure-mode-syntax-table emacs-lisp-mode-syntax-table))
+  (dolist (c (string-to-list ":_-?!#*"))
+    (modify-syntax-entry c "w" clojure-mode-syntax-table)))
+
+
 
 ;; CoffeeScript
 (eval-after-load "coffee-mode"
