@@ -14,6 +14,8 @@
 (setq calendar-latitude 53.2166667)
 (setq calendar-longitude 6.55)
 
+(add-hook 'focus-out-hook 'garbage-collect)
+
 (load-file "~/.emacs.secrets")
 (load-library "url-handlers")
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -52,9 +54,9 @@
                       adoc-mode
                       langtool
                       org-plus-contrib
+                      org-ref
                       htmlize
                       ;; Language support
-                      coffee-mode
                       ess ; R
                       cider ; Clojure
                       markdown-mode
@@ -106,7 +108,7 @@
   (setq mac-option-modifier 'none
         mac-command-modifier 'meta)
 
-  ;;(mac-auto-operator-composition-mode)
+  (mac-auto-operator-composition-mode)
 
   (setq browse-url-browser-function 'browse-url-default-macosx-browser)
   (setq frame-title-format '(buffer-file-name "%f" ("%b")))
@@ -239,14 +241,15 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Visual
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(default ((t (:height 120 :width normal :foundry "nil" :family "PragmataPro")))))
+
 (setq inhibit-splash-screen t)
-
-(global-font-lock-mode t)
-
-(require 'theme-changer)
-(change-theme 'tao-yang 'tao-yin)
-
-(show-paren-mode t)
+(load-theme 'tao-yang t)
 
 ;; No bell
 (setq ring-bell-function 'ignore)
@@ -259,12 +262,6 @@
 (require 'ido-ubiquitous)
 (require 'flx-ido)
 
-(setq ido-enable-prefix nil
-      ido-enable-flex-matching t
-      ido-create-new-buffer 'always
-      ido-use-filename-at-point 'guess
-      ido-default-file-method 'selected-window
-      ido-auto-merge-work-directories-length -1)
 (add-to-list 'ido-ignore-files "\\.DS_Store")
 (ido-mode +1)
 (ido-ubiquitous-mode +1)
@@ -388,7 +385,6 @@
   (add-pretty '("a-fn3"       .  ?γ))
   (add-pretty '("no-op"       .  ?ε)))
 
-
 ;; Lisp
 (defun enable-lisp-utils ()
   (require 'evil-paredit)
@@ -403,6 +399,7 @@
 (defvar lisps '(emacs-lisp-mode
                 lisp-mode
                 ielm-mode
+                cider-mode
                 clojurescript-mode
                 clojurec-mode
                 clojurex-mode
@@ -418,12 +415,6 @@
   (dolist (c (string-to-list ":_-?!#*"))
     (modify-syntax-entry c "w" clojure-mode-syntax-table)))
 
-
-
-;; CoffeeScript
-(eval-after-load "coffee-mode"
-  '(progn
-     (define-key coffee-mode-map (kbd "<return>") 'coffee-newline-and-indent)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Writing & Blogging
@@ -453,8 +444,8 @@
 
 (setq sentence-end-double-space nil)
 
-(when (file-exists-p "/usr/local/Cellar/languagetool/3.2/libexec/languagetool-commandline.jar")
-  (setq langtool-language-tool-jar "/usr/local/Cellar/languagetool/3.2/libexec/languagetool-commandline.jar"
+(when (file-exists-p "/usr/local/Cellar/languagetool/3.4/libexec/languagetool-commandline.jar")
+  (setq langtool-language-tool-jar "/usr/local/Cellar/languagetool/3.4/libexec/languagetool-commandline.jar"
         langtool-default-language "en-US"
         langtool-disabled-rules '("WHITESPACE_RULE"
                                   "EN_UNPAIRED_BRACKETS"
@@ -470,7 +461,6 @@
 (setq org-src-fontify-natively t
       org-export-with-smart-quotes t
       org-fontify-whole-heading-line t
-      org-export-with-section-numbers nil
       org-startup-with-inline-images (display-graphic-p)
       org-html-head-include-default-style nil)
 
@@ -538,12 +528,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(display-time-mode t)
- '(tool-bar-mode nil))
-
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(default ((t (:height 120 :width normal :foundry "nil" :family "PragmataPro")))))
+ '(custom-safe-themes
+   (quote
+    ("23ccf46b0d05ae80ee0661b91a083427a6c61e7a260227d37e36833d862ccffc" default)))
+ '(package-selected-packages
+   (quote
+    (web-mode theme-changer tao-theme smex rainbow-delimiters projectile org-ref org-plus-contrib material-theme markdown-mode magit leuven-theme less-css-mode langtool json-mode js2-mode ido-ubiquitous htmlize highlight flycheck flx-ido expand-region exec-path-from-shell evil-paredit evil-leader ess company-tern coffee-mode cider aggressive-indent ag adoc-mode ace-jump-mode))))

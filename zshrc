@@ -62,9 +62,3 @@ PATH=$PATH:~/.cabal/bin:~/Library/Haskell/bin # add Haskell
 if [[ -a ~/.secrets ]] then
   source ~/.secrets
 fi
-
-
-export LD_LIBRARY_PATH=/usr/local/cuda:/usr/local/cuda/lib:$LD_LIBRARY_PATH
-export PATH=/usr/local/cuda/bin/:$PATH
-
-eval $(docker-machine env docker-machine)
