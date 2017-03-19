@@ -92,11 +92,12 @@
 (set-keyboard-coding-system 'utf-8-unix)
 (prefer-coding-system 'utf-8-unix)
 
+(tool-bar-mode -1)
+(menu-bar-mode -1)
+
 (when (window-system)
   (scroll-bar-mode -1)
-  (fringe-mode '(1 . 1))
-  (unless (eq tool-bar-mode -1)
-    (tool-bar-mode -1)))
+  (fringe-mode '(1 . 1)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; OSX Specific
@@ -205,7 +206,6 @@
   "ps"     'projectile-switch-project
   "pd"     'projectile-dired
   "pg"     'projectile-ag
-
 
   "|"      'evil-window-vsplit
   "_"      'evil-window-split
