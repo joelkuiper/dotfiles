@@ -56,9 +56,19 @@ export JAVA_HOME=$(/usr/libexec/java_home)
 export PATH="/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/share:$HOME/bin:/usr/bin:/opt/bin:$PATH"
 PATH=$PATH:/usr/local/texlive/2014/bin/universal-darwin # add pdflatex
 PATH=~/anaconda/bin:$PATH # add Anaconda
-PATH=$PATH:~/.cabal/bin:~/Library/Haskell/bin # add Haskell
+PATH=$PATH:/Library/TeX/texbin
 
 # Put secret configuration settings in ~/.secrets
 if [[ -a ~/.secrets ]] then
   source ~/.secrets
 fi
+
+export CUDA_ROOT=/usr/local/cuda
+export LIBRARY_PATH=$CUDA_ROOT/lib:$CUDA_ROOT/lib64:$LIBRARY_PATH
+export LD_LIBRARY_PATH=$CUDA_ROOT/:/$CUDA_ROOT/lib:$LD_LIBRARY_PATH
+export DYLD_LIBRARY_PATH=$CUDA_ROOT/lib:/Developer/NVIDIA/CUDA-7.5/lib:$DYLD_LIBRARY_PATH
+export PATH=/usr/local/cuda/bin/:$PATH
+
+
+export DRE_AUTH_MOCK=true
+export PYTHONPATH=$PYTHONPATH:$(brew --prefix)/lib/python2.7/site-packages

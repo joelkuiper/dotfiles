@@ -40,7 +40,6 @@
                       ace-jump-mode
                       flycheck
                       company
-                      ;;pretty-mode
                       ;; Themes
                       theme-changer
                       leuven-theme ; light
@@ -241,15 +240,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Visual
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(default ((t (:height 120 :width normal :foundry "nil" :family "PragmataPro")))))
-
 (setq inhibit-splash-screen t)
 (load-theme 'tao-yang t)
+(set-default-font "PragmataPro Mono 12")
 
 ;; No bell
 (setq ring-bell-function 'ignore)
@@ -268,8 +261,6 @@
 
 ;;; smarter fuzzy matching for ido
 (flx-ido-mode +1)
-;; disable ido faces to see flx highlights
-(setq ido-use-faces nil)
 
 ;; http://emacs.wordpress.com/2007/01/28/simple-window-configuration-management/
 (winner-mode 1)
@@ -293,6 +284,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'company)
 (global-company-mode)
+(define-key company-active-map (kbd "C-n") 'company-select-next-or-abort)
+(define-key company-active-map (kbd "C-p") 'company-select-previous-or-abort)
 
 ;; Also highlight long lines in whitespace-mode
 (require 'whitespace)
@@ -528,9 +521,6 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   (quote
-    ("23ccf46b0d05ae80ee0661b91a083427a6c61e7a260227d37e36833d862ccffc" default)))
  '(package-selected-packages
    (quote
-    (web-mode theme-changer tao-theme smex rainbow-delimiters projectile org-ref org-plus-contrib material-theme markdown-mode magit leuven-theme less-css-mode langtool json-mode js2-mode ido-ubiquitous htmlize highlight flycheck flx-ido expand-region exec-path-from-shell evil-paredit evil-leader ess company-tern coffee-mode cider aggressive-indent ag adoc-mode ace-jump-mode))))
+    (org-ref web-mode theme-changer tao-theme smooth-scrolling smex rainbow-delimiters projectile org-plus-contrib material-theme markdown-mode magit leuven-theme less-css-mode langtool json-mode js2-mode ido-ubiquitous htmlize highlight flycheck flx-ido expand-region exec-path-from-shell evil-paredit evil-leader ess company coffee-mode cider aggressive-indent ag adoc-mode ace-jump-mode))))
