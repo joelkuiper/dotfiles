@@ -14,8 +14,6 @@
 (setq calendar-latitude 53.2166667)
 (setq calendar-longitude 6.55)
 
-(add-hook 'focus-out-hook 'garbage-collect)
-
 (load-file "~/.emacs.secrets")
 (load-library "url-handlers")
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -33,11 +31,9 @@
                       evil
                       evil-leader
                       exec-path-from-shell
-                      flx-ido
-                      ido-ubiquitous
                       smex
                       expand-region
-                      ace-jump-mode
+                      ;;ace-jump-mode
                       flycheck
                       company
                       ;; Themes
@@ -49,6 +45,7 @@
                       magit ; git
                       projectile
                       ag
+                      swiper
                       ;; Writing
                       adoc-mode
                       langtool
@@ -92,7 +89,6 @@
 (prefer-coding-system 'utf-8-unix)
 
 (tool-bar-mode -1)
-(menu-bar-mode -1)
 
 (when (window-system)
   (scroll-bar-mode -1)
@@ -250,17 +246,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customization
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ido
-(require 'ido)
-(require 'ido-ubiquitous)
-(require 'flx-ido)
-
 (add-to-list 'ido-ignore-files "\\.DS_Store")
-(ido-mode +1)
-(ido-ubiquitous-mode +1)
-
-;;; smarter fuzzy matching for ido
-(flx-ido-mode +1)
 
 ;; http://emacs.wordpress.com/2007/01/28/simple-window-configuration-management/
 (winner-mode 1)
@@ -268,9 +254,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Projects
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Ivy
+(ivy-mode 1)
+(setq ivy-use-virtual-buffers t)
+(setq enable-recursive-minibuffers t)
+
 ;; Projectile
-(require 'projectile)
-(projectile-global-mode)
+(setq projectile-completion-system 'ivy)
 
 (setq backup-directory-alist `(("." . "~/.saves")))
 (setq backup-by-copying t)
@@ -322,10 +312,6 @@
 
 (my-code-style)
 
-(add-hook 'prog-mode-hook
-          (lambda ()
-            (flyspell-prog-mode)))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Languages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -355,7 +341,6 @@
 
 ;; Emacs Speaks Statistics
 (require 'ess-site)
-(setq ess-use-ido t)
 
 (defun add-pretty (binding)
   (push binding prettify-symbols-alist))
@@ -401,12 +386,6 @@
 (dolist (mode lisps)
   ;; Add hooks
   (add-hook (intern (concat (symbol-name mode) "-hook")) 'enable-lisp-utils))
-
-;; http://timothypratley.blogspot.nl/2014/08/clojure-friendly-word-definitions-in.html
-(require 'clojure-mode)
-(dolist (mode '(clojure-mode-syntax-table emacs-lisp-mode-syntax-table))
-  (dolist (c (string-to-list ":_-?!#*"))
-    (modify-syntax-entry c "w" clojure-mode-syntax-table)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -523,4 +502,10 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (org-ref web-mode theme-changer tao-theme smooth-scrolling smex rainbow-delimiters projectile org-plus-contrib material-theme markdown-mode magit leuven-theme less-css-mode langtool json-mode js2-mode ido-ubiquitous htmlize highlight flycheck flx-ido expand-region exec-path-from-shell evil-paredit evil-leader ess company coffee-mode cider aggressive-indent ag adoc-mode ace-jump-mode))))
+    (swiper yaml-mode web-mode theme-changer tao-theme smooth-scrolling smex rainbow-delimiters projectile org-ref org-plus-contrib material-theme markdown-mode magit leuven-theme less-css-mode langtool json-mode js2-mode ido-ubiquitous htmlize highlight flycheck flx-ido expand-region exec-path-from-shell evil-paredit evil-leader ess company coffee-mode cider aggressive-indent ag adoc-mode ace-jump-mode))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
