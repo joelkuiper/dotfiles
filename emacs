@@ -37,13 +37,11 @@
                       flycheck
                       company
                       ;; Themes
-                      theme-changer
-                      leuven-theme ; light
-                      material-theme ; dark
                       tao-theme
                       ;; Project management
                       magit ; git
                       projectile
+                      counsel-projectile
                       ag
                       swiper
                       ;; Writing
@@ -182,7 +180,6 @@
   "e"      'eval-expression
   "f"      'find-file
   "q"      'quit-window
-  "o"      'occur
   "sh"     'term ; SHell
   "bs"     'switch-to-buffer ; BufferSwitch
   "br"     'reload-buffer ; BufferReload
@@ -195,12 +192,11 @@
   "gb"     'magit-blame
   "gc"     'magit-commit
   "gl"     'magit-log-all
-  "pt"     'projectile-find-tag
-  "pf"     'projectile-find-file
-  "pF"     'projectile-find-file-other-window
-  "ps"     'projectile-switch-project
+  "p;"     'counsel-projectile
+  "pf"     'counsel-projectile-find-file
+  "ps"     'counsel-projectile-switch-project
   "pd"     'projectile-dired
-  "pg"     'projectile-ag
+  "pg"     'counsel-projectile-ag
 
   "|"      'evil-window-vsplit
   "_"      'evil-window-split
@@ -257,11 +253,10 @@
 ;; Ivy
 (ivy-mode 1)
 (setq ivy-use-virtual-buffers t)
-(setq enable-recursive-minibuffers t)
+(setq ivy-re-builders-alist
+      '((t . ivy--regex-fuzzy)))
 
 ;; Projectile
-(setq projectile-completion-system 'ivy)
-
 (setq backup-directory-alist `(("." . "~/.saves")))
 (setq backup-by-copying t)
 (setq backup-directory-alist
@@ -294,7 +289,6 @@
   ;; java/c/c++
   (setq c-basic-offset n)
   ;; web development
-  (setq coffee-tab-width n) ; coffeescript
   (setq javascript-indent-level n) ; javascript-mode
   (setq js-indent-level n) ; js-mode
   (setq js2-basic-offset n) ; js2-mode, in latest js2-mode, it's alias of js-indent-level
@@ -324,7 +318,6 @@
 (add-to-list 'auto-mode-alist '(".emacs" . emacs-lisp-mode))
 (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.css\\'" . css-mode))
-(add-to-list 'auto-mode-alist '("\\.scss\\'" . scss-mode))
 (add-to-list 'auto-mode-alist '("\\.less\\'" . less-css-mode))
 
 
@@ -368,8 +361,8 @@
   (require 'evil-paredit)
   (aggressive-indent-mode)
   (show-paren-mode t)
-  (prettify)
-  (prettify-symbols-mode t)
+  ;;(prettify)
+  ;;(prettify-symbols-mode t)
   (enable-paredit-mode)
   (rainbow-delimiters-mode)
   (evil-paredit-mode t))
@@ -382,6 +375,12 @@
                 clojurec-mode
                 clojurex-mode
                 clojure-mode))
+
+(defun use-colon-as-word-start ()
+  (let ((table (make-syntax-table clojure-mode-syntax-table)))
+    (modify-syntax-entry ?: "w" table)
+    (set-syntax-table table)))
+(add-hook 'clojure-mode-hook 'use-colon-as-word-start)
 
 (dolist (mode lisps)
   ;; Add hooks
@@ -500,9 +499,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   (quote
-    (swiper yaml-mode web-mode theme-changer tao-theme smooth-scrolling smex rainbow-delimiters projectile org-ref org-plus-contrib material-theme markdown-mode magit leuven-theme less-css-mode langtool json-mode js2-mode ido-ubiquitous htmlize highlight flycheck flx-ido expand-region exec-path-from-shell evil-paredit evil-leader ess company coffee-mode cider aggressive-indent ag adoc-mode ace-jump-mode))))
+ )
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
