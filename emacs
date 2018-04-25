@@ -7,6 +7,9 @@
 (when (< emacs-major-version 24)
   (error "This setup requires Emacs v24, or higher. You have: v%d" emacs-major-version))
 
+
+(setq gc-cons-threshold 20000000)
+
 (setq user-full-name "Joël Kuiper"
       user-mail-address "me@joelkuiper.eu")
 
@@ -33,9 +36,10 @@
                       exec-path-from-shell
                       smex
                       expand-region
-                      ;;ace-jump-mode
+                      ace-jump-mode
                       flycheck
                       company
+                      flx
                       ;; Themes
                       tao-theme
                       ;; Project management
