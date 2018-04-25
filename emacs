@@ -7,8 +7,16 @@
 (when (< emacs-major-version 24)
   (error "This setup requires Emacs v24, or higher. You have: v%d" emacs-major-version))
 
+(setq message-log-max 16384
+      gc-cons-threshold 402653184
+      gc-cons-percentage 0.6)
 
-(setq gc-cons-threshold 20000000)
+(add-hook 'after-init-hook
+          `(lambda ()
+             (setq gc-cons-threshold 800000
+                   gc-cons-percentage 0.1)
+             (garbage-collect)) t)
+
 
 (setq user-full-name "Joël Kuiper"
       user-mail-address "me@joelkuiper.eu")
@@ -44,6 +52,7 @@
                       tao-theme
                       ;; Project management
                       magit ; git
+                      evil-magit
                       projectile
                       counsel-projectile
                       ag
@@ -184,6 +193,7 @@
   "e"      'eval-expression
   "f"      'find-file
   "q"      'quit-window
+  "`"      'swiper
   "sh"     'term ; SHell
   "bs"     'switch-to-buffer ; BufferSwitch
   "br"     'reload-buffer ; BufferReload
@@ -261,12 +271,18 @@
       '((t . ivy--regex-fuzzy)))
 
 ;; Projectile
+(setq projectile-enable-caching t)
+(setq projectile-completion-system 'ivy)
+
 (setq backup-directory-alist `(("." . "~/.saves")))
 (setq backup-by-copying t)
 (setq backup-directory-alist
       `((".*" . ,temporary-file-directory)))
 (setq auto-save-file-name-transforms
       `((".*" ,temporary-file-directory t)))
+
+;; Magit
+(require 'evil-magit)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Programming
@@ -503,7 +519,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(package-selected-packages
+   (quote
+    (evil-magit web-mode theme-changer tao-theme smex rainbow-delimiters paxedit org-ref org-plus-contrib material-theme markdown-mode magit leuven-theme less-css-mode langtool json-mode js2-mode ido-ubiquitous highlight flycheck flx-ido expand-region exec-path-from-shell evil-paredit evil-leader ess counsel-projectile company coffee-mode cider aggressive-indent ag adoc-mode ace-jump-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
