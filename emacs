@@ -194,7 +194,7 @@
   "f"      'find-file
   "q"      'quit-window
   "`"      'swiper
-  "sh"     'term ; SHell
+  "sh"     'ansi-term ; SHell
   "bs"     'switch-to-buffer ; BufferSwitch
   "br"     'reload-buffer ; BufferReload
   "bk"     'ido-kill-buffer
@@ -267,8 +267,10 @@
 ;; Ivy
 (ivy-mode 1)
 (setq ivy-use-virtual-buffers t)
+
 (setq ivy-re-builders-alist
-      '((t . ivy--regex-fuzzy)))
+      '((t . ivy--regex-fuzzy)
+        (t . ivy--regex-plus)))
 
 ;; Projectile
 (setq projectile-enable-caching t)
