@@ -40,6 +40,7 @@
 
 (defvar my-packages '(;; Core
                       evil
+                      evil-matchit
                       evil-leader
                       exec-path-from-shell
                       smex
@@ -147,8 +148,11 @@
 ;;; General
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'evil)
-(require 'evil-leader)
 
+(require 'evil-matchit)
+(global-evil-matchit-mode 1)
+
+(require 'evil-leader)
 (setq evil-leader/in-all-states 1)
 (global-evil-leader-mode)
 (evil-leader/set-leader ",")
@@ -194,7 +198,7 @@
   "e"      'eval-expression
   "f"      'find-file
   "q"      'quit-window
-  "`"      'swiper
+  ";"      'swiper
   "sh"     'ansi-term ; SHell
   "bs"     'switch-to-buffer ; BufferSwitch
   "br"     'reload-buffer ; BufferReload
@@ -212,6 +216,7 @@
   "ps"     'counsel-projectile-switch-project
   "pd"     'projectile-dired
   "pg"     'counsel-projectile-ag
+  "P"      'counsel-evil-registers
 
   "|"      'evil-window-vsplit
   "_"      'evil-window-split
@@ -388,8 +393,8 @@
   (require 'evil-paredit)
   (aggressive-indent-mode)
   (show-paren-mode t)
-  ;;(prettify)
-  ;;(prettify-symbols-mode t)
+  (prettify)
+  (prettify-symbols-mode t)
   (enable-paredit-mode)
   (flycheck-mode)
   (rainbow-delimiters-mode)
