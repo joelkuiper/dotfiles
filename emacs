@@ -66,6 +66,7 @@
                       ;; Language support
                       ess ; R
                       cider ; Clojure
+                      flycheck-joker
                       markdown-mode
                       json-mode
                       less-css-mode
@@ -273,6 +274,7 @@
         (t . ivy--regex-plus)))
 
 ;; Projectile
+(projectile-global-mode)
 (setq projectile-enable-caching t)
 (setq projectile-completion-system 'ivy)
 
@@ -332,6 +334,9 @@
 ;;; Languages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(require 'flycheck)
+(require 'flycheck-joker)
+
 ;; File-types
 (add-to-list 'auto-mode-alist '("\\.org$\\'" . org-mode))
 (add-to-list 'auto-mode-alist '("\\.adoc\\'" . adoc-mode))
@@ -386,6 +391,7 @@
   ;;(prettify)
   ;;(prettify-symbols-mode t)
   (enable-paredit-mode)
+  (flycheck-mode)
   (rainbow-delimiters-mode)
   (evil-paredit-mode t))
 
@@ -412,7 +418,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Writing & Blogging
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(require 'flycheck)
 (flycheck-define-checker
     proselint
   "A linter for prose."
@@ -523,7 +528,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (evil-magit web-mode theme-changer tao-theme smex rainbow-delimiters paxedit org-ref org-plus-contrib material-theme markdown-mode magit leuven-theme less-css-mode langtool json-mode js2-mode ido-ubiquitous highlight flycheck flx-ido expand-region exec-path-from-shell evil-paredit evil-leader ess counsel-projectile company coffee-mode cider aggressive-indent ag adoc-mode ace-jump-mode))))
+    (flycheck-joker evil-magit web-mode theme-changer tao-theme smex rainbow-delimiters paxedit org-ref org-plus-contrib material-theme markdown-mode magit leuven-theme less-css-mode langtool json-mode js2-mode ido-ubiquitous highlight flycheck flx-ido expand-region exec-path-from-shell evil-paredit evil-leader ess counsel-projectile company coffee-mode cider aggressive-indent ag adoc-mode ace-jump-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
