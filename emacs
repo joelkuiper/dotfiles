@@ -212,7 +212,8 @@
   "gb"     'magit-blame
   "gc"     'magit-commit
   "gl"     'magit-log-all
-  "gp"     'magit-push-current-to-upstream
+  "gP"     'magit-push-current-to-upstream
+  "gp"     'magit-pull-from-upstream
   "p;"     'counsel-projectile
   "pf"     'counsel-projectile-find-file
   "ps"     'counsel-projectile-switch-project
