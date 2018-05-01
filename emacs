@@ -72,8 +72,9 @@
                       json-mode
                       less-css-mode
                       web-mode js2-mode
-                      rainbow-delimiters highlight paredit evil-paredit aggressive-indent ; Lisp
-                      ))
+                      ;; Lisp
+                      rainbow-delimiters highlight paredit evil-cleverparens
+                      aggressive-indent))
 
 (defun my-missing-packages ()
   (let (missing-packages)
@@ -392,16 +393,17 @@
   (add-pretty '("no-op"       .  ?ε)))
 
 ;; Lisp
+(require 'evil-cleverparens)
+
 (defun enable-lisp-utils ()
-  (require 'evil-paredit)
   (aggressive-indent-mode)
+  (evil-cleverparens-mode)
   (show-paren-mode t)
   (prettify)
   (prettify-symbols-mode t)
   (enable-paredit-mode)
   (flycheck-mode)
-  (rainbow-delimiters-mode)
-  (evil-paredit-mode t))
+  (rainbow-delimiters-mode))
 
 (defvar lisps '(emacs-lisp-mode
                 lisp-mode
@@ -534,9 +536,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   (quote
-    (flycheck-joker evil-magit web-mode theme-changer tao-theme smex rainbow-delimiters paxedit org-ref org-plus-contrib material-theme markdown-mode magit leuven-theme less-css-mode langtool json-mode js2-mode ido-ubiquitous highlight flycheck flx-ido expand-region exec-path-from-shell evil-paredit evil-leader ess counsel-projectile company coffee-mode cider aggressive-indent ag adoc-mode ace-jump-mode))))
+ )
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
