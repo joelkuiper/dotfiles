@@ -206,11 +206,13 @@
   "u"      'undo-tree-visualize
   "df"     'magit-diff-dwim
   "ws"     'whitespace-mode
-  "gd"     'magit-diff-working-tree
+  "gg"     'magit
+  "gd"     'magit-diff-unstaged
   "gs"     'magit-status
   "gb"     'magit-blame
   "gc"     'magit-commit
   "gl"     'magit-log-all
+  "gp"     'magit-push-current-to-upstream
   "p;"     'counsel-projectile
   "pf"     'counsel-projectile-find-file
   "ps"     'counsel-projectile-switch-project
