@@ -277,6 +277,7 @@
 ;; Ivy
 (ivy-mode 1)
 (setq ivy-use-virtual-buffers t)
+(setq ivy-initial-inputs-alist nil)
 
 (setq ivy-re-builders-alist
       '((t . ivy--regex-fuzzy)
@@ -364,12 +365,9 @@
 
 (add-hook 'web-mode-hook 'custom-web-mode-hook)
 
-(when (executable-find "tern")
-  (add-to-list 'company-backends 'company-tern)
-  (add-hook 'js2-mode-hook 'tern-mode))
-
 ;; Emacs Speaks Statistics
 (require 'ess-site)
+(setq ess-eval-visibly 'nowait)
 
 (defun add-pretty (binding)
   (push binding prettify-symbols-alist))
