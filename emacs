@@ -126,8 +126,6 @@
   ;; for bibtex2html see: http://foswiki.org/Tasks.Item11919
   (setenv "TMPDIR" ".")
 
-  (setq-default fringes-outside-margins t)
-
   ;; BSD ls doesn't support --dired. use brews' GNU core-utils
   (when (executable-find "gls")
     (setq
@@ -195,14 +193,14 @@
   "."      'er/expand-region
   ","      'er/contract-region
   "/"      'comment-or-uncomment-region
-  "x"      'smex ; eXecute
+  "x"      'smex                        ; eXecute
   "e"      'eval-expression
   "f"      'find-file
   "q"      'quit-window
   ";"      'swiper
-  "sh"     'ansi-term ; SHell
-  "bs"     'switch-to-buffer ; BufferSwitch
-  "br"     'reload-buffer ; BufferReload
+  "sh"     'ansi-term                   ; SHell
+  "bs"     'switch-to-buffer            ; BufferSwitch
+  "br"     'reload-buffer               ; BufferReload
   "bk"     'ido-kill-buffer
   "u"      'undo-tree-visualize
   "df"     'magit-diff-dwim
@@ -284,8 +282,6 @@
         (t . ivy--regex-plus)))
 
 ;; Projectile
-(projectile-global-mode)
-(setq projectile-enable-caching t)
 (setq projectile-completion-system 'ivy)
 
 (setq backup-directory-alist `(("." . "~/.saves")))
@@ -407,6 +403,7 @@
                 lisp-mode
                 ielm-mode
                 cider-mode
+                cider-repl-mode
                 clojurescript-mode
                 clojurec-mode
                 clojurex-mode
@@ -498,8 +495,7 @@
    (dot . t)
    (ditaa . t)
    (clojure . t)
-   (plantuml . t)
-   ))
+   (plantuml . t)))
 
 ;; blogging
 (setq org-publish-project-alist
