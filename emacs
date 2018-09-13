@@ -51,6 +51,7 @@
                       flx
                       ;; Themes
                       tao-theme
+                      eziam-theme
                       ;; Project management
                       magit ; git
                       evil-magit
@@ -73,7 +74,7 @@
                       less-css-mode
                       web-mode js2-mode
                       ;; Lisp
-                      rainbow-delimiters highlight paredit evil-cleverparens
+                      highlight paredit evil-cleverparens
                       aggressive-indent))
 
 (defun my-missing-packages ()
@@ -255,8 +256,8 @@
 ;;; Visual
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (setq inhibit-splash-screen t)
-(load-theme 'tao-yang t)
-(set-default-font "PragmataPro Mono 12")
+(load-theme 'eziam-light t)
+(set-default-font "PragmataPro 12")
 
 ;; No bell
 (setq ring-bell-function 'ignore)
@@ -397,7 +398,8 @@
   (prettify-symbols-mode t)
   (enable-paredit-mode)
   (flycheck-mode)
-  (rainbow-delimiters-mode))
+  ;;(rainbow-delimiters-mode)
+  )
 
 (defvar lisps '(emacs-lisp-mode
                 lisp-mode
@@ -530,10 +532,21 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(ansi-color-names-vector
+   [("#181818" . "#282828")
+    ("#ab4642" . "#dc9656")
+    ("#a1b56c" . "#383838")
+    ("#f7ca88" . "#383838")
+    ("#7cafc2" . "#585858")
+    ("#ba8baf" . "#b8b8b8")
+    ("#86c1b9" . "#d8d8d8")
+    ("#ffffff" . "#ffffff")]))
+
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(font-lock-comment ((t (:slant normal))))
+ '(font-lock-comment-face ((t (:foreground "#9E9E9E" :slant normal))))
+ '(font-lock-function-name-face ((t (:background "#f1f1f1" :box nil)))))
