@@ -1,3 +1,6 @@
+# Compatibility for emacs tramp
+[[ $TERM == "tramp" ]] && unsetopt zle && PS1='$ ' && return
+
 # Path to your oh-my-zsh configuration.
 ZSH=$HOME/.oh-my-zsh
 
@@ -7,12 +10,8 @@ ZSH=$HOME/.oh-my-zsh
 # time that oh-my-zsh is loaded.
 ZSH_THEME="minimal"
 
-export LC_ALL=en_US.UTF-8
-export LANG=en_US.UTF-8
-
 export TERM="xterm-256color"
 export EDITOR=vim
-export NODE_PATH=$NODE_PATH:/usr/local/lib/node_modules
 
 #Example aliases
 # alias zshconfig="mate ~/.zshrc"
@@ -38,7 +37,7 @@ DISABLE_AUTO_TITLE="true"
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
-plugins=(git vi-mode brew osx zsh-syntax-highlighting history-substring-search docker sudo)
+plugins=(git vi-mode zsh-syntax-highlighting history-substring-search docker sudo)
 
 bindkey '^[[A' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
@@ -47,28 +46,10 @@ bindkey -M vicmd 'j' history-substring-search-down
 
 source $ZSH/oh-my-zsh.sh
 
-alias bibtex2html="export TMPDIR=. && /usr/local/bin/bibtex2html"
-
-
-export JAVA_HOME=$(/usr/libexec/java_home)
-
-# Customize to your needs...
-export PATH="/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/share:$HOME/bin:/usr/bin:/opt/bin:$PATH"
-PATH=$PATH:/usr/local/texlive/2014/bin/universal-darwin # add pdflatex
-PATH=~/anaconda/bin:$PATH # add Anaconda
-PATH=$PATH:/Library/TeX/texbin
+# Customization
+export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
 
 # Put secret configuration settings in ~/.secrets
 if [[ -a ~/.secrets ]] then
   source ~/.secrets
 fi
-
-export CUDA_ROOT=/usr/local/cuda
-export LIBRARY_PATH=$CUDA_ROOT/lib:$CUDA_ROOT/lib64:$LIBRARY_PATH
-export LD_LIBRARY_PATH=$CUDA_ROOT/:/$CUDA_ROOT/lib:$LD_LIBRARY_PATH
-export DYLD_LIBRARY_PATH=$CUDA_ROOT/lib:/Developer/NVIDIA/CUDA-7.5/lib:$DYLD_LIBRARY_PATH
-export PATH=/usr/local/cuda/bin/:$PATH
-
-
-export DRE_AUTH_MOCK=true
-export PYTHONPATH=$PYTHONPATH:$(brew --prefix)/lib/python2.7/site-packages

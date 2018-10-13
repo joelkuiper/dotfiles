@@ -523,6 +523,8 @@
          :publishing-function org-publish-attachment)
         ("blog" :components ("org-joelkuiper" "org-static-joelkuiper"))))
 
+;; Tramp stuff
+(setq tramp-terminal-type "tramp")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customizations (from M-x customze-*)
