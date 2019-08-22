@@ -7,17 +7,6 @@
 (when (< emacs-major-version 24)
   (error "This setup requires Emacs v24, or higher. You have: v%d" emacs-major-version))
 
-(setq message-log-max 16384
-      gc-cons-threshold 402653184
-      gc-cons-percentage 0.6)
-
-(add-hook 'after-init-hook
-          `(lambda ()
-             (setq gc-cons-threshold 800000
-                   gc-cons-percentage 0.1)
-             (garbage-collect)) t)
-
-
 (setq user-full-name "Joël Kuiper"
       user-mail-address "me@joelkuiper.eu")
 
@@ -51,7 +40,6 @@
                       flx
                       ;; Themes
                       tao-theme
-                      eziam-theme
                       ;; Project management
                       magit ; git
                       evil-magit
@@ -67,14 +55,17 @@
                       htmlize
                       ;; Language support
                       ess ; R
+                      elpy ;; Python
+                      conda
                       cider ; Clojure
-                      flycheck-joker
+                      clojure-snippets
                       markdown-mode
                       json-mode
                       less-css-mode
                       web-mode js2-mode
                       ;; Lisp
-                      highlight paredit evil-cleverparens
+                      rainbow-delimiters highlight paredit evil-cleverparens
+                      highlight-parentheses
                       aggressive-indent))
 
 (defun my-missing-packages ()
@@ -103,6 +94,7 @@
 (set-keyboard-coding-system 'utf-8-unix)
 (prefer-coding-system 'utf-8-unix)
 
+(menu-bar-mode -1)
 (tool-bar-mode -1)
 
 (when (window-system)
@@ -132,6 +124,9 @@
     (setq
      dired-listing-switches "-alh"
      insert-directory-program "gls")))
+
+(setq auto-window-vscroll nil)
+(setq jit-lock-mode t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Util
@@ -256,8 +251,11 @@
 ;;; Visual
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (setq inhibit-splash-screen t)
-(load-theme 'eziam-light t)
-(set-default-font "PragmataPro 12")
+(setq tao-theme-use-sepia nil)
+(setq tao-theme-use-boxes nil)
+(setq tao-theme-use-height nil)
+(load-theme 'tao-yang t)
+(set-default-font "PragmataPro Mono 16")
 
 ;; No bell
 (setq ring-bell-function 'ignore)
@@ -342,7 +340,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (require 'flycheck)
-(require 'flycheck-joker)
 
 ;; File-types
 (add-to-list 'auto-mode-alist '("\\.org$\\'" . org-mode))
@@ -370,22 +367,22 @@
   (push binding prettify-symbols-alist))
 
 (defun prettify ()
-  (add-pretty '("true"        .  ?т))
-  (add-pretty '("false"       .  ?ғ))
-  (add-pretty '(":keys"       .  ?ӄ))
-  (add-pretty '(":strs"       .  ?ş))
-  (add-pretty '("fn"          .  ?λ))
-  (add-pretty '("lambda"      .  ?λ))
+  (add-pretty '("true"        .  ?))
+  (add-pretty '("false"       .  ?))
+  (add-pretty '(":keys"       .  ?))
+  (add-pretty '(":strs"       .  ?))
+  (add-pretty '("fn"          .  ?))
+  (add-pretty '("lambda"      .  ?))
   (add-pretty '("nil"         .  ?Ø))
-  (add-pretty '("partial"     .  ?∂))
-  (add-pretty '("with-redefs" .  ?я))
+  (add-pretty '("partial"     .  ?))
+  (add-pretty '("with-redefs" .  ?))
   (add-pretty '("comp"        .  ?º))
-  (add-pretty '("apply"       .  ?ζ))
-  (add-pretty '("map"         .  ?↦))
-  (add-pretty '("a-fn1"       .  ?α))
-  (add-pretty '("a-fn2"       .  ?β))
-  (add-pretty '("a-fn3"       .  ?γ))
-  (add-pretty '("no-op"       .  ?ε)))
+  (add-pretty '("apply"       .  ?))
+  (add-pretty '("map"         .  ?))
+  (add-pretty '("a-fn1"       .  ?))
+  (add-pretty '("a-fn2"       .  ?))
+  (add-pretty '("a-fn3"       .  ?))
+  (add-pretty '("no-op"       .  ?)))
 
 ;; Lisp
 (require 'evil-cleverparens)
@@ -393,13 +390,13 @@
 (defun enable-lisp-utils ()
   (aggressive-indent-mode)
   (evil-cleverparens-mode)
-  (show-paren-mode t)
-  (prettify)
-  (prettify-symbols-mode t)
+  ;;(show-paren-mode t)
+  ;;(prettify)
+  ;;(prettify-symbols-mode t)
+  (highlight-parentheses-mode t)
   (enable-paredit-mode)
-  (flycheck-mode)
-  ;;(rainbow-delimiters-mode)
-  )
+  ;;(flycheck-mode)
+  (rainbow-delimiters-mode))
 
 (defvar lisps '(emacs-lisp-mode
                 lisp-mode
@@ -420,6 +417,10 @@
 (dolist (mode lisps)
   ;; Add hooks
   (add-hook (intern (concat (symbol-name mode) "-hook")) 'enable-lisp-utils))
+
+;; Python
+(pyvenv-activate "/home/joelkuiper/miniconda3/")
+(elpy-enable)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -534,21 +535,12 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ansi-color-names-vector
-   [("#181818" . "#282828")
-    ("#ab4642" . "#dc9656")
-    ("#a1b56c" . "#383838")
-    ("#f7ca88" . "#383838")
-    ("#7cafc2" . "#585858")
-    ("#ba8baf" . "#b8b8b8")
-    ("#86c1b9" . "#d8d8d8")
-    ("#ffffff" . "#ffffff")]))
-
+ '(package-selected-packages
+   (quote
+    (conda elpy web-mode tao-theme smex rainbow-delimiters org-ref org-plus-contrib markdown-mode langtool json-mode js2-mode highlight-parentheses highlight flycheck-joker flx expand-region exec-path-from-shell evil-matchit evil-magit evil-leader evil-cleverparens ess counsel-projectile company cider aggressive-indent ag adoc-mode ace-jump-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(font-lock-comment ((t (:slant normal))))
- '(font-lock-comment-face ((t (:foreground "#9E9E9E" :slant normal))))
- '(font-lock-function-name-face ((t (:background "#f1f1f1" :box nil)))))
+ )
