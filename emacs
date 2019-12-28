@@ -255,7 +255,7 @@
 (setq tao-theme-use-boxes nil)
 (setq tao-theme-use-height nil)
 (load-theme 'tao-yang t)
-(set-default-font "PragmataPro Mono 16")
+(set-default-font "PragmataPro Mono 12")
 
 ;; No bell
 (setq ring-bell-function 'ignore)
