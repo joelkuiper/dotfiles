@@ -101,13 +101,13 @@
   (scroll-bar-mode -1)
   (fringe-mode '(1 . 1)))
 
+(require 'exec-path-from-shell)
+(exec-path-from-shell-initialize)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; OSX Specific
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (when (or (eq system-type 'darwin) (memq window-system '(mac ns)))
-  (require 'exec-path-from-shell)
-  (exec-path-from-shell-initialize)
-
   (setq mac-option-modifier 'none
         mac-command-modifier 'meta)
 
@@ -419,7 +419,7 @@
   (add-hook (intern (concat (symbol-name mode) "-hook")) 'enable-lisp-utils))
 
 ;; Python
-(pyvenv-activate "/home/joelkuiper/miniconda3/")
+(pyvenv-activate "/home/joelkuiper/anaconda3/")
 (elpy-enable)
 
 
