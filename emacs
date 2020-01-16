@@ -54,11 +54,13 @@
                       org-ref
                       htmlize
                       ;; Language support
+                      yasnippet-snippets
                       ess ; R
                       elpy ;; Python
                       conda
                       cider ; Clojure
                       clojure-snippets
+                      flycheck-clj-kondo
                       markdown-mode
                       json-mode
                       less-css-mode
@@ -101,9 +103,6 @@
   (scroll-bar-mode -1)
   (fringe-mode '(1 . 1)))
 
-(require 'exec-path-from-shell)
-(exec-path-from-shell-initialize)
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; OSX Specific
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -127,6 +126,10 @@
 
 (setq auto-window-vscroll nil)
 (setq jit-lock-mode t)
+(require 'exec-path-from-shell)
+(exec-path-from-shell-initialize)
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Util
@@ -215,6 +218,11 @@
   "pd"     'projectile-dired
   "pg"     'counsel-projectile-ag
   "P"      'counsel-evil-registers
+
+  ;; Clojure
+  "ns"     'cider-find-ns
+  "o"      'evil-jump-backward
+
 
   "|"      'evil-window-vsplit
   "_"      'evil-window-split
@@ -340,6 +348,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (require 'flycheck)
+(yas-global-mode 1)
 
 ;; File-types
 (add-to-list 'auto-mode-alist '("\\.org$\\'" . org-mode))
@@ -386,6 +395,8 @@
 
 ;; Lisp
 (require 'evil-cleverparens)
+(require 'flycheck-clj-kondo)
+
 
 (defun enable-lisp-utils ()
   (aggressive-indent-mode)
@@ -395,7 +406,7 @@
   ;;(prettify-symbols-mode t)
   (highlight-parentheses-mode t)
   (enable-paredit-mode)
-  ;;(flycheck-mode)
+  (flycheck-mode)
   (rainbow-delimiters-mode))
 
 (defvar lisps '(emacs-lisp-mode
@@ -408,6 +419,8 @@
                 clojurex-mode
                 clojure-mode))
 
+(setq cider-auto-select-error-buffer nil)
+
 (defun use-colon-as-word-start ()
   (let ((table (make-syntax-table clojure-mode-syntax-table)))
     (modify-syntax-entry ?: "w" table)
@@ -418,8 +431,13 @@
   ;; Add hooks
   (add-hook (intern (concat (symbol-name mode) "-hook")) 'enable-lisp-utils))
 
+;; Company
+(add-hook 'cider-repl-mode-hook #'cider-company-enable-fuzzy-completion)
+(add-hook 'cider-mode-hook #'cider-company-enable-fuzzy-completion)
+
 ;; Python
-(pyvenv-activate "/home/joelkuiper/anaconda3/")
+;; pip install jedi rope flake8 autopep8 yapf black
+(pyvenv-activate "/home/joelkuiper/miniconda3/")
 (elpy-enable)
 
 
@@ -535,9 +553,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   (quote
-    (conda elpy web-mode tao-theme smex rainbow-delimiters org-ref org-plus-contrib markdown-mode langtool json-mode js2-mode highlight-parentheses highlight flycheck-joker flx expand-region exec-path-from-shell evil-matchit evil-magit evil-leader evil-cleverparens ess counsel-projectile company cider aggressive-indent ag adoc-mode ace-jump-mode))))
+ )
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
