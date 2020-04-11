@@ -27,6 +27,14 @@
 (require 'cl)
 (package-initialize)
 
+;; Bootstrap `use-package'
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+
+(setq use-package-always-ensure t)
+(setq use-package-verbose t)
+
 (defvar my-packages '(;; Core
                       evil
                       evil-matchit
@@ -54,7 +62,10 @@
                       org-ref
                       htmlize
                       ;; Language support
+                      emmet-mode
+                      lsp-mode
                       yasnippet-snippets
+                      vue-mode ;; webdev
                       ess ; R
                       elpy ;; Python
                       conda
@@ -64,7 +75,9 @@
                       markdown-mode
                       json-mode
                       less-css-mode
-                      web-mode js2-mode
+                      scss-mode
+                      web-mode
+                      js2-mode
                       ;; Lisp
                       rainbow-delimiters highlight paredit evil-cleverparens
                       highlight-parentheses
@@ -98,6 +111,7 @@
 
 (menu-bar-mode -1)
 (tool-bar-mode -1)
+(setq frame-inhibit-implied-resize t)
 
 (when (window-system)
   (scroll-bar-mode -1)
@@ -223,6 +237,9 @@
   "ns"     'cider-find-ns
   "o"      'evil-jump-backward
 
+  ;; Vue
+  "jsp"    'prettier-js
+
 
   "|"      'evil-window-vsplit
   "_"      'evil-window-split
@@ -268,6 +285,10 @@
 ;; No bell
 (setq ring-bell-function 'ignore)
 
+(add-hook 'mmm-mode-hook
+          (lambda ()
+            (set-face-background 'mmm-default-submode-face nil)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customization
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -276,6 +297,7 @@
 ;; http://emacs.wordpress.com/2007/01/28/simple-window-configuration-management/
 (winner-mode 1)
 
+(require 'lsp-mode)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Projects
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -342,6 +364,15 @@
   (my-setup-indent 2))
 
 (my-code-style)
+
+;; See https://github.com/AdamNiederer/vue-mode/issues/74
+(setq mmm-js-mode-enter-hook (lambda () (setq syntax-ppss-table nil)))
+
+(add-hook 'vue-mode-hook
+          (lambda ()
+            (subword-mode +1)
+            (flyspell-mode -1)
+            (electric-pair-mode +1)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Languages
@@ -553,7 +584,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+)
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
