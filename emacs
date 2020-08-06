@@ -4,8 +4,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Version check.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(when (< emacs-major-version 24)
-  (error "This setup requires Emacs v24, or higher. You have: v%d" emacs-major-version))
+(when (< emacs-major-version 27)
+  (error "This setup requires Emacs v27, or higher. You have: v%d" emacs-major-version))
 
 (setq user-full-name "Joël Kuiper"
       user-mail-address "me@joelkuiper.eu")
@@ -15,16 +15,14 @@
 (setq calendar-longitude 6.55)
 
 (load-file "~/.emacs.secrets")
-(load-library "url-handlers")
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Packaging setup.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(setq package-archives '(("org" . "http://orgmode.org/elpa/")
-                         ("gnu" . "http://elpa.gnu.org/packages/")
-                         ("melpa" . "http://melpa.milkbox.net/packages/")))
+(setq package-archives '(("org" . "https://orgmode.org/elpa/")
+			 ("gnu" . "https://elpa.gnu.org/packages/")
+			 ("melpa" . "https://melpa.org/packages/")))
 
 (require 'package)
-(require 'cl)
 (package-initialize)
 
 ;; Bootstrap `use-package'
@@ -280,7 +278,7 @@
 (setq tao-theme-use-boxes nil)
 (setq tao-theme-use-height nil)
 (load-theme 'tao-yang t)
-(set-default-font "PragmataPro Mono 12")
+;;(set-default-font "PragmataPro Mono 12")
 
 ;; No bell
 (setq ring-bell-function 'ignore)
@@ -432,9 +430,9 @@
 (defun enable-lisp-utils ()
   (aggressive-indent-mode)
   (evil-cleverparens-mode)
-  ;;(show-paren-mode t)
-  ;;(prettify)
-  ;;(prettify-symbols-mode t)
+  (show-paren-mode t)
+  (prettify)
+  (prettify-symbols-mode t)
   (highlight-parentheses-mode t)
   (enable-paredit-mode)
   (flycheck-mode)
@@ -584,7 +582,8 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
-)
+ '(package-selected-packages
+   '(yasnippet-snippets web-mode vue-mode use-package tao-theme smex scss-mode rainbow-delimiters org-ref org-plus-contrib lsp-mode langtool json-mode js2-mode highlight-parentheses highlight flycheck-clj-kondo flx expand-region exec-path-from-shell evil-matchit evil-magit evil-leader evil-cleverparens ess emmet-mode elpy counsel-projectile conda clojure-snippets cider aggressive-indent ag adoc-mode ace-jump-mode)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
