@@ -10,10 +10,6 @@
 (setq user-full-name "Joël Kuiper"
       user-mail-address "me@joelkuiper.eu")
 
-(setq calendar-location-name "Groningen, Groningen, NL")
-(setq calendar-latitude 53.2166667)
-(setq calendar-longitude 6.55)
-
 (load-file "~/.emacs.secrets")
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Packaging setup.
@@ -25,61 +21,55 @@
 (require 'package)
 (package-initialize)
 
-;; Bootstrap `use-package'
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
-
-(setq use-package-always-ensure t)
-(setq use-package-verbose t)
-
-(defvar my-packages '(;; Core
-                      evil
-                      evil-matchit
-                      evil-leader
-                      exec-path-from-shell
-                      smex
-                      expand-region
-                      ace-jump-mode
-                      flycheck
-                      company
-                      flx
-                      ;; Themes
-                      tao-theme
-                      ;; Project management
-                      magit ; git
-                      evil-magit
-                      projectile
-                      counsel-projectile
-                      ag
-                      swiper
-                      ;; Writing
-                      adoc-mode
-                      langtool
-                      org-plus-contrib
-                      org-ref
-                      htmlize
-                      ;; Language support
-                      emmet-mode
-                      lsp-mode
-                      yasnippet-snippets
-                      vue-mode ;; webdev
-                      ess ; R
-                      elpy ;; Python
-                      conda
-                      cider ; Clojure
-                      clojure-snippets
-                      flycheck-clj-kondo
-                      markdown-mode
-                      json-mode
-                      less-css-mode
-                      scss-mode
-                      web-mode
-                      js2-mode
-                      ;; Lisp
-                      rainbow-delimiters highlight paredit evil-cleverparens
-                      highlight-parentheses
-                      aggressive-indent))
+(defvar my-packages
+  '(;; Core
+    evil
+    evil-matchit
+    evil-leader
+    exec-path-from-shell
+    smex
+    expand-region
+    ace-jump-mode
+    flycheck
+    company
+    flx
+    undo-fu
+    ;; Themes
+    tao-theme
+    ;; Project management
+    magit ; git
+    evil-magit
+    projectile
+    counsel-projectile
+    ag
+    swiper
+    ;; Writing
+    adoc-mode
+    langtool
+    org-plus-contrib
+    org-ref
+    htmlize
+    ;; Language support
+    emmet-mode
+    lsp-mode
+    yasnippet-snippets
+    vue-mode ;; webdev
+    ess ; R
+    elpy ;; Python
+    conda
+    cider ; Clojure
+    clojure-snippets
+    flycheck-clj-kondo
+    markdown-mode
+    json-mode
+    less-css-mode
+    scss-mode
+    web-mode
+    js2-mode
+    ;; Lisp
+    rainbow-delimiters highlight paredit evil-cleverparens
+    highlight-parentheses
+    aggressive-indent))
 
 (defun my-missing-packages ()
   (let (missing-packages)
@@ -107,45 +97,31 @@
 (set-keyboard-coding-system 'utf-8-unix)
 (prefer-coding-system 'utf-8-unix)
 
-(menu-bar-mode -1)
-(tool-bar-mode -1)
+(menu-bar-mode 0)
+(tool-bar-mode 0)
+(scroll-bar-mode 0)
 (setq frame-inhibit-implied-resize t)
 
 (when (window-system)
   (scroll-bar-mode -1)
   (fringe-mode '(1 . 1)))
 
+(setq inhibit-startup-screen t)
+(setq inhibit-startup-echo-area-message t)
+(setq inhibit-startup-message t)
+(setq initial-scratch-message nil)
+(setq initial-major-mode 'org-mode)
+
+(blink-cursor-mode 0)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; OSX Specific
+;;; Util
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(when (or (eq system-type 'darwin) (memq window-system '(mac ns)))
-  (setq mac-option-modifier 'none
-        mac-command-modifier 'meta)
-
-  (mac-auto-operator-composition-mode)
-
-  (setq browse-url-browser-function 'browse-url-default-macosx-browser)
-  (setq frame-title-format '(buffer-file-name "%f" ("%b")))
-
-  ;; for bibtex2html see: http://foswiki.org/Tasks.Item11919
-  (setenv "TMPDIR" ".")
-
-  ;; BSD ls doesn't support --dired. use brews' GNU core-utils
-  (when (executable-find "gls")
-    (setq
-     dired-listing-switches "-alh"
-     insert-directory-program "gls")))
-
 (setq auto-window-vscroll nil)
 (setq jit-lock-mode t)
 (require 'exec-path-from-shell)
 (exec-path-from-shell-initialize)
 
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Util
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'smex)
 (smex-initialize)
 
@@ -157,6 +133,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; General
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(require 'undo-fu)
+(setq evil-undo-system 'undo-fu)
 (require 'evil)
 
 (require 'evil-matchit)
@@ -213,7 +191,6 @@
   "bs"     'switch-to-buffer            ; BufferSwitch
   "br"     'reload-buffer               ; BufferReload
   "bk"     'ido-kill-buffer
-  "u"      'undo-tree-visualize
   "df"     'magit-diff-dwim
   "ws"     'whitespace-mode
   "gg"     'magit
@@ -232,12 +209,7 @@
   "P"      'counsel-evil-registers
 
   ;; Clojure
-  "ns"     'cider-find-ns
   "o"      'evil-jump-backward
-
-  ;; Vue
-  "jsp"    'prettier-js
-
 
   "|"      'evil-window-vsplit
   "_"      'evil-window-split
@@ -266,14 +238,9 @@
 (define-key minibuffer-local-must-match-map [escape] 'minibuffer-keyboard-quit)
 (define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
 
-;; Undo tree
-(require 'undo-tree)
-(global-undo-tree-mode 1)
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Visual
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(setq inhibit-splash-screen t)
 (setq tao-theme-use-sepia nil)
 (setq tao-theme-use-boxes nil)
 (setq tao-theme-use-height nil)
@@ -382,13 +349,12 @@
 ;; File-types
 (add-to-list 'auto-mode-alist '("\\.org$\\'" . org-mode))
 (add-to-list 'auto-mode-alist '("\\.adoc\\'" . adoc-mode))
-(add-to-list 'auto-mode-alist '("\\.js.?" . js2-mode))
 (add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
 (add-to-list 'auto-mode-alist '(".emacs" . emacs-lisp-mode))
-(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.css\\'" . css-mode))
 (add-to-list 'auto-mode-alist '("\\.less\\'" . less-css-mode))
-
+(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.js.?" . js2-mode))
 
 ;; Web stuff
 (defun custom-web-mode-hook ()
@@ -401,38 +367,14 @@
 (require 'ess-site)
 (setq ess-eval-visibly 'nowait)
 
-(defun add-pretty (binding)
-  (push binding prettify-symbols-alist))
-
-(defun prettify ()
-  (add-pretty '("true"        .  ?т))
-  (add-pretty '("false"       .  ?ғ))
-  (add-pretty '(":keys"       .  ?ӄ))
-  (add-pretty '(":strs"       .  ?ş))
-  (add-pretty '("fn"          .  ?λ))
-  (add-pretty '("lambda"      .  ?λ))
-  (add-pretty '("nil"         .  ?Ø))
-  (add-pretty '("partial"     .  ?∂))
-  (add-pretty '("with-redefs" .  ?я))
-  (add-pretty '("comp"        .  ?º))
-  (add-pretty '("apply"       .  ?ζ))
-  (add-pretty '("map"         .  ?↦))
-  (add-pretty '("a-fn1"       .  ?α))
-  (add-pretty '("a-fn2"       .  ?β))
-  (add-pretty '("a-fn3"       .  ?γ))
-  (add-pretty '("no-op"       .  ?ε)))
-
 ;; Lisp
 (require 'evil-cleverparens)
 (require 'flycheck-clj-kondo)
-
 
 (defun enable-lisp-utils ()
   (aggressive-indent-mode)
   (evil-cleverparens-mode)
   (show-paren-mode t)
-  (prettify)
-  (prettify-symbols-mode t)
   (highlight-parentheses-mode t)
   (enable-paredit-mode)
   (flycheck-mode)
@@ -583,10 +525,11 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(yasnippet-snippets web-mode vue-mode use-package tao-theme smex scss-mode rainbow-delimiters org-ref org-plus-contrib lsp-mode langtool json-mode js2-mode highlight-parentheses highlight flycheck-clj-kondo flx expand-region exec-path-from-shell evil-matchit evil-magit evil-leader evil-cleverparens ess emmet-mode elpy counsel-projectile conda clojure-snippets cider aggressive-indent ag adoc-mode ace-jump-mode)))
+   '(evil-matchit evil-leader exec-path-from-shell smex expand-region ace-jump-mode flx undo-fu tao-theme evil-magit counsel-projectile ag swiper adoc-mode langtool org-plus-contrib org-ref htmlize emmet-mode lsp-mode yasnippet-snippets vue-mode ess elpy conda cider clojure-snippets flycheck-clj-kondo markdown-mode json-mode scss-mode web-mode js2-mode rainbow-delimiters highlight evil-cleverparens highlight-parentheses aggressive-indent)))
+
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(default ((t (:inherit nil :extend nil :stipple nil :background "#F1F1F1" :foreground "#3C3C3C" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 120 :width normal :foundry "fsdf" :family "PragmataPro Mono")))))
