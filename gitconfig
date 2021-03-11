@@ -109,7 +109,7 @@
 [core]
   autocrlf = false
   editor = vim
-  excludesfile = /Users/joelkuiper/.gitignore_global
+	excludesFile = ~/.gitignore
   quotepath = false
 [advice]
   statusHints = false

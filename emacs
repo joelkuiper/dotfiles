@@ -21,6 +21,9 @@
 (require 'package)
 (package-initialize)
 
+(setq gc-cons-threshold (* 100 1024 1024)
+      read-process-output-max (* 1024 1024))
+
 (defvar my-packages
   '(;; Core
     evil
@@ -38,20 +41,19 @@
     tao-theme
     ;; Project management
     magit ; git
-    evil-magit
     projectile
+    project-root
     counsel-projectile
     ag
     swiper
     ;; Writing
     adoc-mode
-    langtool
     org-plus-contrib
     org-ref
     htmlize
     ;; Language support
     emmet-mode
-    lsp-mode
+    lsp-mode lsp-ui
     yasnippet-snippets
     vue-mode ;; webdev
     ess ; R
@@ -208,7 +210,10 @@
   "pg"     'counsel-projectile-ag
   "P"      'counsel-evil-registers
 
-  ;; Clojure
+  "lr"     'lsp-find-references
+  "ld"     'lsp-find-definition
+  "lD"     'lsp-find-declaration
+
   "o"      'evil-jump-backward
 
   "|"      'evil-window-vsplit
@@ -262,7 +267,6 @@
 ;; http://emacs.wordpress.com/2007/01/28/simple-window-configuration-management/
 (winner-mode 1)
 
-(require 'lsp-mode)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Projects
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -276,7 +280,10 @@
         (t . ivy--regex-plus)))
 
 ;; Projectile
+(projectile-global-mode)
+(setq projectile-enable-caching t)
 (setq projectile-completion-system 'ivy)
+(setq projectile-project-search-path '("~/Repositories"))
 
 (setq backup-directory-alist `(("." . "~/.saves")))
 (setq backup-by-copying t)
@@ -285,13 +292,12 @@
 (setq auto-save-file-name-transforms
       `((".*" ,temporary-file-directory t)))
 
-;; Magit
-(require 'evil-magit)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Programming
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'company)
+(require 'lsp-mode)
 (global-company-mode)
 (define-key company-active-map (kbd "C-n") 'company-select-next-or-abort)
 (define-key company-active-map (kbd "C-p") 'company-select-previous-or-abort)
@@ -373,22 +379,23 @@
 
 (defun enable-lisp-utils ()
   (aggressive-indent-mode)
+  (paredit-mode)
   (evil-cleverparens-mode)
   (show-paren-mode t)
   (highlight-parentheses-mode t)
-  (enable-paredit-mode)
   (flycheck-mode)
   (rainbow-delimiters-mode))
 
-(defvar lisps '(emacs-lisp-mode
-                lisp-mode
-                ielm-mode
-                cider-mode
-                cider-repl-mode
-                clojurescript-mode
-                clojurec-mode
-                clojurex-mode
-                clojure-mode))
+(defvar lisps
+  '(emacs-lisp-mode
+    lisp-mode
+    ielm-mode
+    cider-mode
+    cider-repl-mode
+    clojurescript-mode
+    clojurec-mode
+    clojurex-mode
+    clojure-mode))
 
 (setq cider-auto-select-error-buffer nil)
 
@@ -401,6 +408,21 @@
 (dolist (mode lisps)
   ;; Add hooks
   (add-hook (intern (concat (symbol-name mode) "-hook")) 'enable-lisp-utils))
+
+(add-hook 'clojure-mode-hook 'lsp)
+(add-hook 'clojurescript-mode-hook 'lsp)
+(add-hook 'clojurec-mode-hook 'lsp)
+
+(setq lsp-enable-completion-at-point nil
+      ;;lsp-lens-enable t
+      lsp-file-watch-threshold 10000
+      lsp-signature-auto-activate nil
+      lsp-headerline-breadcrumb-enable nil
+      lsp-enable-indentation nil
+      lsp-ui-sideline-enable nil
+      lsp-ui-doc-show-with-cursor nil
+      lsp-ui-sideline-show-code-actions nil)
+
 
 ;; Company
 (add-hook 'cider-repl-mode-hook #'cider-company-enable-fuzzy-completion)
@@ -438,14 +460,6 @@
   (add-hook hook 'enable-write-utils))
 
 (setq sentence-end-double-space nil)
-
-(when (file-exists-p "/usr/local/Cellar/languagetool/3.4/libexec/languagetool-commandline.jar")
-  (setq langtool-language-tool-jar "/usr/local/Cellar/languagetool/3.4/libexec/languagetool-commandline.jar"
-        langtool-default-language "en-US"
-        langtool-disabled-rules '("WHITESPACE_RULE"
-                                  "EN_UNPAIRED_BRACKETS"
-                                  "COMMA_PARENTHESIS_WHITESPACE"
-                                  "EN_QUOTES")))
 
 ;; org-mode
 (require 'org)
@@ -524,8 +538,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(evil-matchit evil-leader exec-path-from-shell smex expand-region ace-jump-mode flx undo-fu tao-theme evil-magit counsel-projectile ag swiper adoc-mode langtool org-plus-contrib org-ref htmlize emmet-mode lsp-mode yasnippet-snippets vue-mode ess elpy conda cider clojure-snippets flycheck-clj-kondo markdown-mode json-mode scss-mode web-mode js2-mode rainbow-delimiters highlight evil-cleverparens highlight-parentheses aggressive-indent)))
+ )
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

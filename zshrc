@@ -61,6 +61,7 @@ fi
 unset __conda_setup
 # <<< conda initialize <<<
 
+export PATH=$PATH:~/bin
 
 # Put secret configuration settings in ~/.secrets
 if [[ -a ~/.secrets ]] then
