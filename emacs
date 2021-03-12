@@ -23,6 +23,27 @@
 
 (setq gc-cons-threshold (* 100 1024 1024)
       read-process-output-max (* 1024 1024))
+(setq inhibit-startup-screen t)
+(setq inhibit-startup-echo-area-message t)
+(setq inhibit-startup-message t)
+(setq initial-scratch-message nil)
+(setq initial-major-mode 'org-mode)
+(setq-default indent-tabs-mode nil)
+(setq pop-up-windows nil)
+(tool-bar-mode 0)
+(tooltip-mode  0)
+(menu-bar-mode 0)
+(scroll-bar-mode 0)
+(blink-cursor-mode 0)
+
+(defun custom/kill-this-buffer ()
+  (interactive) (kill-buffer (current-buffer)))
+(global-set-key (kbd "C-x k") 'custom/kill-this-buffer)
+
+(require 'uniquify)
+(setq uniquify-buffer-name-style 'forward)
+
+(save-place-mode 1)
 
 (defvar my-packages
   '(;; Core
@@ -32,13 +53,13 @@
     exec-path-from-shell
     smex
     expand-region
-    ace-jump-mode
     flycheck
     company
     flx
     undo-fu
     ;; Themes
-    tao-theme
+    minimal-theme
+    almost-mono-themes
     ;; Project management
     magit ; git
     projectile
@@ -53,14 +74,12 @@
     htmlize
     ;; Language support
     emmet-mode
-    lsp-mode lsp-ui
-    yasnippet-snippets
+    lsp-mode lsp-ui lsp-ivy
     vue-mode ;; webdev
     ess ; R
     elpy ;; Python
     conda
     cider ; Clojure
-    clojure-snippets
     flycheck-clj-kondo
     markdown-mode
     json-mode
@@ -69,7 +88,7 @@
     web-mode
     js2-mode
     ;; Lisp
-    rainbow-delimiters highlight paredit evil-cleverparens
+    highlight paredit evil-cleverparens
     highlight-parentheses
     aggressive-indent))
 
@@ -98,23 +117,6 @@
 (set-terminal-coding-system 'utf-8-unix)
 (set-keyboard-coding-system 'utf-8-unix)
 (prefer-coding-system 'utf-8-unix)
-
-(menu-bar-mode 0)
-(tool-bar-mode 0)
-(scroll-bar-mode 0)
-(setq frame-inhibit-implied-resize t)
-
-(when (window-system)
-  (scroll-bar-mode -1)
-  (fringe-mode '(1 . 1)))
-
-(setq inhibit-startup-screen t)
-(setq inhibit-startup-echo-area-message t)
-(setq inhibit-startup-message t)
-(setq initial-scratch-message nil)
-(setq initial-major-mode 'org-mode)
-
-(blink-cursor-mode 0)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Util
@@ -178,9 +180,6 @@
 
 ;; Leaders
 (evil-leader/set-key
-  "SPC"    'evil-ace-jump-char-mode
-  "S-SPC"  'evil-ace-jump-word-mode
-  "C-SPC"  'evil-ace-jump-line-mode
   "."      'er/expand-region
   ","      'er/contract-region
   "/"      'comment-or-uncomment-region
@@ -204,6 +203,7 @@
   "gP"     'magit-push-current-to-upstream
   "gp"     'magit-pull-from-upstream
   "p;"     'counsel-projectile
+
   "pf"     'counsel-projectile-find-file
   "ps"     'counsel-projectile-switch-project
   "pd"     'projectile-dired
@@ -214,8 +214,6 @@
   "ld"     'lsp-find-definition
   "lD"     'lsp-find-declaration
 
-  "o"      'evil-jump-backward
-
   "|"      'evil-window-vsplit
   "_"      'evil-window-split
   "<left>" 'windmove-left
@@ -223,7 +221,6 @@
   "<up>"   'windmove-up
   "<down>" 'windmove-down)
 
-(define-key evil-normal-state-map (kbd "SPC") 'evil-ace-jump-word-mode)
 
 ;; esc quits
 (defun minibuffer-keyboard-quit ()
@@ -246,18 +243,43 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Visual
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(setq tao-theme-use-sepia nil)
-(setq tao-theme-use-boxes nil)
-(setq tao-theme-use-height nil)
-(load-theme 'tao-yang t)
-;;(set-default-font "PragmataPro Mono 12")
+(load-theme 'almost-mono-white t)
+(set-background-color "#F1F1F1")
+(set-foreground-color "#000000")
+
+
+(fringe-mode '(0 . 0))
+(set-face-attribute
+ 'default nil
+ :family "PragmataPro Mono"
+ :height 120
+ :weight 'normal
+ :width 'normal)
+
+(setq default-frame-alist
+      (append (list '(vertical-scroll-bars . nil)
+                    '(internal-border-width . 12)
+                    '(font . "PragmataPro Mono 12"))))
+(set-frame-parameter (selected-frame)
+                     'internal-border-width 12)
+
+;; Line spacing, can be 0 for code and 1 or 2 for text
+(setq-default line-spacing 0)
+
+;; Underline line at descent position, not baseline position
+(setq x-underline-at-descent-line t)
+
+(defface fallback '((t :family "PragmataPro Mono 12"
+                       :inherit 'face-faded)) "Fallback")
+(set-display-table-slot standard-display-table 'truncation
+                        (make-glyph-code ?… 'fallback))
+(set-display-table-slot standard-display-table 'wrap
+                        (make-glyph-code ?↩ 'fallback))
+(set-display-table-slot standard-display-table 'selective-display
+                        (string-to-vector " …"))
 
 ;; No bell
 (setq ring-bell-function 'ignore)
-
-(add-hook 'mmm-mode-hook
-          (lambda ()
-            (set-face-background 'mmm-default-submode-face nil)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customization
@@ -284,6 +306,9 @@
 (setq projectile-enable-caching t)
 (setq projectile-completion-system 'ivy)
 (setq projectile-project-search-path '("~/Repositories"))
+(setq projectile-sort-order 'recentf)
+(setq projectile-indexing-method 'hybrid)
+(counsel-projectile-mode +1)
 
 (setq backup-directory-alist `(("." . "~/.saves")))
 (setq backup-by-copying t)
@@ -291,7 +316,7 @@
       `((".*" . ,temporary-file-directory)))
 (setq auto-save-file-name-transforms
       `((".*" ,temporary-file-directory t)))
-
+(setq create-lockfiles nil)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Programming
@@ -301,6 +326,9 @@
 (global-company-mode)
 (define-key company-active-map (kbd "C-n") 'company-select-next-or-abort)
 (define-key company-active-map (kbd "C-p") 'company-select-previous-or-abort)
+
+(setq company-minimum-prefix-length 1
+      company-idle-delay 0.1) ;; default is 0.2
 
 ;; Also highlight long lines in whitespace-mode
 (require 'whitespace)
@@ -331,7 +359,8 @@
 (defun my-code-style ()
   (interactive)
   (setq-default indent-tabs-mode nil
-                default-tab-width 2)
+                default-tab-width 2
+                evil-shift-width tab-width)
   (my-setup-indent 2))
 
 (my-code-style)
@@ -350,7 +379,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (require 'flycheck)
-(yas-global-mode 1)
 
 ;; File-types
 (add-to-list 'auto-mode-alist '("\\.org$\\'" . org-mode))
@@ -381,10 +409,8 @@
   (aggressive-indent-mode)
   (paredit-mode)
   (evil-cleverparens-mode)
-  (show-paren-mode t)
   (highlight-parentheses-mode t)
-  (flycheck-mode)
-  (rainbow-delimiters-mode))
+  (flycheck-mode))
 
 (defvar lisps
   '(emacs-lisp-mode
@@ -420,6 +446,8 @@
       lsp-headerline-breadcrumb-enable nil
       lsp-enable-indentation nil
       lsp-ui-sideline-enable nil
+      lsp-enable-semantic-highlighting nil
+      lsp-enable-symbol-highlighting nil
       lsp-ui-doc-show-with-cursor nil
       lsp-ui-sideline-show-code-actions nil)
 
@@ -429,9 +457,11 @@
 (add-hook 'cider-mode-hook #'cider-company-enable-fuzzy-completion)
 
 ;; Python
-;; pip install jedi rope flake8 autopep8 yapf black
-(pyvenv-activate "/home/joelkuiper/miniconda3/")
-(elpy-enable)
+(defun enable-python-utils ()
+  ;; pip install jedi rope flake8 autopep8 yapf black
+  (pyvenv-activate "/home/joelkuiper/anaconda3/")
+  (elpy-enable))
+(add-hook 'python-mode-hook 'enable-python-utils)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -538,11 +568,14 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(custom-safe-themes
+   '("cbd85ab34afb47003fa7f814a462c24affb1de81ebf172b78cb4e65186ba59d2" default)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :extend nil :stipple nil :background "#F1F1F1" :foreground "#3C3C3C" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 120 :width normal :foundry "fsdf" :family "PragmataPro Mono")))))
+ '(highlight ((t (:background "dark orange"))))
+
+ )
