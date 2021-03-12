@@ -27,11 +27,9 @@
 (setq inhibit-startup-echo-area-message t)
 (setq inhibit-startup-message t)
 (setq initial-scratch-message nil)
-(setq initial-major-mode 'org-mode)
+(setq initial-major-mode 'text-mode)
 (setq-default indent-tabs-mode nil)
-(setq pop-up-windows nil)
 (tool-bar-mode 0)
-(tooltip-mode  0)
 (menu-bar-mode 0)
 (scroll-bar-mode 0)
 (blink-cursor-mode 0)
@@ -39,9 +37,6 @@
 (defun custom/kill-this-buffer ()
   (interactive) (kill-buffer (current-buffer)))
 (global-set-key (kbd "C-x k") 'custom/kill-this-buffer)
-
-(require 'uniquify)
-(setq uniquify-buffer-name-style 'forward)
 
 (save-place-mode 1)
 
@@ -188,8 +183,9 @@
   "f"      'find-file
   "q"      'quit-window
   ";"      'swiper
+  "r"      'counsel-recentf
   "sh"     'ansi-term                   ; SHell
-  "bs"     'switch-to-buffer            ; BufferSwitch
+  "bs"     'counsel-switch-buffer
   "br"     'reload-buffer               ; BufferReload
   "bk"     'ido-kill-buffer
   "df"     'magit-diff-dwim
@@ -202,8 +198,8 @@
   "gl"     'magit-log-all
   "gP"     'magit-push-current-to-upstream
   "gp"     'magit-pull-from-upstream
-  "p;"     'counsel-projectile
 
+  "p;"     'counsel-projectile
   "pf"     'counsel-projectile-find-file
   "ps"     'counsel-projectile-switch-project
   "pd"     'projectile-dired
@@ -225,8 +221,8 @@
 ;; esc quits
 (defun minibuffer-keyboard-quit ()
   "Abort recursive edit.
-   In Delete Selection mode, if the mark is active, just deactivate it;
-   then it takes a second \\[keyboard-quit] to abort the minibuffer."
+  In Delete Selection mode, if the mark is active, just deactivate it;
+  then it takes a second \\[keyboard-quit] to abort the minibuffer."
   (interactive)
   (if (and delete-selection-mode transient-mark-mode mark-active)
       (setq deactivate-mark  t)
@@ -244,32 +240,28 @@
 ;;; Visual
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (load-theme 'almost-mono-white t)
-(set-background-color "#F1F1F1")
-(set-foreground-color "#000000")
 
+(set-background-color "#FAFAFA")
+(set-foreground-color "#111111")
+
+(setq font-lock-maximum-decoration nil)
+(setq font-lock-maximum-size nil)
 
 (fringe-mode '(0 . 0))
 (set-face-attribute
  'default nil
- :family "PragmataPro Mono"
+ :family "PragmataPro"
  :height 120
  :weight 'normal
  :width 'normal)
 
 (setq default-frame-alist
-      (append (list '(vertical-scroll-bars . nil)
-                    '(internal-border-width . 12)
-                    '(font . "PragmataPro Mono 12"))))
+      (append (list '(internal-border-width . 12)
+                    '(font . "PragmataPro 12"))))
 (set-frame-parameter (selected-frame)
                      'internal-border-width 12)
 
-;; Line spacing, can be 0 for code and 1 or 2 for text
-(setq-default line-spacing 0)
-
-;; Underline line at descent position, not baseline position
-(setq x-underline-at-descent-line t)
-
-(defface fallback '((t :family "PragmataPro Mono 12"
+(defface fallback '((t :family "PragmataPro 12"
                        :inherit 'face-faded)) "Fallback")
 (set-display-table-slot standard-display-table 'truncation
                         (make-glyph-code ?… 'fallback))
@@ -448,6 +440,7 @@
       lsp-ui-sideline-enable nil
       lsp-enable-semantic-highlighting nil
       lsp-enable-symbol-highlighting nil
+      lsp-modeline-code-actions-enable nil
       lsp-ui-doc-show-with-cursor nil
       lsp-ui-sideline-show-code-actions nil)
 
@@ -521,7 +514,6 @@
 (add-to-list 'org-latex-packages-alist '("" "times"))
 (add-to-list 'org-latex-packages-alist '("protrusion=true,expansion=true" "microtype"))
 
-
 (org-babel-do-load-languages
  'org-babel-load-languages
  '(
@@ -569,13 +561,12 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   '("cbd85ab34afb47003fa7f814a462c24affb1de81ebf172b78cb4e65186ba59d2" default)))
+   '("cbd85ab34afb47003fa7f814a462c24affb1de81ebf172b78cb4e65186ba59d2" default))
+ )
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(highlight ((t (:background "dark orange"))))
-
- )
+ '(highlight ((t (:background "dark orange")))))
