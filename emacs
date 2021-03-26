@@ -44,6 +44,7 @@
   '(;; Core
     evil
     evil-matchit
+    evil-collection
     evil-leader
     exec-path-from-shell
     smex
@@ -134,7 +135,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'undo-fu)
 (setq evil-undo-system 'undo-fu)
+(setq evil-want-integration t) ;; This is optional since it's already set to t by default.
+(setq evil-want-keybinding nil) ;; https://github.com/emacs-evil/evil-collection
 (require 'evil)
+(evil-collection-init 'magit)
+(evil-collection-init 'dired)
+(evil-collection-init 'ivy)
 
 (require 'evil-matchit)
 (global-evil-matchit-mode 1)
@@ -320,7 +326,7 @@
 (define-key company-active-map (kbd "C-p") 'company-select-previous-or-abort)
 
 (setq company-minimum-prefix-length 1
-      company-idle-delay 0.1) ;; default is 0.2
+      company-idle-delay 0.25) ;; default is 0.2
 
 ;; Also highlight long lines in whitespace-mode
 (require 'whitespace)
@@ -560,9 +566,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   '("cbd85ab34afb47003fa7f814a462c24affb1de81ebf172b78cb4e65186ba59d2" default))
- )
+ '(helm-minibuffer-history-key "M-p")
+ '(package-selected-packages
+   '(evil-collection web-mode vue-mode undo-fu smex scss-mode project-root org-ref org-plus-contrib minimal-theme magit lsp-ui lsp-ivy json-mode js2-mode highlight-parentheses highlight flycheck-clj-kondo flx expand-region exec-path-from-shell evil-matchit evil-leader evil-cleverparens ess emmet-mode elpy counsel-projectile conda cider almost-mono-themes aggressive-indent ag adoc-mode)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
