@@ -69,9 +69,6 @@
     htmlize
     ;; Language support
     ess ; R
-    elpy ;; Python
-    pyenv-mode
-    conda
     markdown-mode
     lsp-mode lsp-ui lsp-ivy
     flycheck
@@ -152,8 +149,9 @@
   (evil-visual-restore))
 
 (define-key evil-visual-state-map (kbd ">") 'shift-right-visual)
-(define-key evil-insert-state-map (kbd "§") 'evil-normal-state)
 (define-key evil-visual-state-map (kbd "<") 'shift-left-visual)
+(define-key evil-insert-state-map (kbd "§") 'evil-normal-state)
+(define-key evil-replace-state-map (kbd "§") 'evil-normal-state)
 
 (define-key evil-visual-state-map (kbd ".") 'er/expand-region)
 ;; (define-key evil-visual-state-map (kbd ",") 'er/contract-region)
@@ -379,7 +377,6 @@
 ;; File-types
 (add-to-list 'auto-mode-alist '("\\.org$\\'" . org-mode))
 (add-to-list 'auto-mode-alist '("\\.adoc\\'" . adoc-mode))
-(add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
 (add-to-list 'auto-mode-alist '(".emacs" . emacs-lisp-mode))
 (add-to-list 'auto-mode-alist '("\\.css\\'" . css-mode))
 (add-to-list 'auto-mode-alist '("\\.less\\'" . less-css-mode))
@@ -455,21 +452,6 @@
 (setq cider-eldoc-display-symbol-at-point nil)
 (setq cider-auto-select-error-buffer nil)
 
-;; Python
-(require 'conda)
-(setq conda-anaconda-home (expand-file-name "/Users/joelkuiper/opt/anaconda3/"))
-(setq conda-env-home-directory (expand-file-name "/Users/joelkuiper/opt/anaconda3/"))
-
-(defun enable-python-utils ()
-  ;; pip install jedi rope flake8 autopep8 yapf black
-  (setenv "WORKON_HOME" "/Users/joelkuiper/opt/anaconda3/envs/")
-  (pyvenv-mode 1)
-  (setq python-shell-interpreter "ipython"
-        python-shell-interpreter-args "-i --simple-prompt")
-  (lsp)
-  (elpy-enable))
-(add-hook 'python-mode-hook 'enable-python-utils)
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Writing & Blogging
@@ -487,7 +469,6 @@
 (evil-define-key 'normal org-mode-map (kbd "<tab>") #'org-cycle)
 
 (defun enable-write-utils ()
-  (flyspell-mode t)
   (visual-line-mode 1))
 
 (dolist (hook '(text-mode-hook
@@ -504,8 +485,6 @@
  '((R . t)
    (shell . t)
    (emacs-lisp . t)
-   (python . t)
-   (ipython . t)
    (dot . t)
    (ditaa . t)
    (clojure . t)
@@ -529,10 +508,8 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   '("cbd85ab34afb47003fa7f814a462c24affb1de81ebf172b78cb4e65186ba59d2" default))
  '(package-selected-packages
-   '(ivy-avy notmuch evil-collection evil-leader evil-string-inflection exec-path-from-shell expand-region ssh-agency flx ivy-rich undo-fu direnv minimal-theme almost-mono-themes magit counsel-projectile ag swiper adoc-mode ox-gfm org-ref ob-ipython htmlize ess elpy pyenv-mode conda scss-mode web-mode js2-mode lsp-ui lsp-ivy terraform-mode flycheck cider highlight evil-cleverparens highlight-parentheses aggressive-indent)))
+   '(web-mode undo-fu terraform-mode ssh-agency scss-mode pyenv-mode ox-gfm org-ref ob-ipython notmuch minimal-theme magit lsp-ui lsp-ivy key-chord js2-mode ivy-rich ivy-avy highlight-parentheses highlight flycheck flx expand-region exec-path-from-shell evil-string-inflection evil-leader evil-collection evil-cleverparens ess elpy direnv counsel-projectile conda cider almost-mono-themes aggressive-indent ag adoc-mode)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
