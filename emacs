@@ -25,7 +25,7 @@
 (setq inhibit-startup-echo-area-message t)
 (setq inhibit-startup-message t)
 (setq initial-scratch-message nil)
-(setq initial-major-mode 'text-mode)
+(setq initial-major-mode 'org-mode)
 (setq-default indent-tabs-mode nil)
 (tool-bar-mode 0)
 (menu-bar-mode 0)
@@ -36,7 +36,7 @@
   (interactive) (kill-buffer (current-buffer)))
 (global-set-key (kbd "C-x k") 'custom/kill-this-buffer)
 
-(setq evil-undo-system 'undo-fu)
+(setq evil-undo-system 'undo-redo)
 (setq evil-want-keybinding nil) ;; https://github.com/emacs-evil/evil-collection
 
 (defvar my-packages
@@ -54,7 +54,6 @@
     flx
     ivy
     ivy-rich
-    undo-fu
     vundo
     direnv
     ;; Themes
