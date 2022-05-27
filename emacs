@@ -55,6 +55,7 @@
     ivy
     ivy-rich
     undo-fu
+    vundo
     direnv
     ;; Themes
     minimal-theme
@@ -229,6 +230,7 @@
   "lD"     'lsp-find-declaration
   "ld"     'lsp-ui-doc-glance
 
+  "u"      'vundo
   "|"      'evil-window-vsplit
   "_"      'evil-window-split
   "<left>" 'windmove-left
