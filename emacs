@@ -1,3 +1,4 @@
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; personal configuration of emacs + evil
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -8,6 +9,7 @@
   (error "This setup requires Emacs v28, or higher. You have: v%d" emacs-major-version))
 
 (load-file "~/.emacs.secrets")
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Packaging setup.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -120,7 +122,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; General
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(require 'undo-fu)
 (require 'evil)
 (evil-collection-init 'magit)
 (evil-collection-init 'dired)
@@ -150,8 +151,6 @@
 
 (define-key evil-visual-state-map (kbd ">") 'shift-right-visual)
 (define-key evil-visual-state-map (kbd "<") 'shift-left-visual)
-(define-key evil-insert-state-map (kbd "§") 'evil-normal-state)
-(define-key evil-replace-state-map (kbd "§") 'evil-normal-state)
 
 (define-key evil-visual-state-map (kbd ".") 'er/expand-region)
 ;; (define-key evil-visual-state-map (kbd ",") 'er/contract-region)
@@ -168,9 +167,6 @@
   (setq mac-command-modifier 'meta)
   (setq mac-option-modifier 'none)
   ;; Make mouse wheel / trackpad scrolling less jerky
-  (setq mouse-wheel-scroll-amount '(1
-                                    ((shift) . 5)
-                                    ((control))))
   (dolist (multiple '("" "double-" "triple-"))
     (dolist (direction '("right" "left"))
       (global-set-key (read-kbd-macro (concat "<" multiple "wheel-" direction ">")) 'ignore)))
@@ -185,9 +181,12 @@
 
 ;; Leaders
 (evil-leader/set-key
-  "."      'er/expand-region
-  "'"      'avy-goto-word-0
-  "nm"     'notmuch-company
+  "1"      (lambda () (interactive) (find-file "~/.emacs"))
+  "2"      (lambda () (interactive) (find-file "~/org/ideas.org"))
+  "3"      (lambda () (interactive) (find-file "~/org/todo.org"))
+
+  "'"      'er/expand-region
+  "."      'avy-goto-word-0
   ","      'er/contract-region
   "/"      'comment-or-uncomment-region
   "x"      'counsel-M-x                 ; eXecute
@@ -202,6 +201,8 @@
   "bk"     'ido-kill-buffer
   "df"     'magit-diff-dwim
   "www"    'eww
+  "news"   (lambda () (interactive) (eww-browse-url "https://lite.cnn.com"))
+  "wiki"   (lambda () (interactive) (eww-browse-url "https://en.wikipedia.org/"))
   "ws"     'whitespace-mode
   "gg"     'magit
   "gd"     'magit-diff-unstaged
@@ -238,7 +239,6 @@
   "<down>" 'windmove-down
   )
 
-
 ;; esc quits
 (defun minibuffer-keyboard-quit ()
   "Abort recursive edit.
@@ -261,7 +261,7 @@
 ;;; Visual
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(load-theme 'almost-mono-white t)
+(load-theme 'almost-mono-black t)
 
 (setq font-lock-maximum-decoration nil)
 (global-prettify-symbols-mode +1)
@@ -457,18 +457,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Writing & Blogging
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(flycheck-define-checker proselint
-  "A linter for prose."
-  :command ("proselint" source-inplace)
-  :error-patterns
-  ((warning line-start (file-name) ":" line ":" column ": "
-            (id (one-or-more (not (any " "))))
-            (message) line-end))
-  :modes (text-mode markdown-mode gfm-mode org-mode adoc-mode))
-
-(add-to-list 'flycheck-checkers 'proselint)
 (evil-define-key 'normal org-mode-map (kbd "<tab>") #'org-cycle)
 
+(setq vc-follow-symlinks nil)
 (defun enable-write-utils ()
   (visual-line-mode 1))
 
@@ -500,6 +491,12 @@
 
 (put 'erase-buffer 'disabled nil)
 
+(define-key evil-insert-state-map (kbd "§") 'evil-normal-state)
+(define-key evil-insert-state-map (kbd "§") 'evil-normal-state)
+(define-key evil-replace-state-map (kbd "±") 'evil-normal-state)
+(define-key evil-replace-state-map (kbd "±") 'evil-normal-state)
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customizations (from M-x customze-*)
@@ -509,8 +506,10 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   '("4780d7ce6e5491e2c1190082f7fe0f812707fc77455616ab6f8b38e796cbffa9" "8f5b54bf6a36fe1c138219960dd324aad8ab1f62f543bed73ef5ad60956e36ae" "d0fd069415ef23ccc21ccb0e54d93bdbb996a6cce48ffce7f810826bb243502c" default))
  '(package-selected-packages
-   '(web-mode undo-fu terraform-mode ssh-agency scss-mode pyenv-mode ox-gfm org-ref ob-ipython notmuch minimal-theme magit lsp-ui lsp-ivy key-chord js2-mode ivy-rich ivy-avy highlight-parentheses highlight flycheck flx expand-region exec-path-from-shell evil-string-inflection evil-leader evil-collection evil-cleverparens ess elpy direnv counsel-projectile conda cider almost-mono-themes aggressive-indent ag adoc-mode)))
+   '(web-mode vundo undo-fu terraform-mode ssh-agency scss-mode pyenv-mode ox-gfm org-ref ob-ipython notmuch minimal-theme magit lsp-ui lsp-ivy key-chord js2-mode ivy-rich ivy-avy highlight-parentheses highlight flycheck flx expand-region exec-path-from-shell evil-string-inflection evil-leader evil-collection evil-cleverparens ess elpy direnv counsel-projectile conda cider almost-mono-themes aggressive-indent ag adoc-mode)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
