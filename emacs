@@ -41,6 +41,12 @@
 (setq evil-undo-system 'undo-redo)
 (setq evil-want-keybinding nil) ;; https://github.com/emacs-evil/evil-collection
 
+(set-face-attribute 'default nil
+		    :family "Pragmata Pro Liga"
+                    :height 180
+                    :weight 'normal
+                    :width 'normal)
+
 (defvar my-packages
   '(;; Core
     evil
@@ -492,7 +498,7 @@
  '(custom-safe-themes
    '("4780d7ce6e5491e2c1190082f7fe0f812707fc77455616ab6f8b38e796cbffa9" "8f5b54bf6a36fe1c138219960dd324aad8ab1f62f543bed73ef5ad60956e36ae" "d0fd069415ef23ccc21ccb0e54d93bdbb996a6cce48ffce7f810826bb243502c" default))
  '(package-selected-packages
-   '(web-mode vundo undo-fu terraform-mode ssh-agency scss-mode pyenv-mode ox-gfm org-ref ob-ipython notmuch minimal-theme magit lsp-ui lsp-ivy key-chord js2-mode ivy-rich ivy-avy highlight-parentheses highlight flycheck flx expand-region exec-path-from-shell evil-string-inflection evil-leader evil-collection evil-cleverparens ess elpy direnv counsel-projectile conda cider almost-mono-themes aggressive-indent ag adoc-mode)))
+   '(avy web-mode vundo undo-fu terraform-mode ssh-agency scss-mode pyenv-mode ox-gfm org-ref ob-ipython notmuch minimal-theme magit lsp-ui lsp-ivy key-chord js2-mode ivy-rich ivy-avy highlight-parentheses highlight flycheck flx expand-region exec-path-from-shell evil-string-inflection evil-leader evil-collection evil-cleverparens ess elpy direnv counsel-projectile conda cider almost-mono-themes aggressive-indent ag adoc-mode)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
