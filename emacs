@@ -41,12 +41,6 @@
 (setq evil-undo-system 'undo-redo)
 (setq evil-want-keybinding nil) ;; https://github.com/emacs-evil/evil-collection
 
-(set-face-attribute 'default nil
-		    :family "Pragmata Pro Liga"
-                    :height 180
-                    :weight 'normal
-                    :width 'normal)
-
 (defvar my-packages
   '(;; Core
     evil
@@ -68,6 +62,7 @@
     ;; Themes
     minimal-theme
     almost-mono-themes
+    diminish
     ;; Project management
     magit ; git
     projectile
@@ -76,8 +71,11 @@
     swiper
     ;; Writing
     htmlize
+    flycheck-languagetool
     ;; Language support
     ess ; R
+    js2-mode
+    web-mode
     markdown-mode
     lsp-mode lsp-ui lsp-ivy
     flycheck
@@ -160,6 +158,10 @@
 (define-key evil-visual-state-map (kbd "<") 'shift-left-visual)
 
 (define-key evil-visual-state-map (kbd ".") 'er/expand-region)
+(define-key evil-normal-state-map (kbd ".") 'avy-goto-char)
+
+
+
 ;; (define-key evil-visual-state-map (kbd ",") 'er/contract-region)
 
 (define-key evil-normal-state-map (kbd "C-x <right>") 'windmove-right)
@@ -178,11 +180,19 @@
 ;; Leaders
 (evil-leader/set-key
   "1"      (lambda () (interactive) (find-file "~/.emacs"))
-  "2"      (lambda () (interactive) (find-file "~/org/ideas.org"))
-  "3"      (lambda () (interactive) (find-file "~/org/todo.org"))
+  "2"      (lambda () (interactive) (find-file "~/Sync/org/ideas.org"))
+  "3"      (lambda () (interactive) (find-file "~/Sync/org/todo.org"))
+  "4"      (lambda () (interactive) (find-file "~/Sync/org/journal.org"))
+  "5"      (lambda () (interactive) (find-file "~/Sync/org/repl.el"))
 
-  "'"      'er/expand-region
-  "."      'avy-goto-word-0
+  "*nl"    (lambda () (interactive)
+             (setq-local ispell-dictionary "nl"
+                         flycheck-languagetool-language "nl-NL"))
+  "*en"    (lambda () (interactive)
+             (setq-local ispell-dictionary "en_US"
+                         flycheck-languagetool-language "en-US"))
+
+  "."      'er/expand-region
   ","      'er/contract-region
   "/"      'comment-or-uncomment-region
   "x"      'counsel-M-x                 ; eXecute
@@ -196,9 +206,6 @@
   "br"     'reload-buffer               ; BufferReload
   "bk"     'ido-kill-buffer
   "df"     'magit-diff-dwim
-  "www"    'eww
-  "news"   (lambda () (interactive) (eww-browse-url "https://lite.cnn.com"))
-  "wiki"   (lambda () (interactive) (eww-browse-url "https://en.wikipedia.org/"))
   "ws"     'whitespace-mode
   "gg"     'magit
   "gd"     'magit-diff-unstaged
@@ -282,11 +289,14 @@
 ;; No bell
 (setq ring-bell-function 'ignore)
 
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customization
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; http://emacs.wordpress.com/2007/01/28/simple-window-configuration-management/
 (winner-mode 1)
+(setq vc-follow-symlinks nil)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Projects
@@ -304,10 +314,9 @@
 
 ;; Projectile
 (projectile-global-mode)
-(setq projectile-project-search-path '("~/Repositories"))
+(setq projectile-project-search-path '("~/Repositories" "~/Sync/projects"))
 (setq projectile-sort-order 'recently-active)
 (setq projectile-indexing-method 'hybrid)
-(setq projectile-enable-caching t)
 (setq projectile-globally-ignored-files '(".DS_Store" ".gitmodules"))
 (counsel-projectile-mode +1)
 
@@ -336,10 +345,11 @@
       '(face lines-tail spaces tabs newline space-mark tab-mark newline-mark))
 
 ;; Cleanup whitespace on save (co-workers love this ;-))
-(add-hook 'before-save-hook
-          (lambda ()
-            (whitespace-cleanup)
-            (delete-trailing-whitespace)))
+(add-hook
+ 'before-save-hook
+ (lambda ()
+   (whitespace-cleanup)
+   (delete-trailing-whitespace)))
 
 ;; Indentation
 (defun my-setup-indent (n)
@@ -455,8 +465,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (evil-define-key 'normal org-mode-map (kbd "<tab>") #'org-cycle)
 
-(setq vc-follow-symlinks nil)
 (defun enable-write-utils ()
+  (diminish 'flycheck-mode)
+  (flycheck-languagetool-setup)
+  ;;(flycheck-mode)
   (visual-line-mode 1))
 
 (dolist (hook '(text-mode-hook
@@ -466,6 +478,12 @@
   (add-hook hook 'enable-write-utils))
 
 (setq sentence-end-double-space nil)
+(setq flycheck-languagetool-server-jar "~/Sync/etc/LanguageTool/languagetool-server.jar")
+
+;; (setq-local flycheck-languagetool-language "nl-nl")
+;; (setq-local flycheck-languagetool-language "en-US")
+;; (ispell-change-dictionary)
+
 
 ;; org-mode
 (org-babel-do-load-languages
@@ -486,6 +504,7 @@
 (setq tramp-terminal-type "tramp")
 
 (put 'erase-buffer 'disabled nil)
+(set-background-color "#fafafa")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customizations (from M-x customze-*)
@@ -496,9 +515,20 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   '("4780d7ce6e5491e2c1190082f7fe0f812707fc77455616ab6f8b38e796cbffa9" "8f5b54bf6a36fe1c138219960dd324aad8ab1f62f543bed73ef5ad60956e36ae" "d0fd069415ef23ccc21ccb0e54d93bdbb996a6cce48ffce7f810826bb243502c" default))
+   '("4780d7ce6e5491e2c1190082f7fe0f812707fc77455616ab6f8b38e796cbffa9"
+     "8f5b54bf6a36fe1c138219960dd324aad8ab1f62f543bed73ef5ad60956e36ae"
+     "d0fd069415ef23ccc21ccb0e54d93bdbb996a6cce48ffce7f810826bb243502c"
+     default))
  '(package-selected-packages
-   '(avy web-mode vundo undo-fu terraform-mode ssh-agency scss-mode pyenv-mode ox-gfm org-ref ob-ipython notmuch minimal-theme magit lsp-ui lsp-ivy key-chord js2-mode ivy-rich ivy-avy highlight-parentheses highlight flycheck flx expand-region exec-path-from-shell evil-string-inflection evil-leader evil-collection evil-cleverparens ess elpy direnv counsel-projectile conda cider almost-mono-themes aggressive-indent ag adoc-mode)))
+   '(sqlite3 avy web-mode vundo undo-fu terraform-mode ssh-agency
+             scss-mode pyenv-mode ox-gfm org-ref ob-ipython notmuch
+             minimal-theme magit lsp-ui lsp-ivy key-chord js2-mode
+             ivy-rich ivy-avy highlight-parentheses highlight flycheck
+             flx expand-region exec-path-from-shell
+             evil-string-inflection evil-leader evil-collection
+             evil-cleverparens ess elpy direnv counsel-projectile
+             conda cider almost-mono-themes aggressive-indent ag
+             adoc-mode)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
