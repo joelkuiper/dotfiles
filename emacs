@@ -254,6 +254,10 @@
 
 (use-package diminish :ensure t)
 
+(use-package eldoc :diminish eldoc-mode)
+(use-package autorevert :diminish auto-revert-mode)
+
+
 (tool-bar-mode 0)
 (menu-bar-mode 0)
 (scroll-bar-mode 0)
@@ -408,6 +412,7 @@
 
 (use-package highlight-parentheses
   :ensure t
+  :diminish highlight-parentheses-mode
   :commands highlight-parentheses-mode)
 
 (use-package lsp-mode
@@ -464,7 +469,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package flycheck
   :ensure t
-  :defer t
+  :defer flycheck-mode
   :config
   (setq flycheck-languagetool-server-jar "~/Sync/etc/LanguageTool/languagetool-server.jar"))
 
