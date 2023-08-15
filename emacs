@@ -317,8 +317,7 @@
   (define-key company-active-map (kbd "C-n") 'company-select-next-or-abort)
   (define-key company-active-map (kbd "C-p") 'company-select-previous-or-abort))
 
-(use-package lsp-mode
-  :ensure t)
+(use-package lsp-mode :ensure t :defer t)
 
 (use-package whitespace
   :ensure t
@@ -361,23 +360,16 @@
 ;;; Languages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(use-package flycheck
-  :ensure t)
-
-;; File-types
-(dolist (file-type '(("\\.org$\\'" . org-mode)
-                     ("\\.adoc\\'" . adoc-mode)
-                     (".emacs" . emacs-lisp-mode)
-                     ("\\.css\\'" . css-mode)
-                     ("\\.less\\'" . less-css-mode)
-                     ("\\.html?\\'" . web-mode)
-                     ("\\.js.?" . js2-mode)))
-  (add-to-list 'auto-mode-alist file-type))
+(use-package flycheck :ensure t :defer t)
 
 ;; Web stuff
 (use-package web-mode
   :ensure t
   :hook (web-mode . custom-web-mode-hook)
+  :mode (("\\.html?\\'" . web-mode)
+         ("\\.css\\'" . web-mode)
+         ("\\.less\\'" . web-mode)
+         ("\\.js\\'" . web-mode))
   :config
   (defun custom-web-mode-hook ()
     "Hooks for Web mode."
@@ -386,17 +378,51 @@
 ;; Emacs Speaks Statistics
 (use-package ess
   :ensure t
+  :mode (("\\.R\\'" . R-mode)
+         ("\\.r\\'" . R-mode))
   :config
   (setq ess-eval-visibly 'nowait)
   (setq ess-r-backend 'lsp))
 
+
 ;; Lisp
+(use-package aggressive-indent
+  :ensure t
+  :commands aggressive-indent-mode)
 
-(use-package paredit :ensure t)
+(use-package paredit
+  :ensure t
+  :commands paredit-mode)
 
-(use-package aggressive-indent :ensure t)
+(use-package evil-cleverparens
+  :ensure t
+  :commands evil-cleverparens-mode)
 
-(use-package highlight-parentheses :ensure t)
+(use-package highlight-parentheses
+  :ensure t
+  :commands highlight-parentheses-mode)
+
+(use-package lsp-mode
+  :ensure t
+  :commands lsp
+  :hook ((clojure-mode clojurescript-mode clojurec-mode) . lsp)
+  :config
+  (setq
+   company-minimum-prefix-length 1
+   lsp-enable-completion-at-point nil
+   lsp-lens-enable nil
+   lsp-eldoc-enable-hover nil
+   lsp-file-watch-threshold 10000
+   lsp-signature-auto-activate nil
+   lsp-headerline-breadcrumb-enable nil
+   lsp-enable-indentation nil
+   lsp-ui-sideline-enable nil
+   lsp-enable-semantic-highlighting nil
+   lsp-enable-symbol-highlighting nil
+   lsp-modeline-code-actions-enable nil
+   lsp-modeline-diagnostics-enable nil
+   lsp-ui-doc-show-with-cursor nil
+   lsp-ui-sideline-show-code-actions nil))
 
 (defun enable-lisp-utils ()
   (aggressive-indent-mode)
@@ -411,35 +437,19 @@
 (dolist (mode lisps)
   (add-hook (intern (concat (symbol-name mode) "-hook")) 'enable-lisp-utils))
 
-(add-hook 'clojure-mode-hook 'lsp)
-(add-hook 'clojurescript-mode-hook 'lsp)
-(add-hook 'clojurec-mode-hook 'lsp)
-
-(setq
- company-minimum-prefix-length 1
- lsp-enable-completion-at-point nil
- lsp-lens-enable nil
- lsp-eldoc-enable-hover nil
- lsp-file-watch-threshold 10000
- lsp-signature-auto-activate nil
- lsp-headerline-breadcrumb-enable nil
- lsp-enable-indentation nil
- lsp-ui-sideline-enable nil
- lsp-enable-semantic-highlighting nil
- lsp-enable-symbol-highlighting nil
- lsp-modeline-code-actions-enable nil
- lsp-modeline-diagnostics-enable nil
- lsp-ui-doc-show-with-cursor nil
- lsp-ui-sideline-show-code-actions nil)
-
 (use-package cider
   :ensure t
+  :commands cider-jack-in
+  :hook ((clojure-mode . cider-mode)
+         (clojurescript-mode . cider-mode)
+         (clojurec-mode . cider-mode))
   :config
   (setq cider-eldoc-display-symbol-at-point nil)
   (setq cider-auto-select-error-buffer nil)
   (setq cider-repl-print-length 100)
   (setq cider-repl-print-level 10)
   (setq cider-repl-use-pretty-printing t))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Writing & Blogging
@@ -448,6 +458,7 @@
 
 (use-package flycheck
   :ensure t
+  :defer t
   :config
   (setq flycheck-languagetool-server-jar "~/Sync/etc/LanguageTool/languagetool-server.jar"))
 
@@ -469,6 +480,7 @@
 ;; org-mode
 (use-package org
   :ensure t
+  :mode (("\\.org\\'" . org-mode))
   :config
   (org-babel-do-load-languages
    'org-babel-load-languages
