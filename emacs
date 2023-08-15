@@ -5,8 +5,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Version check.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(when (< emacs-major-version 28)
-  (error "This setup requires Emacs v28, or higher. You have: v%d" emacs-major-version))
+(when (< emacs-major-version 29)
+  (error "This setup requires Emacs v29, or higher. You have: v%d" emacs-major-version))
 
 (load-file "~/.emacs.secrets")
 
@@ -38,52 +38,9 @@
   (interactive) (kill-buffer (current-buffer)))
 (global-set-key (kbd "C-x k") 'custom/kill-this-buffer)
 
-(setq evil-undo-system 'undo-redo)
-(setq evil-want-keybinding nil) ;; https://github.com/emacs-evil/evil-collection
-
 (defvar my-packages
   '(;; Core
-    evil
-    evil-collection
-    evil-avy avy
-    evil-leader
-    evil-string-inflection
-    exec-path-from-shell
-    expand-region
-    key-chord
-    ssh-agency
-    flycheck
-    company
-    flx
-    ivy
-    ivy-rich
-    vundo
-    direnv
-    ;; Themes
-    minimal-theme
-    almost-mono-themes
-    diminish
-    ;; Project management
-    magit ; git
-    projectile
-    counsel-projectile
-    ag
-    swiper
-    ;; Writing
-    htmlize
-    flycheck-languagetool
-    ;; Language support
-    ess ; R
-    js2-mode
-    web-mode
-    markdown-mode
-    lsp-mode lsp-ui lsp-ivy
-    flycheck
-    ;; Lisp
-    cider ; Clojure
-    highlight paredit evil-cleverparens
-    highlight-parentheses
-    aggressive-indent))
+    use-package))
 
 (defun my-missing-packages ()
   (let (missing-packages)
@@ -114,10 +71,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Util
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(require 'exec-path-from-shell)
-(exec-path-from-shell-initialize)
-(exec-path-from-shell-copy-env "LC_ALL")
-(exec-path-from-shell-copy-env "LANG")
+(use-package exec-path-from-shell
+  :ensure t
+  :config
+  (exec-path-from-shell-initialize)
+  (exec-path-from-shell-copy-env "LC_ALL")
+  (exec-path-from-shell-copy-env "LANG"))
+
 
 (defun reload-buffer ()
   "revert-buffer without confirmation."
@@ -125,231 +85,254 @@
   (revert-buffer t t))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; General
+;;; Evil
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(require 'evil)
-(evil-collection-init 'magit)
-(evil-collection-init 'dired)
-(evil-collection-init 'ivy)
+(use-package evil-collection
+  :ensure t
+  :after evil
+  :config
+  (evil-collection-init)
+  (evil-collection-init 'magit)
+  (evil-collection-init 'dired)
+  (evil-collection-init 'ivy))
 
-(require 'evil-leader)
-(setq evil-leader/in-all-states 1)
-(global-evil-leader-mode)
-(evil-leader/set-leader ",")
-(evil-mode 1)
-(setq evil-shift-width 2)
+(use-package evil
+  :ensure t
+  :init
+  (setq evil-undo-system 'undo-redo
+        evil-want-keybinding nil ; https://github.com/emacs-evil/evil-collection
+        evil-shift-width 2)
+  :config
+  (evil-mode 1)
+  ;; Shift left/right functions and bindings
+  (defun shift-left-visual ()
+    "Shift left and restore visual selection."
+    (interactive)
+    (evil-shift-left (region-beginning) (region-end))
+    (evil-normal-state)
+    (evil-visual-restore))
 
-(require 'expand-region)
-(defun shift-left-visual ()
-  "Shift left and restore visual selection."
-  (interactive)
-  (evil-shift-left (region-beginning) (region-end))
-  (evil-normal-state)
-  (evil-visual-restore))
+  (defun shift-right-visual ()
+    "Shift right and restore visual selection."
+    (interactive)
+    (evil-shift-right (region-beginning) (region-end))
+    (evil-normal-state)
+    (evil-visual-restore))
 
-(defun shift-right-visual ()
-  "Shift right and restore visual selection."
-  (interactive)
-  (evil-shift-right (region-beginning) (region-end))
-  (evil-normal-state)
-  (evil-visual-restore))
+  (define-key evil-visual-state-map (kbd ">") 'shift-right-visual)
+  (define-key evil-visual-state-map (kbd "<") 'shift-left-visual)
+  (define-key evil-visual-state-map (kbd ".") 'er/expand-region)
+  (define-key evil-normal-state-map (kbd ".") 'avy-goto-char)
 
-(define-key evil-visual-state-map (kbd ">") 'shift-right-visual)
-(define-key evil-visual-state-map (kbd "<") 'shift-left-visual)
+  (define-key evil-normal-state-map (kbd "C-x <right>") 'windmove-right)
+  (define-key evil-normal-state-map (kbd "C-x <left>") 'windmove-left)
+  (define-key evil-normal-state-map (kbd "C-x <down>") 'windmove-down)
+  (define-key evil-normal-state-map (kbd "C-x <up>") 'windmove-up)
 
-(define-key evil-visual-state-map (kbd ".") 'er/expand-region)
-(define-key evil-normal-state-map (kbd ".") 'avy-goto-char)
+  (define-key evil-insert-state-map (kbd "§") 'evil-normal-state)
+  (define-key evil-insert-state-map (kbd "§") 'evil-normal-state)
+  (define-key evil-replace-state-map (kbd "±") 'evil-normal-state)
+  (define-key evil-replace-state-map (kbd "±") 'evil-normal-state)
 
-
-
-;; (define-key evil-visual-state-map (kbd ",") 'er/contract-region)
-
-(define-key evil-normal-state-map (kbd "C-x <right>") 'windmove-right)
-(define-key evil-normal-state-map (kbd "C-x <left>") 'windmove-left)
-(define-key evil-normal-state-map (kbd "C-x <down>") 'windmove-down)
-(define-key evil-normal-state-map (kbd "C-x <up>") 'windmove-up)
-
-(define-key evil-insert-state-map (kbd "§") 'evil-normal-state)
-(define-key evil-insert-state-map (kbd "§") 'evil-normal-state)
-(define-key evil-replace-state-map (kbd "±") 'evil-normal-state)
-(define-key evil-replace-state-map (kbd "±") 'evil-normal-state)
-
-
-
-
-;; Leaders
-(evil-leader/set-key
-  "1"      (lambda () (interactive) (find-file "~/.emacs"))
-  "2"      (lambda () (interactive) (find-file "~/Sync/org/ideas.org"))
-  "3"      (lambda () (interactive) (find-file "~/Sync/org/todo.org"))
-  "4"      (lambda () (interactive) (find-file "~/Sync/org/journal.org"))
-  "5"      (lambda () (interactive) (find-file "~/Sync/org/repl.el"))
-
-  "*nl"    (lambda () (interactive)
-             (setq-local ispell-dictionary "nl"
-                         flycheck-languagetool-language "nl-NL"))
-  "*en"    (lambda () (interactive)
-             (setq-local ispell-dictionary "en_US"
-                         flycheck-languagetool-language "en-US"))
-
-  "."      'er/expand-region
-  ","      'er/contract-region
-  "/"      'comment-or-uncomment-region
-  "x"      'counsel-M-x                 ; eXecute
-  "e"      'eval-expression
-  "f"      'counsel-fzf
-  "q"      'quit-window
-  ";"      'swiper
-  "r"      'counsel-buffer-or-recentf
-  "sh"     'eshell                      ; SHell
-  "bs"     'counsel-ibuffer
-  "br"     'reload-buffer               ; BufferReload
-  "bk"     'ido-kill-buffer
-  "df"     'magit-diff-dwim
-  "ws"     'whitespace-mode
-  "gg"     'magit
-  "gd"     'magit-diff-unstaged
-  "gs"     'magit-status
-  "gb"     'magit-blame
-  "gc"     'magit-commit
-  "gl"     'magit-log-all
-  "gP"     'magit-push-current-to-upstream
-  "gp"     'magit-pull-from-upstream
-
-  "m"      'counsel-semantic-or-imenu
-  "ln"     'display-line-numbers-mode
-
-  "p;"     'counsel-projectile
-  "pf"     'counsel-projectile-find-file
-  "ps"     'counsel-projectile-switch-project
-  "pd"     'projectile-dired
-  "pg"     'counsel-projectile-ag
-  "P"      'counsel-yank-pop
-
-  "ch"     'cider-repl-history
-  "cb"     'cider-repl-clear-buffer
-
-  "lr"     'lsp-find-references
-  "lD"     'lsp-find-declaration
-  "ld"     'lsp-ui-doc-glance
-
-  "u"      'vundo
-  "|"      'evil-window-vsplit
-  "_"      'evil-window-split
-  "<left>" 'windmove-left
-  "<right>"'windmove-right
-  "<up>"   'windmove-up
-  "<down>" 'windmove-down
-  )
-
-;; esc quits
-(defun minibuffer-keyboard-quit ()
-  "Abort recursive edit.
+  ;; Leaders
+  (use-package evil-leader
+    :ensure t
+    :config
+    ;; esc quits
+    (defun minibuffer-keyboard-quit ()
+      "Abort recursive edit.
   In Delete Selection mode, if the mark is active, just deactivate it;
   then it takes a second \\[keyboard-quit] to abort the minibuffer."
-  (interactive)
-  (if (and delete-selection-mode transient-mark-mode mark-active)
-      (setq deactivate-mark  t)
-    (when (get-buffer "*Completions*") (delete-windows-on "*Completions*"))
-    (abort-recursive-edit)))
-(define-key evil-normal-state-map [escape] 'keyboard-quit)
-(define-key evil-visual-state-map [escape] 'keyboard-quit)
-(define-key minibuffer-local-map [escape] 'minibuffer-keyboard-quit)
-(define-key minibuffer-local-ns-map [escape] 'minibuffer-keyboard-quit)
-(define-key minibuffer-local-completion-map [escape] 'minibuffer-keyboard-quit)
-(define-key minibuffer-local-must-match-map [escape] 'minibuffer-keyboard-quit)
-(define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
+      (interactive)
+      (if (and delete-selection-mode transient-mark-mode mark-active)
+          (setq deactivate-mark  t)
+        (when (get-buffer "*Completions*") (delete-windows-on "*Completions*"))
+        (abort-recursive-edit)))
+    (evil-define-key 'normal org-mode-map (kbd "<tab>") #'org-cycle)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    (define-key evil-normal-state-map [escape] 'keyboard-quit)
+    (define-key evil-visual-state-map [escape] 'keyboard-quit)
+    (define-key minibuffer-local-map [escape] 'minibuffer-keyboard-quit)
+    (define-key minibuffer-local-ns-map [escape] 'minibuffer-keyboard-quit)
+    (define-key minibuffer-local-completion-map [escape] 'minibuffer-keyboard-quit)
+    (define-key minibuffer-local-must-match-map [escape] 'minibuffer-keyboard-quit)
+    (define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
+
+    (setq evil-leader/in-all-states 1)
+    (global-evil-leader-mode)
+    (evil-leader/set-leader ",")
+    (evil-leader/set-key
+      "1"      (lambda () (interactive) (find-file "~/.emacs"))
+      "2"      (lambda () (interactive) (find-file "~/Sync/org/ideas.org"))
+      "3"      (lambda () (interactive) (find-file "~/Sync/org/todo.org"))
+      "4"      (lambda () (interactive) (find-file "~/Sync/org/journal.org"))
+      "5"      (lambda () (interactive) (find-file "~/Sync/org/repl.el"))
+
+      "*nl"    (lambda () (interactive)
+                 (setq-local ispell-dictionary "nl"
+                             flycheck-languagetool-language "nl-NL"))
+      "*en"    (lambda () (interactive)
+                 (setq-local ispell-dictionary "en_US"
+                             flycheck-languagetool-language "en-US"))
+
+      "."      'er/expand-region
+      ","      'er/contract-region
+      "/"      'comment-or-uncomment-region
+      "x"      'counsel-M-x                 ; eXecute
+      "e"      'eval-expression
+      "f"      'counsel-fzf
+      "q"      'quit-window
+      ";"      'swiper
+      "r"      'counsel-buffer-or-recentf
+      "sh"     'eshell                      ; SHell
+      "bs"     'counsel-ibuffer
+      "br"     'reload-buffer               ; BufferReload
+      "bk"     'ido-kill-buffer
+      "df"     'magit-diff-dwim
+      "ws"     'whitespace-mode
+      "gg"     'magit
+      "gd"     'magit-diff-unstaged
+      "gs"     'magit-status
+      "gb"     'magit-blame
+      "gc"     'magit-commit
+      "gl"     'magit-log-all
+      "gP"     'magit-push-current-to-upstream
+      "gp"     'magit-pull-from-upstream
+
+      "m"      'counsel-semantic-or-imenu
+      "ln"     'display-line-numbers-mode
+
+      "p;"     'counsel-projectile
+      "pf"     'counsel-projectile-find-file
+      "ps"     'counsel-projectile-switch-project
+      "pd"     'projectile-dired
+      "pg"     'counsel-projectile-ag
+      "P"      'counsel-yank-pop
+
+      "ch"     'cider-repl-history
+      "cb"     'cider-repl-clear-buffer
+
+      "lr"     'lsp-find-references
+      "lD"     'lsp-find-declaration
+      "ld"     'lsp-ui-doc-glance
+
+      "u"      'vundo
+      "|"      'evil-window-vsplit
+      "_"      'evil-window-split
+      "<left>" 'windmove-left
+      "<right>"'windmove-right
+      "<up>"   'windmove-up
+      "<down>" 'windmove-down)))
+
+(use-package evil-cleverparens :ensure t)
+
+(use-package expand-region
+  :ensure t
+  :bind (:map evil-visual-state-map
+              ("," . 'er/contract-region)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Visual
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(use-package almost-mono-themes
+  :ensure t
+  :config
+  (load-theme 'almost-mono-white t))
 
-(load-theme 'almost-mono-white t)
+(use-package unicode-fonts
+  :ensure t
+  :config
+  (unicode-fonts-setup)
+  (defface fallback '((t :family "PragmataPro"
+                         :inherit 'face-faded)) "Fallback")
+  (set-display-table-slot standard-display-table 'truncation
+                          (make-glyph-code ?… 'fallback))
+  (set-display-table-slot standard-display-table 'wrap
+                          (make-glyph-code ?↩ 'fallback))
+  (set-display-table-slot standard-display-table 'selective-display
+                          (string-to-vector " …")))
 
-(setq font-lock-maximum-decoration nil)
-(global-prettify-symbols-mode +1)
-(fringe-mode '(0 . 0))
-
-(setq default-frame-alist
-      (append (list '(internal-border-width . 12))))
-(set-frame-parameter (selected-frame)
-                     'internal-border-width 12)
-
-(defface fallback '((t :family "PragmataPro"
-                       :inherit 'face-faded)) "Fallback")
-(set-display-table-slot standard-display-table 'truncation
-                        (make-glyph-code ?… 'fallback))
-(set-display-table-slot standard-display-table 'wrap
-                        (make-glyph-code ?↩ 'fallback))
-(set-display-table-slot standard-display-table 'selective-display
-                        (string-to-vector " …"))
-
-
-
-;; No bell
-(setq ring-bell-function 'ignore)
-
-
+(put 'erase-buffer 'disabled nil)
+(set-background-color "#fafafa")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customization
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; http://emacs.wordpress.com/2007/01/28/simple-window-configuration-management/
 (winner-mode 1)
 (setq vc-follow-symlinks nil)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Projects
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Ivy
-(ivy-mode 1)
-(setq ivy-use-virtual-buffers t)
-(ivy-rich-mode 1)
-(setq ivy-re-builders-alist
-      '((swiper . ivy--regex-plus)
-        (counsel-projectile-switch-project . ivy--regex-plus)
-        (counsel-ag . ivy--regex-plus)
-        (counsel-rg . ivy--regex-plus)
-        (t      . ivy--regex-fuzzy)))
+(use-package ivy-rich :ensure t)
+(use-package counsel-projectile :ensure t)
+(use-package magit :ensure t)
 
-;; Projectile
-(projectile-global-mode)
-(setq projectile-project-search-path '("~/Repositories" "~/Sync/projects"))
-(setq projectile-sort-order 'recently-active)
-(setq projectile-indexing-method 'hybrid)
-(setq projectile-globally-ignored-files '(".DS_Store" ".gitmodules"))
-(counsel-projectile-mode +1)
+(use-package ivy
+  :ensure t
+  :config
+  (ivy-mode 1)
+  (setq ivy-use-virtual-buffers t)
+  (ivy-rich-mode 1)
+  (setq ivy-re-builders-alist
+        '((swiper . ivy--regex-plus)
+          (counsel-projectile-switch-project . ivy--regex-plus)
+          (counsel-ag . ivy--regex-plus)
+          (counsel-rg . ivy--regex-plus)
+          (t      . ivy--regex-fuzzy))))
 
-(setq backup-directory-alist `(("." . "~/.saves")))
-(setq backup-by-copying t)
-(setq backup-directory-alist
-      `((".*" . ,temporary-file-directory)))
-(setq auto-save-file-name-transforms
-      `((".*" ,temporary-file-directory t)))
+(use-package projectile
+  :ensure t
+  :config
+  (projectile-global-mode)
+  (projectile-global-mode)
+  (setq projectile-project-search-path '("~/Repositories" "~/Sync/projects"))
+  (setq projectile-sort-order 'recently-active)
+  (setq projectile-indexing-method 'hybrid)
+  (setq projectile-globally-ignored-files '(".DS_Store" ".gitmodules"))
+  (counsel-projectile-mode +1)
+
+  (setq backup-directory-alist `(("." . "~/.saves")))
+  (setq backup-by-copying t)
+  (setq backup-directory-alist
+        `((".*" . ,temporary-file-directory)))
+  (setq auto-save-file-name-transforms
+        `((".*" ,temporary-file-directory t))))
+
+(use-package counsel-projectile
+  :ensure t
+  :after (ivy projectile)
+  :config
+  (counsel-projectile-mode +1))
+
 (setq create-lockfiles nil)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Programming
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(require 'company)
-(require 'lsp-mode)
-(global-company-mode)
-(define-key company-active-map (kbd "C-n") 'company-select-next-or-abort)
-(define-key company-active-map (kbd "C-p") 'company-select-previous-or-abort)
+(use-package company
+  :ensure t
+  :config
+  (global-company-mode)
+  (define-key company-active-map (kbd "C-n") 'company-select-next-or-abort)
+  (define-key company-active-map (kbd "C-p") 'company-select-previous-or-abort))
 
+(use-package lsp-mode
+  :ensure t)
 
-;; Also highlight long lines in whitespace-mode
-(require 'whitespace)
-(setq whitespace-line-column 80)
-(setq whitespace-style
-      '(face lines-tail spaces tabs newline space-mark tab-mark newline-mark))
+(use-package whitespace
+  :ensure t
+  :config
+  ;; whitespace configurations...
+  (setq whitespace-line-column 80)
+  (setq whitespace-style
+        '(face lines-tail spaces tabs newline space-mark tab-mark newline-mark))
 
-;; Cleanup whitespace on save (co-workers love this ;-))
-(add-hook
- 'before-save-hook
- (lambda ()
-   (whitespace-cleanup)
-   (delete-trailing-whitespace)))
+  (add-hook
+   'before-save-hook
+   (lambda ()
+     (whitespace-cleanup)
+     (delete-trailing-whitespace))))
 
 ;; Indentation
 (defun my-setup-indent (n)
@@ -374,37 +357,46 @@
 
 (my-code-style)
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Languages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(require 'flycheck)
+(use-package flycheck
+  :ensure t)
 
 ;; File-types
-(add-to-list 'auto-mode-alist '("\\.org$\\'" . org-mode))
-(add-to-list 'auto-mode-alist '("\\.adoc\\'" . adoc-mode))
-(add-to-list 'auto-mode-alist '(".emacs" . emacs-lisp-mode))
-(add-to-list 'auto-mode-alist '("\\.css\\'" . css-mode))
-(add-to-list 'auto-mode-alist '("\\.less\\'" . less-css-mode))
-(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.js.?" . js2-mode))
+(dolist (file-type '(("\\.org$\\'" . org-mode)
+                     ("\\.adoc\\'" . adoc-mode)
+                     (".emacs" . emacs-lisp-mode)
+                     ("\\.css\\'" . css-mode)
+                     ("\\.less\\'" . less-css-mode)
+                     ("\\.html?\\'" . web-mode)
+                     ("\\.js.?" . js2-mode)))
+  (add-to-list 'auto-mode-alist file-type))
 
 ;; Web stuff
-(defun custom-web-mode-hook ()
-  "Hooks for Web mode."
-  (toggle-truncate-lines t))
-
-(add-hook 'web-mode-hook 'custom-web-mode-hook)
+(use-package web-mode
+  :ensure t
+  :hook (web-mode . custom-web-mode-hook)
+  :config
+  (defun custom-web-mode-hook ()
+    "Hooks for Web mode."
+    (toggle-truncate-lines t)))
 
 ;; Emacs Speaks Statistics
-(require 'ess-site)
-(setq ess-eval-visibly 'nowait)
-(setq ess-r-backend 'lsp)
-
+(use-package ess
+  :ensure t
+  :config
+  (setq ess-eval-visibly 'nowait)
+  (setq ess-r-backend 'lsp))
 
 ;; Lisp
-(require 'evil-cleverparens)
+
+(use-package paredit :ensure t)
+
+(use-package aggressive-indent :ensure t)
+
+(use-package highlight-parentheses :ensure t)
 
 (defun enable-lisp-utils ()
   (aggressive-indent-mode)
@@ -413,30 +405,15 @@
   (highlight-parentheses-mode t))
 
 (defvar lisps
-  '(emacs-lisp-mode
-    lisp-mode
-    ielm-mode
-    cider-mode
-    cider-repl-mode
-    clojurescript-mode
-    clojurec-mode
-    clojurex-mode
-    clojure-mode))
-
-(defun use-colon-as-word-start ()
-  (let ((table (make-syntax-table clojure-mode-syntax-table)))
-    (modify-syntax-entry ?: "w" table)
-    (set-syntax-table table)))
-(add-hook 'clojure-mode-hook 'use-colon-as-word-start)
+  '(emacs-lisp-mode lisp-mode ielm-mode cider-mode cider-repl-mode
+                    clojurescript-mode clojurec-mode clojurex-mode clojure-mode))
 
 (dolist (mode lisps)
-  ;; Add hooks
   (add-hook (intern (concat (symbol-name mode) "-hook")) 'enable-lisp-utils))
 
 (add-hook 'clojure-mode-hook 'lsp)
 (add-hook 'clojurescript-mode-hook 'lsp)
 (add-hook 'clojurec-mode-hook 'lsp)
-
 
 (setq
  company-minimum-prefix-length 1
@@ -455,17 +432,27 @@
  lsp-ui-doc-show-with-cursor nil
  lsp-ui-sideline-show-code-actions nil)
 
-(require 'cider)
-(setq cider-eldoc-display-symbol-at-point nil)
-(setq cider-auto-select-error-buffer nil)
-
+(use-package cider
+  :ensure t
+  :config
+  (setq cider-eldoc-display-symbol-at-point nil)
+  (setq cider-auto-select-error-buffer nil)
+  (setq cider-repl-print-length 100)
+  (setq cider-repl-print-level 10)
+  (setq cider-repl-use-pretty-printing t))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Writing & Blogging
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(evil-define-key 'normal org-mode-map (kbd "<tab>") #'org-cycle)
+
+
+(use-package flycheck
+  :ensure t
+  :config
+  (setq flycheck-languagetool-server-jar "~/Sync/etc/LanguageTool/languagetool-server.jar"))
 
 (defun enable-write-utils ()
+  (require 'flycheck-languagetool)
   (diminish 'flycheck-mode)
   (flycheck-languagetool-setup)
   ;;(flycheck-mode)
@@ -478,57 +465,33 @@
   (add-hook hook 'enable-write-utils))
 
 (setq sentence-end-double-space nil)
-(setq flycheck-languagetool-server-jar "~/Sync/etc/LanguageTool/languagetool-server.jar")
-
-;; (setq-local flycheck-languagetool-language "nl-nl")
-;; (setq-local flycheck-languagetool-language "en-US")
-;; (ispell-change-dictionary)
-
 
 ;; org-mode
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((R . t)
-   (shell . t)
-   (emacs-lisp . t)
-   (dot . t)
-   (ditaa . t)
-   (clojure . t)
-   (plantuml . t)))
+(use-package org
+  :ensure t
+  :config
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((R . t)
+     (shell . t)
+     (emacs-lisp . t)
+     (dot . t)
+     (ditaa . t)
+     (clojure . t)
+     (plantuml . t)))
 
-;; Always redisplay inline images after executing SRC block
-(eval-after-load 'org
+  ;; Always redisplay inline images after executing SRC block
   (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images))
 
 ;; Tramp stuff
 (setq tramp-terminal-type "tramp")
-
-(put 'erase-buffer 'disabled nil)
-(set-background-color "#fafafa")
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Customizations (from M-x customze-*)
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   '("4780d7ce6e5491e2c1190082f7fe0f812707fc77455616ab6f8b38e796cbffa9"
-     "8f5b54bf6a36fe1c138219960dd324aad8ab1f62f543bed73ef5ad60956e36ae"
-     "d0fd069415ef23ccc21ccb0e54d93bdbb996a6cce48ffce7f810826bb243502c"
-     default))
  '(package-selected-packages
-   '(sqlite3 avy web-mode vundo undo-fu terraform-mode ssh-agency
-             scss-mode pyenv-mode ox-gfm org-ref ob-ipython notmuch
-             minimal-theme magit lsp-ui lsp-ivy key-chord js2-mode
-             ivy-rich ivy-avy highlight-parentheses highlight flycheck
-             flx expand-region exec-path-from-shell
-             evil-string-inflection evil-leader evil-collection
-             evil-cleverparens ess elpy direnv counsel-projectile
-             conda cider almost-mono-themes aggressive-indent ag
-             adoc-mode)))
+   '(org-plus-contrib cider highlight-parentheses aggressive-indent evil-cleverparens ess web-mode flycheck lsp-mode company counsel-projectile projectile ivy unicode-fonts almost-mono-white-theme expand-region evil exec-path-from-shell)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
