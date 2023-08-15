@@ -151,7 +151,6 @@
   (define-key evil-visual-state-map (kbd ">") 'shift-right-visual)
   (define-key evil-visual-state-map (kbd "<") 'shift-left-visual)
   (define-key evil-visual-state-map (kbd ".") 'er/expand-region)
-  (define-key evil-normal-state-map (kbd ".") 'avy-goto-char)
 
   (define-key evil-normal-state-map (kbd "C-x <right>") 'windmove-right)
   (define-key evil-normal-state-map (kbd "C-x <left>") 'windmove-left)
@@ -161,7 +160,7 @@
   (define-key evil-insert-state-map (kbd "§") 'evil-normal-state)
   (define-key evil-insert-state-map (kbd "§") 'evil-normal-state)
   (define-key evil-replace-state-map (kbd "±") 'evil-normal-state)
-  (define-key evil-replace-state-map (kbd "±") 'evil-normal-state) )
+  (define-key evil-replace-state-map (kbd "±") 'evil-normal-state))
 
 (use-package evil-leader
   :ensure t
@@ -450,11 +449,11 @@
    lsp-headerline-breadcrumb-enable nil
    lsp-enable-indentation nil
    lsp-ui-sideline-enable nil
-   lsp-enable-semantic-highlighting nil
+   ;;lsp-enable-semantic-highlighting nil
    lsp-enable-symbol-highlighting nil
    lsp-modeline-code-actions-enable nil
    lsp-modeline-diagnostics-enable nil
-   lsp-ui-doc-show-with-cursor nil
+   ;; lsp-ui-doc-show-with-cursor nil
    lsp-ui-sideline-show-code-actions nil))
 
 (defun enable-lisp-utils ()
