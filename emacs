@@ -126,6 +126,7 @@
     (evil-shift-right (region-beginning) (region-end))
     (evil-normal-state)
     (evil-visual-restore))
+
   ;; esc quits
   (defun minibuffer-keyboard-quit ()
     "Abort recursive edit.
@@ -212,7 +213,7 @@
     "ln"     'display-line-numbers-mode
 
     "p;"     'counsel-projectile
-    "pf"     'counsel-projectile-find-file
+    "pf"     'counsel-projectile
     "ps"     'counsel-projectile-switch-project
     "pd"     'projectile-dired
     "pg"     'counsel-projectile-ag
@@ -326,7 +327,7 @@
   (projectile-global-mode)
   (setq projectile-project-search-path '("~/Repositories" "~/Sync/projects"))
   (setq projectile-sort-order 'recently-active)
-  (setq projectile-indexing-method 'hybrid)
+  (setq projectile-indexing-method 'alien)
   (setq projectile-globally-ignored-files '(".DS_Store" ".gitmodules" "kit-modules")))
 
 (use-package counsel-projectile
