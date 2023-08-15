@@ -1,5 +1,4 @@
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; personal configuration of emacs + evil
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -74,6 +73,18 @@
   (exec-path-from-shell-copy-env "LC_ALL")
   (exec-path-from-shell-copy-env "LANG"))
 
+(defun display-tree ()
+  "Run the Unix tree command on the project root and display the output."
+  (interactive)
+  (let* ((project-root (projectile-project-root))
+         (current-file (buffer-file-name))
+         (tree-output
+          (shell-command-to-string
+           (format "tree %s -P '%s'" project-root
+                   (file-relative-name current-file project-root)))))
+    (with-output-to-temp-buffer "*tree*"
+      (princ tree-output))))
+
 
 (defun reload-buffer ()
   "revert-buffer without confirmation."
@@ -115,6 +126,26 @@
     (evil-shift-right (region-beginning) (region-end))
     (evil-normal-state)
     (evil-visual-restore))
+  ;; esc quits
+  (defun minibuffer-keyboard-quit ()
+    "Abort recursive edit.
+  In Delete Selection mode, if the mark is active, just deactivate it;
+  then it takes a second \\[keyboard-quit] to abort the minibuffer."
+    (interactive)
+    (if (and delete-selection-mode transient-mark-mode mark-active)
+        (setq deactivate-mark  t)
+      (when (get-buffer "*Completions*") (delete-windows-on "*Completions*"))
+      (abort-recursive-edit)))
+  (evil-define-key 'normal org-mode-map (kbd "<tab>") #'org-cycle)
+
+  (define-key evil-normal-state-map [escape] 'keyboard-quit)
+  (define-key evil-visual-state-map [escape] 'keyboard-quit)
+  (define-key minibuffer-local-map [escape] 'minibuffer-keyboard-quit)
+  (define-key minibuffer-local-ns-map [escape] 'minibuffer-keyboard-quit)
+  (define-key minibuffer-local-completion-map [escape] 'minibuffer-keyboard-quit)
+  (define-key minibuffer-local-must-match-map [escape] 'minibuffer-keyboard-quit)
+  (define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
+
 
   (define-key evil-visual-state-map (kbd ">") 'shift-right-visual)
   (define-key evil-visual-state-map (kbd "<") 'shift-left-visual)
@@ -129,97 +160,78 @@
   (define-key evil-insert-state-map (kbd "§") 'evil-normal-state)
   (define-key evil-insert-state-map (kbd "§") 'evil-normal-state)
   (define-key evil-replace-state-map (kbd "±") 'evil-normal-state)
-  (define-key evil-replace-state-map (kbd "±") 'evil-normal-state)
+  (define-key evil-replace-state-map (kbd "±") 'evil-normal-state) )
+
+(use-package evil-leader
+  :ensure t
+  :after evil
+  :config
+  (setq evil-leader/in-all-states 1)
+  (global-evil-leader-mode)
+  (evil-leader/set-leader ",")
 
   ;; Leaders
-  (use-package evil-leader
-    :ensure t
-    :config
-    ;; esc quits
-    (defun minibuffer-keyboard-quit ()
-      "Abort recursive edit.
-  In Delete Selection mode, if the mark is active, just deactivate it;
-  then it takes a second \\[keyboard-quit] to abort the minibuffer."
-      (interactive)
-      (if (and delete-selection-mode transient-mark-mode mark-active)
-          (setq deactivate-mark  t)
-        (when (get-buffer "*Completions*") (delete-windows-on "*Completions*"))
-        (abort-recursive-edit)))
-    (evil-define-key 'normal org-mode-map (kbd "<tab>") #'org-cycle)
+  (evil-leader/set-key
+    "1"      (lambda () (interactive) (find-file "~/.emacs"))
+    "2"      (lambda () (interactive) (find-file "~/Sync/org/ideas.org"))
+    "3"      (lambda () (interactive) (find-file "~/Sync/org/todo.org"))
+    "4"      (lambda () (interactive) (find-file "~/Sync/org/journal.org"))
+    "5"      (lambda () (interactive) (find-file "~/Sync/org/repl.el"))
 
-    (define-key evil-normal-state-map [escape] 'keyboard-quit)
-    (define-key evil-visual-state-map [escape] 'keyboard-quit)
-    (define-key minibuffer-local-map [escape] 'minibuffer-keyboard-quit)
-    (define-key minibuffer-local-ns-map [escape] 'minibuffer-keyboard-quit)
-    (define-key minibuffer-local-completion-map [escape] 'minibuffer-keyboard-quit)
-    (define-key minibuffer-local-must-match-map [escape] 'minibuffer-keyboard-quit)
-    (define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
+    "*nl"    (lambda () (interactive)
+               (setq-local ispell-dictionary "nl"
+                           flycheck-languagetool-language "nl-NL"))
+    "*en"    (lambda () (interactive)
+               (setq-local ispell-dictionary "en_US"
+                           flycheck-languagetool-language "en-US"))
 
-    (setq evil-leader/in-all-states 1)
-    (global-evil-leader-mode)
-    (evil-leader/set-leader ",")
-    (evil-leader/set-key
-      "1"      (lambda () (interactive) (find-file "~/.emacs"))
-      "2"      (lambda () (interactive) (find-file "~/Sync/org/ideas.org"))
-      "3"      (lambda () (interactive) (find-file "~/Sync/org/todo.org"))
-      "4"      (lambda () (interactive) (find-file "~/Sync/org/journal.org"))
-      "5"      (lambda () (interactive) (find-file "~/Sync/org/repl.el"))
+    "."      'er/expand-region
+    ","      'er/contract-region
+    "/"      'comment-or-uncomment-region
+    "x"      'counsel-M-x               ; eXecute
+    "e"      'eval-expression
+    "f"      'counsel-fzf
+    "q"      'quit-window
+    ";"      'swiper
+    "r"      'counsel-buffer-or-recentf
+    "sh"     'eshell                    ; SHell
+    "bs"     'counsel-ibuffer
+    "br"     'reload-buffer             ; BufferReload
+    "bk"     'ido-kill-buffer
+    "ws"     'whitespace-mode
+    "gg"     'magit
+    "gd"     'magit-diff-unstaged
+    "gs"     'magit-status
+    "gb"     'magit-blame
+    "gc"     'magit-commit
+    "gl"     'magit-log-all
+    "gP"     'magit-push-current-to-upstream
+    "gp"     'magit-pull-from-upstream
+    "d"      'display-tree
+    "m"      'counsel-semantic-or-imenu
+    "ln"     'display-line-numbers-mode
 
-      "*nl"    (lambda () (interactive)
-                 (setq-local ispell-dictionary "nl"
-                             flycheck-languagetool-language "nl-NL"))
-      "*en"    (lambda () (interactive)
-                 (setq-local ispell-dictionary "en_US"
-                             flycheck-languagetool-language "en-US"))
+    "p;"     'counsel-projectile
+    "pf"     'counsel-projectile-find-file
+    "ps"     'counsel-projectile-switch-project
+    "pd"     'projectile-dired
+    "pg"     'counsel-projectile-ag
+    "P"      'counsel-yank-pop
 
-      "."      'er/expand-region
-      ","      'er/contract-region
-      "/"      'comment-or-uncomment-region
-      "x"      'counsel-M-x                 ; eXecute
-      "e"      'eval-expression
-      "f"      'counsel-fzf
-      "q"      'quit-window
-      ";"      'swiper
-      "r"      'counsel-buffer-or-recentf
-      "sh"     'eshell                      ; SHell
-      "bs"     'counsel-ibuffer
-      "br"     'reload-buffer               ; BufferReload
-      "bk"     'ido-kill-buffer
-      "df"     'magit-diff-dwim
-      "ws"     'whitespace-mode
-      "gg"     'magit
-      "gd"     'magit-diff-unstaged
-      "gs"     'magit-status
-      "gb"     'magit-blame
-      "gc"     'magit-commit
-      "gl"     'magit-log-all
-      "gP"     'magit-push-current-to-upstream
-      "gp"     'magit-pull-from-upstream
+    "ch"     'cider-repl-history
+    "cb"     'cider-repl-clear-buffer
 
-      "m"      'counsel-semantic-or-imenu
-      "ln"     'display-line-numbers-mode
+    "lr"     'lsp-find-references
+    "lD"     'lsp-find-declaration
+    "ld"     'lsp-ui-doc-glance
 
-      "p;"     'counsel-projectile
-      "pf"     'counsel-projectile-find-file
-      "ps"     'counsel-projectile-switch-project
-      "pd"     'projectile-dired
-      "pg"     'counsel-projectile-ag
-      "P"      'counsel-yank-pop
-
-      "ch"     'cider-repl-history
-      "cb"     'cider-repl-clear-buffer
-
-      "lr"     'lsp-find-references
-      "lD"     'lsp-find-declaration
-      "ld"     'lsp-ui-doc-glance
-
-      "u"      'vundo
-      "|"      'evil-window-vsplit
-      "_"      'evil-window-split
-      "<left>" 'windmove-left
-      "<right>"'windmove-right
-      "<up>"   'windmove-up
-      "<down>" 'windmove-down)))
+    "u"      'vundo
+    "|"      'evil-window-vsplit
+    "_"      'evil-window-split
+    "<left>" 'windmove-left
+    "<right>"'windmove-right
+    "<up>"   'windmove-up
+    "<down>" 'windmove-down))
 
 (use-package evil-cleverparens :ensure t)
 
