@@ -29,10 +29,6 @@
 (setq initial-scratch-message nil)
 (setq initial-major-mode 'org-mode)
 (setq-default indent-tabs-mode nil)
-(tool-bar-mode 0)
-(menu-bar-mode 0)
-(scroll-bar-mode 0)
-(blink-cursor-mode 0)
 
 (defun custom/kill-this-buffer ()
   (interactive) (kill-buffer (current-buffer)))
@@ -90,6 +86,7 @@
 (use-package evil-collection
   :ensure t
   :after evil
+  :diminish evil-collection-unimpaired-mode
   :config
   (evil-collection-init)
   (evil-collection-init 'magit)
@@ -255,6 +252,13 @@
 (put 'erase-buffer 'disabled nil)
 (set-background-color "#fafafa")
 
+(use-package diminish :ensure t)
+
+(tool-bar-mode 0)
+(menu-bar-mode 0)
+(scroll-bar-mode 0)
+(blink-cursor-mode 0)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customization
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -264,12 +268,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Projects
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(use-package ivy-rich :ensure t)
-(use-package counsel-projectile :ensure t)
+(use-package ivy-rich :ensure t :diminish ivy-rich-mode)
+(use-package counsel-projectile :ensure t :diminish counsel-projectile-mode)
 (use-package magit :ensure t)
 
 (use-package ivy
   :ensure t
+  :diminish ivy-mode
   :config
   (ivy-mode 1)
   (setq ivy-use-virtual-buffers t)
@@ -283,6 +288,7 @@
 
 (use-package projectile
   :ensure t
+  :diminish projectile-mode
   :config
   (projectile-global-mode)
   (projectile-global-mode)
@@ -301,6 +307,7 @@
 
 (use-package counsel-projectile
   :ensure t
+  :diminish counsel-projectile-mode
   :after (ivy projectile)
   :config
   (counsel-projectile-mode +1))
@@ -312,12 +319,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package company
   :ensure t
+  :diminish company-mode
   :config
   (global-company-mode)
   (define-key company-active-map (kbd "C-n") 'company-select-next-or-abort)
   (define-key company-active-map (kbd "C-p") 'company-select-previous-or-abort))
-
-(use-package lsp-mode :ensure t :defer t)
 
 (use-package whitespace
   :ensure t
@@ -360,7 +366,6 @@
 ;;; Languages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(use-package flycheck :ensure t :defer t)
 
 ;; Web stuff
 (use-package web-mode
@@ -388,14 +393,17 @@
 ;; Lisp
 (use-package aggressive-indent
   :ensure t
+  :diminish aggressive-indent-mode
   :commands aggressive-indent-mode)
 
 (use-package paredit
   :ensure t
+  :diminish paredit-mode
   :commands paredit-mode)
 
 (use-package evil-cleverparens
   :ensure t
+  :diminish evil-cleverparens-mode
   :commands evil-cleverparens-mode)
 
 (use-package highlight-parentheses
@@ -454,8 +462,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Writing & Blogging
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
 (use-package flycheck
   :ensure t
   :defer t
@@ -464,7 +470,6 @@
 
 (defun enable-write-utils ()
   (require 'flycheck-languagetool)
-  (diminish 'flycheck-mode)
   (flycheck-languagetool-setup)
   ;;(flycheck-mode)
   (visual-line-mode 1))
