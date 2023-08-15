@@ -268,17 +268,33 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (winner-mode 1)
 (setq vc-follow-symlinks nil)
+(setq create-lockfiles nil)
+
+(setq backup-directory-alist `(("." . "~/.saves")))
+(setq backup-by-copying t)
+(setq backup-directory-alist
+      `((".*" . ,temporary-file-directory)))
+(setq auto-save-file-name-transforms
+      `((".*" ,temporary-file-directory t)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Projects
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(use-package ivy-rich :ensure t :diminish ivy-rich-mode)
-(use-package counsel-projectile :ensure t :diminish counsel-projectile-mode)
 (use-package magit :ensure t)
+
+(use-package ivy-rich
+  :ensure t
+  :after ivy
+  :diminish ivy-rich-mode)
+
+(use-package counsel
+  :ensure t
+  :diminish counsel-mode)
 
 (use-package ivy
   :ensure t
   :diminish ivy-mode
+  :after counsel
   :config
   (ivy-mode 1)
   (setq ivy-use-virtual-buffers t)
@@ -299,24 +315,15 @@
   (setq projectile-project-search-path '("~/Repositories" "~/Sync/projects"))
   (setq projectile-sort-order 'recently-active)
   (setq projectile-indexing-method 'hybrid)
-  (setq projectile-globally-ignored-files '(".DS_Store" ".gitmodules"))
-  (counsel-projectile-mode +1)
-
-  (setq backup-directory-alist `(("." . "~/.saves")))
-  (setq backup-by-copying t)
-  (setq backup-directory-alist
-        `((".*" . ,temporary-file-directory)))
-  (setq auto-save-file-name-transforms
-        `((".*" ,temporary-file-directory t))))
+  (setq projectile-globally-ignored-files '(".DS_Store" ".gitmodules" "kit-modules")))
 
 (use-package counsel-projectile
   :ensure t
   :diminish counsel-projectile-mode
-  :after (ivy projectile)
+  :after (ivy counsel projectile)
   :config
   (counsel-projectile-mode +1))
 
-(setq create-lockfiles nil)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Programming
@@ -469,7 +476,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package flycheck
   :ensure t
-  :defer flycheck-mode
+  :diminish flycheck-mode
   :config
   (setq flycheck-languagetool-server-jar "~/Sync/etc/LanguageTool/languagetool-server.jar"))
 
