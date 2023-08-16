@@ -12,6 +12,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Packaging setup.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(setq byte-compile-warnings nil)
+
 (setq
  package-archives
  '(("gnu" . "https://elpa.gnu.org/packages/")
@@ -176,7 +178,7 @@
     "2"      (lambda () (interactive) (find-file "~/Sync/org/ideas.org"))
     "3"      (lambda () (interactive) (find-file "~/Sync/org/todo.org"))
     "4"      (lambda () (interactive) (find-file "~/Sync/org/journal.org"))
-    "5"      (lambda () (interactive) (find-file "~/Sync/org/repl.el"))
+    "5"      (lambda () (interactive) (find-file "~/Sync/org/repl.org"))
 
     "*nl"    (lambda () (interactive)
                (setq-local ispell-dictionary "nl"
@@ -281,6 +283,7 @@
 (winner-mode 1)
 (setq vc-follow-symlinks nil)
 (setq create-lockfiles nil)
+(setq tramp-terminal-type "tramp")
 
 (setq backup-directory-alist `(("." . "~/.saves")))
 (setq backup-by-copying t)
@@ -509,25 +512,32 @@
 (setq sentence-end-double-space nil)
 
 ;; org-mode
+(defconst my-org-babel-languages
+  '((R . t)
+    (dot . t)
+    (ditaa . t)
+    (clojure . t)
+    (emacs-lisp . t)
+    (plantuml . t)
+    (sql . t)) ; Add SQLite (SQL) support
+  "Languages to enable in Org mode.")
+
+(defun my-org-confirm-babel-evaluate (lang body)
+  (not (assoc-string lang my-org-babel-languages t))) ; don't ask for languages in my-org-babel-languages
+
+(setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
+
 (use-package org
   :ensure t
   :mode (("\\.org\\'" . org-mode))
   :config
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((R . t)
-     (shell . t)
-     (emacs-lisp . t)
-     (dot . t)
-     (ditaa . t)
-     (clojure . t)
-     (plantuml . t)))
+  ;; Enable specified languages
+  (org-babel-do-load-languages 'org-babel-load-languages my-org-babel-languages)
 
   ;; Always redisplay inline images after executing SRC block
   (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images))
 
 ;; Tramp stuff
-(setq tramp-terminal-type "tramp")
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
