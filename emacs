@@ -489,16 +489,17 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Writing & Blogging
+;;; Writing & Blogging (org mode)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(use-package flycheck
+
+(use-package flycheck-languagetool
   :ensure t
-  :diminish flycheck-mode
+  :after flycheck
   :config
-  (setq flycheck-languagetool-server-jar "~/Sync/etc/LanguageTool/languagetool-server.jar"))
+  (setq flycheck-languagetool-server-jar
+        "~/Sync/etc/LanguageTool/languagetool-server.jar"))
 
 (defun enable-write-utils ()
-  (require 'flycheck-languagetool)
   (flycheck-languagetool-setup)
   ;;(flycheck-mode)
   (visual-line-mode 1))
@@ -519,7 +520,7 @@
     (clojure . t)
     (emacs-lisp . t)
     (plantuml . t)
-    (sql . t)) ; Add SQLite (SQL) support
+    (sqlite . t))
   "Languages to enable in Org mode.")
 
 (defun my-org-confirm-babel-evaluate (lang body)
@@ -537,17 +538,16 @@
   ;; Always redisplay inline images after executing SRC block
   (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images))
 
-;; Tramp stuff
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(org-plus-contrib cider highlight-parentheses aggressive-indent evil-cleverparens ess web-mode flycheck lsp-mode company counsel-projectile projectile ivy unicode-fonts almost-mono-white-theme expand-region evil exec-path-from-shell)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   '(flycheck-languagetool web-mode unicode-fonts magit lsp-mode ivy-rich highlight-parentheses flycheck expand-region exec-path-from-shell evil-leader evil-collection evil-cleverparens ess diminish counsel-projectile company cider almost-mono-themes aggressive-indent)))
