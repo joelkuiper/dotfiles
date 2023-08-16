@@ -313,10 +313,9 @@
   (ivy-rich-mode 1)
   (setq ivy-re-builders-alist
         '((swiper . ivy--regex-plus)
-          (counsel-projectile-switch-project . ivy--regex-plus)
           (counsel-ag . ivy--regex-plus)
           (counsel-rg . ivy--regex-plus)
-          (t      . ivy--regex-fuzzy))))
+          (t      . ivy--regex-plus))))
 
 (use-package projectile
   :ensure t
@@ -334,6 +333,9 @@
   :diminish counsel-projectile-mode
   :after (ivy counsel projectile)
   :config
+  (setq ivy-re-builders-alist
+        '((counsel-projectile-switch-project . ivy--regex-plus)
+          (counsel-projectile-find-file . ivy--regex-plus)))
   (counsel-projectile-mode +1))
 
 
