@@ -175,7 +175,7 @@
   ;; Leaders
   (evil-leader/set-key
     "1"      (lambda () (interactive) (find-file "~/.emacs"))
-    "2"      (lambda () (interactive) (find-file "~/Sync/org/ideas.org"))
+    "2"      (lambda () (interactive) (find-file "~/Sync/org/scratch.org"))
     "3"      (lambda () (interactive) (find-file "~/Sync/org/todo.org"))
     "4"      (lambda () (interactive) (find-file "~/Sync/org/journal.org"))
     "5"      (lambda () (interactive) (find-file "~/Sync/org/repl.org"))
@@ -315,10 +315,7 @@
   (setq ivy-use-virtual-buffers t)
   (ivy-rich-mode 1)
   (setq ivy-re-builders-alist
-        '((swiper . ivy--regex-plus)
-          (counsel-ag . ivy--regex-plus)
-          (counsel-rg . ivy--regex-plus)
-          (t      . ivy--regex-plus))))
+        '((t . ivy--regex-fuzzy))))
 
 (use-package projectile
   :ensure t
@@ -336,9 +333,6 @@
   :diminish counsel-projectile-mode
   :after (ivy counsel projectile)
   :config
-  (setq ivy-re-builders-alist
-        '((counsel-projectile-switch-project . ivy--regex-plus)
-          (counsel-projectile-find-file . ivy--regex-plus)))
   (counsel-projectile-mode +1))
 
 
@@ -393,7 +387,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Languages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
+(use-package flycheck
+  :ensure t
+  :diminish flycheck-mode)
 
 ;; Web stuff
 (use-package web-mode
@@ -406,6 +402,7 @@
   :config
   (defun custom-web-mode-hook ()
     "Hooks for Web mode."
+    (flycheck-mode)
     (toggle-truncate-lines t)))
 
 ;; Emacs Speaks Statistics
@@ -494,14 +491,14 @@
 
 (use-package flycheck-languagetool
   :ensure t
-  :after flycheck
+  :after (flycheck)
   :config
   (setq flycheck-languagetool-server-jar
         "~/Sync/etc/LanguageTool/languagetool-server.jar"))
 
 (defun enable-write-utils ()
   (flycheck-languagetool-setup)
-  ;;(flycheck-mode)
+  (flycheck-mode)
   (visual-line-mode 1))
 
 (dolist (hook '(text-mode-hook
@@ -516,10 +513,9 @@
 (defconst my-org-babel-languages
   '((R . t)
     (dot . t)
-    (ditaa . t)
     (clojure . t)
     (emacs-lisp . t)
-    (plantuml . t)
+    (shell . t)
     (sqlite . t))
   "Languages to enable in Org mode.")
 
