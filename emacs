@@ -210,13 +210,12 @@
     "gP"     'magit-push-current-to-upstream
     "gp"     'magit-pull-from-upstream
     "d"      'display-tree
-    "m"      'counsel-semantic-or-imenu
     "ln"     'display-line-numbers-mode
 
     "p;"     'counsel-projectile
     "pf"     'counsel-projectile
     "ps"     'counsel-projectile-switch-project
-    "pl"     'watch-log-file
+    "pl"     'project-watch-log-file
     "pd"     'projectile-dired
     "pg"     'counsel-projectile-ag
     "P"      'counsel-yank-pop
@@ -335,12 +334,12 @@
   :init
   (counsel-projectile-mode +1)
   :config
-  (defun watch-log-file ()
+  (defun project-watch-log-file ()
     "Open and watch a log file from the project."
     (interactive)
     (let* ((project-root (projectile-project-root))
-           (relative-logfile (counsel-file-jump nil project-root))
-           (logfile (expand-file-name relative-logfile project-root)))
+           (log-files (directory-files-recursively project-root "\\.log$"))
+           (logfile (completing-read "Select log file: " log-files nil t)))
       (unless (file-exists-p logfile)
         (error "Log file does not exist: %s" logfile))
       (find-file logfile)
