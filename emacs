@@ -70,7 +70,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package exec-path-from-shell
   :ensure t
-  :config
+  :init
   (exec-path-from-shell-initialize)
   (exec-path-from-shell-copy-env "LC_ALL")
   (exec-path-from-shell-copy-env "LANG"))
@@ -100,7 +100,7 @@
   :ensure t
   :after evil
   :diminish evil-collection-unimpaired-mode
-  :config
+  :init
   (evil-collection-init)
   (evil-collection-init 'magit)
   (evil-collection-init 'dired)
@@ -167,7 +167,7 @@
 (use-package evil-leader
   :ensure t
   :after evil
-  :config
+  :init
   (setq evil-leader/in-all-states 1)
   (global-evil-leader-mode)
   (evil-leader/set-leader ",")
@@ -216,6 +216,7 @@
     "p;"     'counsel-projectile
     "pf"     'counsel-projectile
     "ps"     'counsel-projectile-switch-project
+    "pl"     'watch-log-file
     "pd"     'projectile-dired
     "pg"     'counsel-projectile-ag
     "P"      'counsel-yank-pop
@@ -247,12 +248,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package almost-mono-themes
   :ensure t
-  :config
+  :init
   (load-theme 'almost-mono-white t))
 
 (use-package unicode-fonts
   :ensure t
-  :config
+  :init
   (unicode-fonts-setup)
   (defface fallback '((t :family "PragmataPro"
                          :inherit 'face-faded)) "Fallback")
@@ -310,7 +311,7 @@
   :ensure t
   :diminish ivy-mode
   :after counsel
-  :config
+  :init
   (ivy-mode 1)
   (setq ivy-use-virtual-buffers t)
   (ivy-rich-mode 1)
@@ -320,8 +321,7 @@
 (use-package projectile
   :ensure t
   :diminish projectile-mode
-  :config
-  (projectile-global-mode)
+  :init
   (projectile-global-mode)
   (setq projectile-project-search-path '("~/Repositories" "~/Sync/projects"))
   (setq projectile-sort-order 'recently-active)
@@ -332,8 +332,20 @@
   :ensure t
   :diminish counsel-projectile-mode
   :after (ivy counsel projectile)
+  :init
+  (counsel-projectile-mode +1)
   :config
-  (counsel-projectile-mode +1))
+  (defun watch-log-file ()
+    "Open and watch a log file from the project."
+    (interactive)
+    (let* ((project-root (projectile-project-root))
+           (relative-logfile (counsel-file-jump nil project-root))
+           (logfile (expand-file-name relative-logfile project-root)))
+      (unless (file-exists-p logfile)
+        (error "Log file does not exist: %s" logfile))
+      (find-file logfile)
+      (auto-revert-tail-mode t)
+      (message "Watching log file: %s" logfile))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -342,15 +354,14 @@
 (use-package company
   :ensure t
   :diminish company-mode
-  :config
+  :init
   (global-company-mode)
   (define-key company-active-map (kbd "C-n") 'company-select-next-or-abort)
   (define-key company-active-map (kbd "C-p") 'company-select-previous-or-abort))
 
 (use-package whitespace
   :ensure t
-  :config
-  ;; whitespace configurations...
+  :init
   (setq whitespace-line-column 80)
   (setq whitespace-style
         '(face lines-tail spaces tabs newline space-mark tab-mark newline-mark))
@@ -376,7 +387,7 @@
          ("\\.css\\'" . web-mode)
          ("\\.less\\'" . web-mode)
          ("\\.js\\'" . web-mode))
-  :config
+  :init
   (defun custom-web-mode-hook ()
     "Hooks for Web mode."
     (flycheck-mode)
@@ -387,7 +398,7 @@
   :ensure t
   :mode (("\\.R\\'" . R-mode)
          ("\\.r\\'" . R-mode))
-  :config
+  :init
   (setq ess-eval-visibly 'nowait)
   (setq ess-r-backend 'lsp))
 
@@ -417,7 +428,7 @@
   :ensure t
   :commands lsp
   :hook ((clojure-mode clojurescript-mode clojurec-mode) . lsp)
-  :config
+  :init
   (setq
    company-minimum-prefix-length 1
    lsp-enable-completion-at-point nil
@@ -454,12 +465,15 @@
   :hook ((clojure-mode . cider-mode)
          (clojurescript-mode . cider-mode)
          (clojurec-mode . cider-mode))
-  :config
+  :init
   (setq cider-eldoc-display-symbol-at-point nil)
   (setq cider-auto-select-error-buffer nil)
   (setq cider-repl-print-length 100)
   (setq cider-repl-print-level 10)
-  (setq cider-repl-use-pretty-printing t))
+  (setq cider-repl-use-pretty-printing t)
+  :config
+  ;; Any additional configuration that doesn't need to be set at startup.
+  )
 
 ;; Indentation and code style
 (defun my-setup-indent (n)
@@ -491,7 +505,7 @@
 (use-package flycheck-languagetool
   :ensure t
   :after (flycheck)
-  :config
+  :init
   (setq flycheck-languagetool-server-jar
         "~/Sync/etc/LanguageTool/languagetool-server.jar"))
 
@@ -526,7 +540,7 @@
 (use-package org
   :ensure t
   :mode (("\\.org\\'" . org-mode))
-  :config
+  :init
   ;; Enable specified languages
   (org-babel-do-load-languages 'org-babel-load-languages my-org-babel-languages)
 
