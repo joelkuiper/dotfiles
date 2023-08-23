@@ -7,8 +7,6 @@
 (when (< emacs-major-version 29)
   (error "This setup requires Emacs v29, or higher. You have: v%d" emacs-major-version))
 
-(load-file "~/.emacs.secrets")
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Packaging setup.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -77,6 +75,9 @@
 
 (use-package vundo :ensure t)
 (use-package direnv :ensure t)
+(use-package diminish :ensure t)
+(use-package eldoc :diminish eldoc-mode)
+(use-package autorevert :diminish auto-revert-mode)
 
 (defun display-tree ()
   "Run the Unix tree command on the project root and display the output."
@@ -90,11 +91,79 @@
     (with-output-to-temp-buffer "*tree*"
       (princ tree-output))))
 
-
 (defun reload-buffer ()
   "revert-buffer without confirmation."
   (interactive)
   (revert-buffer t t))
+
+;; Persist history over Emacs restarts.
+(use-package savehist
+  :ensure t
+  :init
+  (savehist-mode))
+
+
+(defun my-determine-font-size ()
+  "Determine the font size based on the hostname."
+  (let ((hostname (system-name)))
+    (cond ((string-equal hostname "large-screen-host") 160) ; Adjust as needed
+          ((string-equal hostname "Theseus") 140)
+          (t 140)))) ; Default font size
+
+(defun my-set-font (&rest faces)
+  "Set font attributes for the given FACES."
+  (let* ((font-size (my-determine-font-size))
+         (font-family "PragmataPro Liga")
+         (font-weight 'normal)
+         (font-width 'normal))
+    (dolist (face faces)
+      (set-face-attribute face nil
+                          :family font-family
+                          :height font-size
+                          :weight font-weight
+                          :width font-width))))
+
+(use-package emacs
+  :init
+  ;; Add prompt indicator to `completing-read-multiple'.
+  ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
+  (defun crm-indicator (args)
+    (cons (format "[CRM%s] %s"
+                  (replace-regexp-in-string
+                   "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
+                   crm-separator)
+                  (car args))
+          (cdr args)))
+  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+
+
+  (winner-mode 1)
+  (setq vc-follow-symlinks nil)
+  (setq create-lockfiles nil)
+  (setq tramp-terminal-type "tramp")
+
+  (setq backup-directory-alist `(("." . "~/.saves")))
+  (setq backup-by-copying t)
+  (setq backup-directory-alist
+        `((".*" . ,temporary-file-directory)))
+  (setq auto-save-file-name-transforms
+        `((".*" ,temporary-file-directory t)))
+
+
+  ;; Do not allow the cursor in the minibuffer prompt
+  (setq minibuffer-prompt-properties
+        '(read-only t cursor-intangible t face minibuffer-prompt))
+  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+
+
+  (put 'erase-buffer 'disabled nil)
+  ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
+  ;; Vertico commands are hidden in normal buffers.
+  (setq read-extended-command-predicate
+        #'command-completion-default-include-p)
+
+  ;; Enable recursive minibuffers
+  (setq enable-recursive-minibuffers t))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Evil
@@ -173,7 +242,7 @@
   (setq evil-leader/in-all-states 1)
   (global-evil-leader-mode)
   (evil-leader/set-leader ",")
-
+  :config
   ;; Leaders
   (evil-leader/set-key
     "1"      (lambda () (interactive) (find-file "~/.emacs"))
@@ -237,101 +306,17 @@
     "<up>"   'windmove-up
     "<down>" 'windmove-down))
 
-(use-package evil-cleverparens :ensure t)
-
 (use-package expand-region
   :ensure t
   :bind (:map evil-visual-state-map
               ("," . 'er/contract-region)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Visual
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(use-package almost-mono-themes
-  :ensure t
-  :init
-  (load-theme 'almost-mono-white t))
-
-(use-package unicode-fonts
-  :ensure t
-  :init
-  (unicode-fonts-setup)
-  (defface fallback '((t :family "PragmataPro"
-                         :inherit 'face-faded)) "Fallback")
-  (set-display-table-slot standard-display-table 'truncation
-                          (make-glyph-code ?… 'fallback))
-  (set-display-table-slot standard-display-table 'wrap
-                          (make-glyph-code ?↩ 'fallback))
-  (set-display-table-slot standard-display-table 'selective-display
-                          (string-to-vector " …")))
-
-(put 'erase-buffer 'disabled nil)
-(set-background-color "#fafafa")
-
-(use-package diminish :ensure t)
-
-(use-package eldoc :diminish eldoc-mode)
-(use-package autorevert :diminish auto-revert-mode)
-
-
-(tool-bar-mode 0)
-(menu-bar-mode 0)
-(scroll-bar-mode 0)
-(blink-cursor-mode 0)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Customization
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(winner-mode 1)
-(setq vc-follow-symlinks nil)
-(setq create-lockfiles nil)
-(setq tramp-terminal-type "tramp")
-
-(setq backup-directory-alist `(("." . "~/.saves")))
-(setq backup-by-copying t)
-(setq backup-directory-alist
-      `((".*" . ,temporary-file-directory)))
-(setq auto-save-file-name-transforms
-      `((".*" ,temporary-file-directory t)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Projects
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package magit :ensure t)
 (use-package direnv :ensure t)
-
 (use-package prescient :ensure t)
-(use-package ivy-rich
-  :ensure t
-  :after ivy
-  :diminish ivy-rich-mode
-  :init
-  (ivy-rich-mode 1))
-
-(use-package counsel
-  :ensure t
-  :after ivy
-  :diminish counsel-mode)
-
-(use-package ivy
-  :ensure t
-  :diminish ivy-mode
-  :after counsel
-  :init
-  (ivy-mode 1)
-  (setq ivy-use-virtual-buffers t))
-
-(use-package company-prescient
-  :ensure t
-  :after counsel
-  :init
-  (company-prescient-mode))
-
-(use-package ivy-prescient
-  :ensure t
-  :after ivy
-  :config
-  (ivy-prescient-mode))
 
 (use-package projectile
   :ensure t
@@ -346,7 +331,7 @@
 (use-package counsel-projectile
   :ensure t
   :diminish counsel-projectile-mode
-  :after (counsel projectile)
+  :after (company-prescient projectile)
   :init
   (counsel-projectile-mode +1)
   :config
@@ -362,6 +347,59 @@
       (let ((auto-revert-verbose nil)) ;; Suppress verbose revert messages
         (auto-revert-tail-mode t))
       (message "Watching log file: %s" logfile))))
+
+;; Enable vertico
+(use-package vertico
+  :ensure t
+  :config
+  (my-set-font 'vertico-multiline 'vertico-group-title
+               'vertico-group-separator 'vertico-current)
+  :init
+  (vertico-mode)
+
+  ;; Different scroll margin
+  ;; (setq vertico-scroll-margin 0)
+
+  ;; Show more candidates
+  ;; (setq vertico-count 20)
+
+  ;; Grow and shrink the Vertico minibuffer
+  ;; (setq vertico-resize t)
+
+  ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
+  ;; (setq vertico-cycle t)
+  )
+
+(use-package vertico-prescient
+  :ensure t
+  :after vertico
+  :init
+  (vertico-prescient-mode))
+
+;; Autocomplete
+
+(use-package company
+  :ensure t
+  :diminish company-mode
+  :init
+  (global-company-mode)
+  (setq company-minimum-prefix-length 1)
+  (define-key company-active-map (kbd "C-n") 'company-select-next-or-abort)
+  (define-key company-active-map (kbd "C-p") 'company-select-previous-or-abort)
+  :config
+  (my-set-font 'company-tooltip-common 'company-tooltip)
+
+  (set-face-attribute 'company-scrollbar-bg nil
+                      :background "#DFDEDC") ; background color of the scrollbar
+  (set-face-attribute 'company-scrollbar-fg nil
+                      :background "#2D2D2C") ; foreground color of the scrollbar
+  )
+
+(use-package company-prescient
+  :ensure t
+  :after company
+  :init
+  (company-prescient-mode))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -386,6 +424,27 @@
 (use-package flycheck
   :ensure t
   :diminish flycheck-mode)
+
+(use-package lsp-mode
+  :ensure t
+  :commands lsp
+  :hook ((clojure-mode clojurescript-mode clojurec-mode) . lsp)
+  :init
+  (setq
+   ;;lsp-enable-completion-at-point nil
+   lsp-lens-enable nil
+   lsp-eldoc-enable-hover nil
+   lsp-file-watch-threshold 10000
+   lsp-signature-auto-activate nil
+   lsp-headerline-breadcrumb-enable nil
+   lsp-enable-indentation nil
+   lsp-ui-sideline-enable nil
+   lsp-enable-semantic-highlighting nil
+   lsp-enable-symbol-highlighting nil
+   lsp-modeline-code-actions-enable nil
+   lsp-modeline-diagnostics-enable nil
+   lsp-ui-doc-show-with-cursor nil
+   lsp-ui-sideline-show-code-actions nil))
 
 ;; Web stuff
 (use-package web-mode
@@ -433,26 +492,7 @@
   :diminish highlight-parentheses-mode
   :commands highlight-parentheses-mode)
 
-(use-package lsp-mode
-  :ensure t
-  :commands lsp
-  :hook ((clojure-mode clojurescript-mode clojurec-mode) . lsp)
-  :init
-  (setq
-   lsp-enable-completion-at-point nil
-   lsp-lens-enable nil
-   lsp-eldoc-enable-hover nil
-   lsp-file-watch-threshold 10000
-   lsp-signature-auto-activate nil
-   lsp-headerline-breadcrumb-enable nil
-   lsp-enable-indentation nil
-   lsp-ui-sideline-enable nil
-   lsp-enable-semantic-highlighting nil
-   lsp-enable-symbol-highlighting nil
-   lsp-modeline-code-actions-enable nil
-   lsp-modeline-diagnostics-enable nil
-   lsp-ui-doc-show-with-cursor nil
-   lsp-ui-sideline-show-code-actions nil))
+
 
 (defun enable-lisp-utils ()
   (aggressive-indent-mode)
@@ -552,16 +592,38 @@
   ;; Always redisplay inline images after executing SRC block
   (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images))
 
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(bnf-mode flycheck-languagetool web-mode unicode-fonts magit lsp-mode ivy-rich highlight-parentheses flycheck expand-region exec-path-from-shell evil-leader evil-collection evil-cleverparens ess diminish counsel-projectile company cider almost-mono-themes aggressive-indent)))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Visual
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(use-package tao-theme
+  :ensure t
+  :init
+  (load-theme 'tao-yang t)
+  :config
+  (my-set-font 'minibuffer-prompt)
+  (custom-theme-set-faces
+   'tao-yang
+   `(default ((t (:background "#fafafa" :foreground "#241F31"))))))
+
+
+(use-package unicode-fonts
+  :ensure t
+  :init
+  (unicode-fonts-setup)
+  (defface fallback '((t :family "PragmataPro"
+                         :inherit 'face-faded)) "Fallback")
+  (set-display-table-slot standard-display-table 'truncation
+                          (make-glyph-code ?… 'fallback))
+  (set-display-table-slot standard-display-table 'wrap
+                          (make-glyph-code ?↩ 'fallback))
+  (set-display-table-slot standard-display-table 'selective-display
+                          (string-to-vector " …")))
+
+(global-font-lock-mode 1)
+
+(my-set-font 'default)
+
+(tool-bar-mode 0)
+(menu-bar-mode 0)
+(scroll-bar-mode 0)
+(blink-cursor-mode 0)
