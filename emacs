@@ -75,6 +75,9 @@
   (exec-path-from-shell-copy-env "LC_ALL")
   (exec-path-from-shell-copy-env "LANG"))
 
+(use-package vundo :ensure t)
+(use-package direnv :ensure t)
+
 (defun display-tree ()
   "Run the Unix tree command on the project root and display the output."
   (interactive)
@@ -103,8 +106,7 @@
   :init
   (evil-collection-init)
   (evil-collection-init 'magit)
-  (evil-collection-init 'dired)
-  (evil-collection-init 'ivy))
+  (evil-collection-init 'dired))
 
 (use-package evil
   :ensure t
@@ -296,14 +298,19 @@
 ;;; Projects
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package magit :ensure t)
+(use-package direnv :ensure t)
 
+(use-package prescient :ensure t)
 (use-package ivy-rich
   :ensure t
   :after ivy
-  :diminish ivy-rich-mode)
+  :diminish ivy-rich-mode
+  :init
+  (ivy-rich-mode 1))
 
 (use-package counsel
   :ensure t
+  :after ivy
   :diminish counsel-mode)
 
 (use-package ivy
@@ -312,10 +319,19 @@
   :after counsel
   :init
   (ivy-mode 1)
-  (setq ivy-use-virtual-buffers t)
-  (ivy-rich-mode 1)
-  (setq ivy-re-builders-alist
-        '((t . ivy--regex-fuzzy))))
+  (setq ivy-use-virtual-buffers t))
+
+(use-package company-prescient
+  :ensure t
+  :after counsel
+  :init
+  (company-prescient-mode))
+
+(use-package ivy-prescient
+  :ensure t
+  :after ivy
+  :config
+  (ivy-prescient-mode))
 
 (use-package projectile
   :ensure t
@@ -330,7 +346,7 @@
 (use-package counsel-projectile
   :ensure t
   :diminish counsel-projectile-mode
-  :after (ivy counsel projectile)
+  :after (counsel projectile)
   :init
   (counsel-projectile-mode +1)
   :config
@@ -343,21 +359,14 @@
       (unless (file-exists-p logfile)
         (error "Log file does not exist: %s" logfile))
       (find-file logfile)
-      (auto-revert-tail-mode t)
+      (let ((auto-revert-verbose nil)) ;; Suppress verbose revert messages
+        (auto-revert-tail-mode t))
       (message "Watching log file: %s" logfile))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Programming
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(use-package company
-  :ensure t
-  :diminish company-mode
-  :init
-  (global-company-mode)
-  (define-key company-active-map (kbd "C-n") 'company-select-next-or-abort)
-  (define-key company-active-map (kbd "C-p") 'company-select-previous-or-abort))
-
 (use-package whitespace
   :ensure t
   :init
@@ -415,6 +424,7 @@
 
 (use-package evil-cleverparens
   :ensure t
+  :after (evil)
   :diminish evil-cleverparens-mode
   :commands evil-cleverparens-mode)
 
@@ -429,7 +439,6 @@
   :hook ((clojure-mode clojurescript-mode clojurec-mode) . lsp)
   :init
   (setq
-   company-minimum-prefix-length 1
    lsp-enable-completion-at-point nil
    lsp-lens-enable nil
    lsp-eldoc-enable-hover nil
@@ -438,11 +447,11 @@
    lsp-headerline-breadcrumb-enable nil
    lsp-enable-indentation nil
    lsp-ui-sideline-enable nil
-   ;;lsp-enable-semantic-highlighting nil
+   lsp-enable-semantic-highlighting nil
    lsp-enable-symbol-highlighting nil
    lsp-modeline-code-actions-enable nil
    lsp-modeline-diagnostics-enable nil
-   ;; lsp-ui-doc-show-with-cursor nil
+   lsp-ui-doc-show-with-cursor nil
    lsp-ui-sideline-show-code-actions nil))
 
 (defun enable-lisp-utils ()
@@ -469,10 +478,7 @@
   (setq cider-auto-select-error-buffer nil)
   (setq cider-repl-print-length 100)
   (setq cider-repl-print-level 10)
-  (setq cider-repl-use-pretty-printing t)
-  :config
-  ;; Any additional configuration that doesn't need to be set at startup.
-  )
+  (setq cider-repl-use-pretty-printing t))
 
 ;; Indentation and code style
 (defun my-setup-indent (n)
@@ -558,4 +564,4 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(flycheck-languagetool web-mode unicode-fonts magit lsp-mode ivy-rich highlight-parentheses flycheck expand-region exec-path-from-shell evil-leader evil-collection evil-cleverparens ess diminish counsel-projectile company cider almost-mono-themes aggressive-indent)))
+   '(bnf-mode flycheck-languagetool web-mode unicode-fonts magit lsp-mode ivy-rich highlight-parentheses flycheck expand-region exec-path-from-shell evil-leader evil-collection evil-cleverparens ess diminish counsel-projectile company cider almost-mono-themes aggressive-indent)))

@@ -11,6 +11,7 @@ ZSH=$HOME/.oh-my-zsh
 ZSH_THEME="minimal"
 
 export EDITOR=vim
+export VISUAL=emacs
 
 #Example aliases
 # alias zshconfig="mate ~/.zshrc"
@@ -39,7 +40,10 @@ DISABLE_LS_COLORS="true"
 plugins=(git vi-mode history-substring-search fzf)
 
 source $ZSH/oh-my-zsh.sh
-export PATH=$PATH:~/bin
+export JAVA_HOME=~/Sync/etc/graalvm-jdk-20.0.2+9.1
+export PATH=$JAVA_HOME/bin/:$PATH
+export PATH=$PATH:~/.local/bin/:~/bin/
+export LLVM_TOOLCHAIN=$(lli --print-toolchain-path)
 
 # Put secret configuration settings in ~/.secrets
 if [[ -a ~/.secrets ]] then
