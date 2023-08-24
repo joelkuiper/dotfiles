@@ -151,7 +151,7 @@
 
 
   (put 'erase-buffer 'disabled nil)
-
+  (setq tab-always-indent 'complete)
   ;; Enable recursive minibuffers
   (setq enable-recursive-minibuffers t))
 
@@ -191,18 +191,7 @@
    'tao-yang
    `(default ((t (:background "#fafafa" :foreground "#241F31"))))))
 
-
 (my-set-font 'default)
-(defface fallback '((t :family "PragmataPro"
-                       :inherit 'face-faded)) "Fallback")
-(set-display-table-slot standard-display-table 'truncation
-                        (make-glyph-code ?… 'fallback))
-(set-display-table-slot standard-display-table 'wrap
-                        (make-glyph-code ?↩ 'fallback))
-(set-display-table-slot standard-display-table 'selective-display
-                        (string-to-vector " …"))
-
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Evil
@@ -212,7 +201,7 @@
   :after evil
   :diminish evil-collection-unimpaired-mode
   :init
-  (evil-collection-init '(cider magit dired)))
+  (evil-collection-init '(cider company magit dired)))
 
 (use-package evil
   :ensure t
@@ -360,25 +349,16 @@
       (message "Watching log file: %s" logfile))))
 
 ;; Autocomplete
-(use-package company
+;; Install corfu
+(use-package corfu
   :ensure t
-  :diminish company-mode
-  :init
-  (global-company-mode)
-  (setq company-minimum-prefix-length 2
-        company-idle-delay 0.2)
-
-  (define-key company-active-map (kbd "C-n") 'company-select-next-or-abort)
-  (define-key company-active-map (kbd "C-p") 'company-select-previous-or-abort)
   :config
-  (my-set-font 'company-tooltip-common 'company-tooltip)
-
-  (set-face-attribute 'company-scrollbar-bg nil
-                      :background "#DFDEDC") ; background color of the scrollbar
-  (set-face-attribute 'company-scrollbar-fg nil
-                      :background "#2D2D2C") ; foreground color of the scrollbar
-  )
-
+  (setq corfu-auto t
+        corfu-quit-no-match 'separator)
+  :custom
+  (corfu-cycle t)
+  :init
+  (global-corfu-mode))
 
 
 (use-package projectile
