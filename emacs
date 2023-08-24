@@ -10,7 +10,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Packaging setup.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(setq byte-compile-warnings nil)
 
 (setq
  package-archives
@@ -20,14 +19,12 @@
 (require 'package)
 (package-initialize)
 
-(setq gc-cons-threshold (* 100 1024 1024)
-      read-process-output-max (* 1024 1024))
+(setq byte-compile-warnings nil)
 (setq inhibit-startup-screen t)
 (setq inhibit-startup-echo-area-message t)
 (setq inhibit-startup-message t)
 (setq initial-scratch-message nil)
 (setq initial-major-mode 'org-mode)
-(setq-default indent-tabs-mode nil)
 
 (defun custom/kill-this-buffer ()
   (interactive) (kill-buffer (current-buffer)))
@@ -56,29 +53,9 @@
       (if compile-window
           (delete-window compile-window)))))
 
-;; Always, always, prefer UTF-8, anything else is insanity
-(setq locale-coding-system 'utf-8)
-(set-default-coding-systems 'utf-8-unix)
-(set-terminal-coding-system 'utf-8-unix)
-(set-keyboard-coding-system 'utf-8-unix)
-(prefer-coding-system 'utf-8-unix)
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Util
+;;; Utility functions.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(use-package exec-path-from-shell
-  :ensure t
-  :init
-  (exec-path-from-shell-initialize)
-  (exec-path-from-shell-copy-env "LC_ALL")
-  (exec-path-from-shell-copy-env "LANG"))
-
-(use-package vundo :ensure t)
-(use-package direnv :ensure t)
-(use-package diminish :ensure t)
-(use-package eldoc :diminish eldoc-mode)
-(use-package autorevert :diminish auto-revert-mode)
-
 (defun display-tree ()
   "Run the Unix tree command on the project root and display the output."
   (interactive)
@@ -96,17 +73,11 @@
   (interactive)
   (revert-buffer t t))
 
-;; Persist history over Emacs restarts.
-(use-package savehist
-  :ensure t
-  :init
-  (savehist-mode))
-
 
 (defun my-determine-font-size ()
   "Determine the font size based on the hostname."
   (let ((hostname (system-name)))
-    (cond ((string-equal hostname "large-screen-host") 160) ; Adjust as needed
+    (cond ((string-equal hostname "Aether") 160)
           ((string-equal hostname "Theseus") 140)
           (t 140)))) ; Default font size
 
@@ -123,8 +94,18 @@
                           :weight font-weight
                           :width font-width))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Core config.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package emacs
   :init
+  ;; Always, always, prefer UTF-8, anything else is insanity
+  (setq locale-coding-system 'utf-8)
+  (set-default-coding-systems 'utf-8-unix)
+  (set-terminal-coding-system 'utf-8-unix)
+  (set-keyboard-coding-system 'utf-8-unix)
+  (prefer-coding-system 'utf-8-unix)
+
   ;; Add prompt indicator to `completing-read-multiple'.
   ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
   (defun crm-indicator (args)
@@ -136,12 +117,12 @@
           (cdr args)))
   (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
 
-
   (winner-mode 1)
   (setq vc-follow-symlinks nil)
   (setq create-lockfiles nil)
   (setq tramp-terminal-type "tramp")
 
+  (setq-default indent-tabs-mode nil)
   (setq backup-directory-alist `(("." . "~/.saves")))
   (setq backup-by-copying t)
   (setq backup-directory-alist
@@ -165,6 +146,55 @@
   ;; Enable recursive minibuffers
   (setq enable-recursive-minibuffers t))
 
+;; Packages
+
+(use-package exec-path-from-shell
+  :ensure t
+  :init
+  (exec-path-from-shell-initialize)
+  (exec-path-from-shell-copy-env "LC_ALL")
+  (exec-path-from-shell-copy-env "LANG"))
+
+(use-package vundo :ensure t)
+(use-package direnv :ensure t)
+(use-package diminish :ensure t)
+(use-package eldoc :diminish eldoc-mode)
+(use-package autorevert :diminish auto-revert-mode)
+
+;; Persist history over Emacs restarts.
+(use-package savehist :ensure t :init (savehist-mode))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Visual.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(tool-bar-mode 0)
+(menu-bar-mode 0)
+(scroll-bar-mode 0)
+;;(blink-cursor-mode 0)
+
+(use-package tao-theme
+  :ensure t
+  :init
+  (load-theme 'tao-yang t)
+  :config
+  (my-set-font 'minibuffer-prompt)
+  (custom-theme-set-faces
+   'tao-yang
+   `(default ((t (:background "#fafafa" :foreground "#241F31"))))))
+
+
+(my-set-font 'default)
+(defface fallback '((t :family "PragmataPro"
+                       :inherit 'face-faded)) "Fallback")
+(set-display-table-slot standard-display-table 'truncation
+                        (make-glyph-code ?… 'fallback))
+(set-display-table-slot standard-display-table 'wrap
+                        (make-glyph-code ?↩ 'fallback))
+(set-display-table-slot standard-display-table 'selective-display
+                        (string-to-vector " …"))
+
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Evil
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -173,9 +203,7 @@
   :after evil
   :diminish evil-collection-unimpaired-mode
   :init
-  (evil-collection-init)
-  (evil-collection-init 'magit)
-  (evil-collection-init 'dired))
+  (evil-collection-init '(cider magit dired)))
 
 (use-package evil
   :ensure t
@@ -183,8 +211,8 @@
   (setq evil-undo-system 'undo-redo
         evil-want-keybinding nil ; https://github.com/emacs-evil/evil-collection
         evil-shift-width 2)
-  :config
   (evil-mode 1)
+  :config
   ;; Shift left/right functions and bindings
   (defun shift-left-visual ()
     "Shift left and restore visual selection."
@@ -293,10 +321,6 @@
 
     "ch"     'cider-repl-history
     "cb"     'cider-repl-clear-buffer
-
-    "lr"     'lsp-find-references
-    "lD"     'lsp-find-declaration
-    "ld"     'lsp-ui-doc-glance
 
     "u"      'vundo
     "|"      'evil-window-vsplit
@@ -546,6 +570,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Writing & Blogging (org mode)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(use-package unicode-fonts
+  :ensure t
+  :init
+  (unicode-fonts-setup))
 
 (use-package flycheck-languagetool
   :ensure t
@@ -593,37 +621,18 @@
   (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Visual
+;;; Custom
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(use-package tao-theme
-  :ensure t
-  :init
-  (load-theme 'tao-yang t)
-  :config
-  (my-set-font 'minibuffer-prompt)
-  (custom-theme-set-faces
-   'tao-yang
-   `(default ((t (:background "#fafafa" :foreground "#241F31"))))))
-
-
-(use-package unicode-fonts
-  :ensure t
-  :init
-  (unicode-fonts-setup)
-  (defface fallback '((t :family "PragmataPro"
-                         :inherit 'face-faded)) "Fallback")
-  (set-display-table-slot standard-display-table 'truncation
-                          (make-glyph-code ?… 'fallback))
-  (set-display-table-slot standard-display-table 'wrap
-                          (make-glyph-code ?↩ 'fallback))
-  (set-display-table-slot standard-display-table 'selective-display
-                          (string-to-vector " …")))
-
-(global-font-lock-mode 1)
-
-(my-set-font 'default)
-
-(tool-bar-mode 0)
-(menu-bar-mode 0)
-(scroll-bar-mode 0)
-(blink-cursor-mode 0)
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   '(tao-theme company-prescient vertico-prescient vertico prescient web-mode vundo unicode-fonts magit lsp-mode ivy-rich highlight-parentheses flycheck-languagetool expand-region exec-path-from-shell evil-leader evil-collection evil-cleverparens ess direnv diminish counsel-projectile company cider almost-mono-themes aggressive-indent)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
