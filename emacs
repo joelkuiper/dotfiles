@@ -56,7 +56,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Utility functions.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defun display-tree ()
+(defun my-display-tree ()
   "Run the Unix tree command on the project root and display the output."
   (interactive)
   (let* ((project-root (projectile-project-root))
@@ -68,7 +68,7 @@
     (with-output-to-temp-buffer "*tree*"
       (princ tree-output))))
 
-(defun reload-buffer ()
+(defun my-reload-buffer ()
   "revert-buffer without confirmation."
   (interactive)
   (revert-buffer t t))
@@ -93,6 +93,19 @@
                           :height font-size
                           :weight font-weight
                           :width font-width))))
+
+;; esc quits
+(defun minibuffer-keyboard-quit ()
+  "Abort recursive edit.
+  In Delete Selection mode, if the mark is active, just deactivate it;
+  then it takes a second \\[keyboard-quit] to abort the minibuffer."
+  (interactive)
+  (if (and delete-selection-mode transient-mark-mode mark-active)
+      (setq deactivate-mark  t)
+    (when (get-buffer "*Completions*") (delete-windows-on "*Completions*"))
+    (abort-recursive-edit)))
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Core config.
@@ -170,7 +183,7 @@
 (tool-bar-mode 0)
 (menu-bar-mode 0)
 (scroll-bar-mode 0)
-;;(blink-cursor-mode 0)
+(blink-cursor-mode 0)
 
 (use-package tao-theme
   :ensure t
@@ -228,20 +241,10 @@
     (evil-normal-state)
     (evil-visual-restore))
 
-  ;; esc quits
-  (defun minibuffer-keyboard-quit ()
-    "Abort recursive edit.
-  In Delete Selection mode, if the mark is active, just deactivate it;
-  then it takes a second \\[keyboard-quit] to abort the minibuffer."
-    (interactive)
-    (if (and delete-selection-mode transient-mark-mode mark-active)
-        (setq deactivate-mark  t)
-      (when (get-buffer "*Completions*") (delete-windows-on "*Completions*"))
-      (abort-recursive-edit)))
-  (evil-define-key 'normal org-mode-map (kbd "<tab>") #'org-cycle)
-
   (define-key evil-normal-state-map [escape] 'keyboard-quit)
   (define-key evil-visual-state-map [escape] 'keyboard-quit)
+  (evil-define-key 'normal org-mode-map (kbd "<tab>") #'org-cycle)
+  
   (define-key minibuffer-local-map [escape] 'minibuffer-keyboard-quit)
   (define-key minibuffer-local-ns-map [escape] 'minibuffer-keyboard-quit)
   (define-key minibuffer-local-completion-map [escape] 'minibuffer-keyboard-quit)
@@ -256,12 +259,7 @@
   (define-key evil-normal-state-map (kbd "C-x <right>") 'windmove-right)
   (define-key evil-normal-state-map (kbd "C-x <left>") 'windmove-left)
   (define-key evil-normal-state-map (kbd "C-x <down>") 'windmove-down)
-  (define-key evil-normal-state-map (kbd "C-x <up>") 'windmove-up)
-
-  (define-key evil-insert-state-map (kbd "§") 'evil-normal-state)
-  (define-key evil-insert-state-map (kbd "§") 'evil-normal-state)
-  (define-key evil-replace-state-map (kbd "±") 'evil-normal-state)
-  (define-key evil-replace-state-map (kbd "±") 'evil-normal-state))
+  (define-key evil-normal-state-map (kbd "C-x <up>") 'windmove-up))
 
 (use-package evil-leader
   :ensure t
@@ -297,7 +295,7 @@
     "r"      'counsel-buffer-or-recentf
     "sh"     'eshell                    ; SHell
     "bs"     'counsel-ibuffer
-    "br"     'reload-buffer             ; BufferReload
+    "br"     'my-reload-buffer             ; BufferReload
     "bk"     'ido-kill-buffer
     "ws"     'whitespace-mode
     "gg"     'magit
@@ -308,15 +306,16 @@
     "gl"     'magit-log-all
     "gP"     'magit-push-current-to-upstream
     "gp"     'magit-pull-from-upstream
-    "d"      'display-tree
+    "d"      'my-display-tree
     "ln"     'display-line-numbers-mode
 
     "p;"     'counsel-projectile
-    "pf"     'counsel-projectile
+    "pp"     'counsel-projectile
+    "pf"     'counsel-projectile-find-file
     "ps"     'counsel-projectile-switch-project
     "pl"     'project-watch-log-file
     "pd"     'projectile-dired
-    "pg"     'counsel-projectile-ag
+    "pg"     'counsel-projectile-git-grep
     "P"      'counsel-yank-pop
 
     "ch"     'cider-repl-history
@@ -342,20 +341,10 @@
 (use-package direnv :ensure t)
 (use-package prescient :ensure t)
 
-(use-package projectile
-  :ensure t
-  :diminish projectile-mode
-  :init
-  (projectile-global-mode)
-  (setq projectile-project-search-path '("~/Repositories" "~/Sync/projects"))
-  (setq projectile-sort-order 'recently-active)
-  (setq projectile-indexing-method 'alien)
-  (setq projectile-globally-ignored-files '(".DS_Store" ".gitmodules" "kit-modules")))
-
 (use-package counsel-projectile
   :ensure t
   :diminish counsel-projectile-mode
-  :after (company-prescient projectile)
+  :after (projectile)
   :init
   (counsel-projectile-mode +1)
   :config
@@ -372,42 +361,15 @@
         (auto-revert-tail-mode t))
       (message "Watching log file: %s" logfile))))
 
-;; Enable vertico
-(use-package vertico
-  :ensure t
-  :config
-  (my-set-font 'vertico-multiline 'vertico-group-title
-               'vertico-group-separator 'vertico-current)
-  :init
-  (vertico-mode)
-
-  ;; Different scroll margin
-  ;; (setq vertico-scroll-margin 0)
-
-  ;; Show more candidates
-  ;; (setq vertico-count 20)
-
-  ;; Grow and shrink the Vertico minibuffer
-  ;; (setq vertico-resize t)
-
-  ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
-  ;; (setq vertico-cycle t)
-  )
-
-(use-package vertico-prescient
-  :ensure t
-  :after vertico
-  :init
-  (vertico-prescient-mode))
-
 ;; Autocomplete
-
 (use-package company
   :ensure t
   :diminish company-mode
   :init
   (global-company-mode)
-  (setq company-minimum-prefix-length 1)
+  (setq company-minimum-prefix-length 2
+        company-idle-delay 0.2)
+
   (define-key company-active-map (kbd "C-n") 'company-select-next-or-abort)
   (define-key company-active-map (kbd "C-p") 'company-select-previous-or-abort)
   :config
@@ -419,12 +381,47 @@
                       :background "#2D2D2C") ; foreground color of the scrollbar
   )
 
+
+
+(use-package projectile
+  :ensure t
+  :diminish projectile-mode
+  :init
+  (projectile-global-mode)
+  (setq projectile-project-search-path '("~/Repositories" "~/Sync/projects"))
+  (setq projectile-sort-order 'recently-active)
+  (setq projectile-indexing-method 'alien)
+  (setq projectile-globally-ignored-files '(".DS_Store" ".gitmodules" "kit-modules")))
+
+
+
 (use-package company-prescient
   :ensure t
-  :after company
+  :after counsel-projectile
   :init
   (company-prescient-mode))
 
+
+;; Enable vertico
+(use-package vertico
+  :ensure t
+  :init
+  (vertico-mode)
+
+  ;; Different scroll margin
+  (setq vertico-scroll-margin 0)
+
+  ;; Show more candidates
+  ;; (setq vertico-count 20)
+
+  ;; Grow and shrink the Vertico minibuffer
+  (setq vertico-resize t))
+
+(use-package vertico-prescient
+  :ensure t
+  :after vertico
+  :init
+  (vertico-prescient-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Programming
