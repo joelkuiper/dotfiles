@@ -151,10 +151,6 @@
 
 
   (put 'erase-buffer 'disabled nil)
-  ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
-  ;; Vertico commands are hidden in normal buffers.
-  (setq read-extended-command-predicate
-        #'command-completion-default-include-p)
 
   ;; Enable recursive minibuffers
   (setq enable-recursive-minibuffers t))
@@ -244,7 +240,7 @@
   (define-key evil-normal-state-map [escape] 'keyboard-quit)
   (define-key evil-visual-state-map [escape] 'keyboard-quit)
   (evil-define-key 'normal org-mode-map (kbd "<tab>") #'org-cycle)
-  
+
   (define-key minibuffer-local-map [escape] 'minibuffer-keyboard-quit)
   (define-key minibuffer-local-ns-map [escape] 'minibuffer-keyboard-quit)
   (define-key minibuffer-local-completion-map [escape] 'minibuffer-keyboard-quit)
@@ -320,6 +316,8 @@
 
     "ch"     'cider-repl-history
     "cb"     'cider-repl-clear-buffer
+    "o."     'org-time-stamp
+    "oe"     'org-export
 
     "u"      'vundo
     "|"      'evil-window-vsplit
