@@ -24,7 +24,7 @@
 (setq inhibit-startup-echo-area-message t)
 (setq inhibit-startup-message t)
 (setq initial-scratch-message nil)
-(setq initial-major-mode 'org-mode)
+(setq initial-major-mode 'fundamental-mode)
 
 (defun custom/kill-this-buffer ()
   (interactive) (kill-buffer (current-buffer)))
@@ -153,10 +153,13 @@
   (put 'erase-buffer 'disabled nil)
   (setq tab-always-indent 'complete)
   ;; Enable recursive minibuffers
-  (setq enable-recursive-minibuffers t))
+  (setq enable-recursive-minibuffers t)
+
+  (setq scroll-step 1)
+  (setq scroll-margin 3))
+
 
 ;; Packages
-
 (use-package exec-path-from-shell
   :ensure t
   :init
@@ -225,6 +228,7 @@
     (evil-shift-right (region-beginning) (region-end))
     (evil-normal-state)
     (evil-visual-restore))
+
 
   (define-key evil-normal-state-map [escape] 'keyboard-quit)
   (define-key evil-visual-state-map [escape] 'keyboard-quit)
@@ -371,23 +375,17 @@
   (setq projectile-indexing-method 'alien)
   (setq projectile-globally-ignored-files '(".DS_Store" ".gitmodules" "kit-modules")))
 
-
-
 (use-package company-prescient
   :ensure t
   :after counsel-projectile
   :init
   (company-prescient-mode))
 
-
 ;; Enable vertico
 (use-package vertico
   :ensure t
   :init
   (vertico-mode)
-
-  ;; Different scroll margin
-  (setq vertico-scroll-margin 0)
 
   ;; Show more candidates
   ;; (setq vertico-count 20)
@@ -500,8 +498,15 @@
   (highlight-parentheses-mode t))
 
 (defvar lisps
-  '(emacs-lisp-mode lisp-mode ielm-mode cider-mode cider-repl-mode
-                    clojurescript-mode clojurec-mode clojurex-mode clojure-mode))
+  '(emacs-lisp-mode
+    lisp-mode
+    ielm-mode
+    cider-mode
+    cider-repl-mode
+    clojurescript-mode
+    clojurec-mode
+    clojurex-mode
+    clojure-mode))
 
 (dolist (mode lisps)
   (add-hook (intern (concat (symbol-name mode) "-hook")) 'enable-lisp-utils))
@@ -535,9 +540,10 @@
 
 (defun my-code-style ()
   (interactive)
-  (setq-default indent-tabs-mode nil
-                default-tab-width 2
-                evil-shift-width tab-width)
+  (setq-default
+   indent-tabs-mode nil
+   default-tab-width 2
+   evil-shift-width tab-width)
   (my-setup-indent 2))
 
 (my-code-style)
