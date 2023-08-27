@@ -11,7 +11,6 @@ ZSH=$HOME/.oh-my-zsh
 ZSH_THEME="minimal"
 
 export EDITOR=vim
-export VISUAL=emacs
 
 #Example aliases
 # alias zshconfig="mate ~/.zshrc"

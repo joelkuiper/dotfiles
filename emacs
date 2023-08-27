@@ -105,8 +105,6 @@
     (when (get-buffer "*Completions*") (delete-windows-on "*Completions*"))
     (abort-recursive-edit)))
 
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Core config.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -189,12 +187,43 @@
   :init
   (load-theme 'tao-yang t)
   :config
-  (my-set-font 'minibuffer-prompt)
+  (my-set-font 'default 'minibuffer-prompt)
   (custom-theme-set-faces
    'tao-yang
-   `(default ((t (:background "#fafafa" :foreground "#241F31"))))))
+   `(default ((t (:background "#fafafa" :foreground "#241f31"))))))
 
-(my-set-font 'default)
+(use-package ligature
+  :ensure t
+  :config
+  ;; Enable ligatures everywhere
+  (ligature-set-ligatures 't '("---" "--" "ff" "fi" "fl" "ffi" "ffl"))
+  ;; Enable all ligatures in programming modes
+  (ligature-set-ligatures
+   'prog-mode
+   '("[INFO ]" "[WARN ]" "[PASS ]" "[VERBOSE]" "[KO]" "[OK]" "[PASS]"
+     "[ERROR]" "[DEBUG]" "[INFO]" "[WARN]" "[WARNING]" "[ERR]"
+     "[FATAL]" "[TRACE]" "[FIXME]" "[TODO]" "[BUG]" "[NOTE]" "[HACK]"
+     "[MARK]" "[FAIL]" "!=" "!==" "!≡≡" "!=<" "#(" "#_" "#{" "#?" "##"
+     "#_(" "#[" "%=" "&%" "&&" "&+" "&-" "&/" "&=" "&&&" "$>" "(|"
+     "*>" "++" "+++" "+=" "+>" "++=" "--" "-<" "-<<" "-=" "->" "->>"
+     "-->" "-+-" "-\\/" "-|>" "-<|" "->-" "-<-" "-|" "-||" "-|:"
+     ".=" "//=" "/=" "/==" "/-\\" "/-:" "/->" "/=>" "/-<" "/=<" "/=:"
+     ":=" ":=" ":=>" ":-\\" ":=\\" ":-/" ":=/" ":-|" ":=|" ":|-" ":|="
+     "<$>" "<*" "<*>" "<+>" "<-" "<<=" "<=" "<=>" "<>" "<|>" "<<-"
+     "<|" "<=<" "<~" "<~~" "<<~" "<$" "<+" "<!>" "<@>" "<#>" "<%>"
+     "<^>" "<&>" "<?>" "<.>" "</>" "<\\>" "<\">" "<:>" "<~>" "<**>"
+     "<<^" "<=" "<->" "<!--" "<--" "<~<" "<==>" "<|-" "<||" "<<|"
+     "<-<" "<-->" "<<==" "<==" "<-\\" "<-/" "<=\\" "<=/" "=<<" "=="
+     "===" "==>" "=>" "=~" "=>>" "=~=" "==>>" "=>=" "=<=" "=<" "==<"
+     "=<|" "=/" "=/=" "=/<" "=|" "=||" "=|:" ">-" ">=" ">>-" ">>="
+     ">=>" ">>^" ">>|" ">!=" ">->" ">==" ">=" ">/=" ">-|" ">=|" ">-\\"
+     ">=\\" ">-/" ">=/" ">λ=" "?." "^=" "^^" "^<<" "^>>" "\\=" "\\=="
+     "\\/-" "\\-/" "\\-:" "\\->" "\\=>" "\\-<" "\\=<" "\\=:" "|="
+     "|>=" "|>" "|+|" "|->" "|-->" "|=>" "|==>" "|>-" "|<<" "||>"
+     "|>>" "|-" "||-" "||=" "|)" "|]" "|-:" "|=:" "|-<" "|=<" "|--<"
+     "|==<" "~=" "~>" "~~>" "~>>" "[[" "[|" "_|_" "]]"))
+  (global-ligature-mode t))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Evil
@@ -260,7 +289,7 @@
   :config
   ;; Leaders
   (evil-leader/set-key
-    "1"      (lambda () (interactive) (find-file "~/.emacs"))
+    "1"      (lambda () (interactive) (find-file "~/Sync/dotfiles/emacs"))
     "2"      (lambda () (interactive) (find-file "~/Sync/org/scratch.org"))
     "3"      (lambda () (interactive) (find-file "~/Sync/org/todo.org"))
     "4"      (lambda () (interactive) (find-file "~/Sync/org/journal.org"))
@@ -284,7 +313,7 @@
     "r"      'counsel-buffer-or-recentf
     "sh"     'eshell                    ; SHell
     "bs"     'counsel-ibuffer
-    "br"     'my-reload-buffer             ; BufferReload
+    "br"     'my-reload-buffer          ; BufferReload
     "bk"     'ido-kill-buffer
     "ws"     'whitespace-mode
     "gg"     'magit
@@ -489,8 +518,6 @@
   :diminish highlight-parentheses-mode
   :commands highlight-parentheses-mode)
 
-
-
 (defun enable-lisp-utils ()
   (aggressive-indent-mode)
   (paredit-mode)
@@ -551,11 +578,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Writing & Blogging (org mode)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(use-package unicode-fonts
-  :ensure t
-  :init
-  (unicode-fonts-setup))
-
 (use-package flycheck-languagetool
   :ensure t
   :after (flycheck)
@@ -564,8 +586,8 @@
         "~/Sync/etc/LanguageTool/languagetool-server.jar"))
 
 (defun enable-write-utils ()
-  (flycheck-languagetool-setup)
-  (flycheck-mode)
+  ;;(flycheck-languagetool-setup)
+  ;;(flycheck-mode)
   (visual-line-mode 1))
 
 (dolist (hook '(text-mode-hook
@@ -610,7 +632,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(tao-theme company-prescient vertico-prescient vertico prescient web-mode vundo unicode-fonts magit lsp-mode ivy-rich highlight-parentheses flycheck-languagetool expand-region exec-path-from-shell evil-leader evil-collection evil-cleverparens ess direnv diminish counsel-projectile company cider almost-mono-themes aggressive-indent)))
+   '(ligature tao-theme company-prescient vertico-prescient vertico prescient web-mode vundo unicode-fonts magit lsp-mode ivy-rich highlight-parentheses flycheck-languagetool expand-region exec-path-from-shell evil-leader evil-collection evil-cleverparens ess direnv diminish counsel-projectile company cider almost-mono-themes aggressive-indent)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
