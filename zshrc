@@ -39,10 +39,16 @@ DISABLE_LS_COLORS="true"
 plugins=(git vi-mode history-substring-search fzf)
 
 source $ZSH/oh-my-zsh.sh
+
+export NODE_HOME=~/Sync/etc/node-v20.5.1-linux-x64
+export PATH=$NODE_HOME/bin/:$PATH
+
 export JAVA_HOME=~/Sync/etc/graalvm-jdk-20.0.2+9.1
 export PATH=$JAVA_HOME/bin/:$PATH
-export PATH=$PATH:~/.local/bin/:~/bin/
 export LLVM_TOOLCHAIN=$(lli --print-toolchain-path)
+export PATH=$LLVM_TOOLCHAIN/:$PATH
+
+export PATH=~/.local/bin/:~/bin/:$PATH
 
 # Put secret configuration settings in ~/.secrets
 if [[ -a ~/.secrets ]] then
