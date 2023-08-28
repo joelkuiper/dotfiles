@@ -26,10 +26,6 @@
 (setq initial-scratch-message nil)
 (setq initial-major-mode 'fundamental-mode)
 
-(defun custom/kill-this-buffer ()
-  (interactive) (kill-buffer (current-buffer)))
-(global-set-key (kbd "C-x k") 'custom/kill-this-buffer)
-
 (defvar my-packages
   '(;; Core
     use-package))
@@ -72,7 +68,6 @@
   "revert-buffer without confirmation."
   (interactive)
   (revert-buffer t t))
-
 
 (defun my-determine-font-size ()
   "Determine the font size based on the hostname."
@@ -187,7 +182,7 @@
   :init
   (load-theme 'tao-yang t)
   :config
-  (my-set-font 'default 'minibuffer-prompt)
+  (my-set-font 'default 'minibuffer-prompt 'fixed-pitch)
   (custom-theme-set-faces
    'tao-yang
    `(default ((t (:background "#fafafa" :foreground "#241f31"))))))
@@ -217,7 +212,7 @@
      "===" "==>" "=>" "=~" "=>>" "=~=" "==>>" "=>=" "=<=" "=<" "==<"
      "=<|" "=/" "=/=" "=/<" "=|" "=||" "=|:" ">-" ">=" ">>-" ">>="
      ">=>" ">>^" ">>|" ">!=" ">->" ">==" ">=" ">/=" ">-|" ">=|" ">-\\"
-     ">=\\" ">-/" ">=/" ">λ=" "?." "^=" "^^" "^<<" "^>>" "\\=" "\\=="
+     ">=\\" ">-/" ">=/" "?." "^=" "^^" "^<<" "^>>" "\\=" "\\=="
      "\\/-" "\\-/" "\\-:" "\\->" "\\=>" "\\-<" "\\=<" "\\=:" "|="
      "|>=" "|>" "|+|" "|->" "|-->" "|=>" "|==>" "|>-" "|<<" "||>"
      "|>>" "|-" "||-" "||=" "|)" "|]" "|-:" "|=:" "|-<" "|=<" "|--<"
@@ -289,7 +284,7 @@
   :config
   ;; Leaders
   (evil-leader/set-key
-    "1"      (lambda () (interactive) (find-file "~/Sync/dotfiles/emacs"))
+    "1"      (lambda () (interactive) (find-file "~/.emacs"))
     "2"      (lambda () (interactive) (find-file "~/Sync/org/scratch.org"))
     "3"      (lambda () (interactive) (find-file "~/Sync/org/todo.org"))
     "4"      (lambda () (interactive) (find-file "~/Sync/org/journal.org"))
@@ -399,10 +394,16 @@
   :diminish projectile-mode
   :init
   (projectile-global-mode)
-  (setq projectile-project-search-path '("~/Repositories" "~/Sync/projects"))
+  (setq projectile-project-search-path
+        '("~/Repositories" "~/Sync/Repositories" "~/Projects"))
   (setq projectile-sort-order 'recently-active)
   (setq projectile-indexing-method 'alien)
-  (setq projectile-globally-ignored-files '(".DS_Store" ".gitmodules" "kit-modules")))
+  (setq projectile-globally-ignored-files
+        '(".DS_Store" ".gitmodules" "kit-modules")))
+
+(use-package company
+  :ensure t
+  :diminish company-mode)
 
 (use-package company-prescient
   :ensure t
@@ -420,7 +421,8 @@
   ;; (setq vertico-count 20)
 
   ;; Grow and shrink the Vertico minibuffer
-  (setq vertico-resize t))
+  ;; (setq vertico-resize t)
+  )
 
 (use-package vertico-prescient
   :ensure t
@@ -583,10 +585,10 @@
   :after (flycheck)
   :init
   (setq flycheck-languagetool-server-jar
-        "~/Sync/etc/LanguageTool/languagetool-server.jar"))
+        "~/Sync/etc/LanguageTool/languagetool-server.jar")
+  (flycheck-languagetool-setup))
 
 (defun enable-write-utils ()
-  ;;(flycheck-languagetool-setup)
   ;;(flycheck-mode)
   (visual-line-mode 1))
 
