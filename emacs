@@ -165,7 +165,6 @@
 (use-package diminish :ensure t)
 (use-package eldoc :diminish eldoc-mode)
 (use-package autorevert :diminish auto-revert-mode)
-
 (use-package vterm :ensure t)
 
 ;; Persist history over Emacs restarts.
@@ -179,15 +178,38 @@
 (scroll-bar-mode 0)
 (blink-cursor-mode 0)
 
+;; Highlights hex codes
+(use-package rainbow-mode
+  :ensure t
+  :hook (text-mode prog-mode))
+
 (use-package tao-theme
   :ensure t
   :init
   (load-theme 'tao-yang t)
   :config
+  (setq tao-theme-use-boxes nil)
+
+  ;; Set the ansi-color-names-vector
+  (setq ansi-color-names-vector
+        ["#241f31" "#9C3328" "DarkOliveGreen" "DarkGoldenrod"
+         "SkyBlue4" "magenta" "light blue" "#bbc2cf"])
+
   (my-set-font 'default 'minibuffer-prompt 'fixed-pitch)
+
   (custom-theme-set-faces
    'tao-yang
-   `(default ((t (:background "#fafafa" :foreground "#241f31"))))))
+   `(default ((t (:background "#fafafa" :foreground "#241f31"))))
+
+   ;; vterm colors customizations with :inherit background
+   `(term-color-white ((t (:foreground " #616161" :background :inherit))))
+   `(term-color-black ((t (:foreground "#241f31" :background :inherit))))
+   `(term-color-red ((t (:foreground " #9C3328" :background :inherit))))
+   `(term-color-green ((t (:foreground "DarkOliveGreen" :background :inherit))))
+   `(term-color-yellow ((t (:foreground "DarkGoldenrod" :background :inherit))))
+   `(term-color-blue ((t (:foreground "SkyBlue4" :background :inherit))))
+   `(term-color-magenta ((t (:foreground "magenta" :background :inherit))))
+   `(term-color-cyan ((t (:foreground "light blue" :background :inherit))))))
 
 (use-package ligature
   :ensure t
@@ -310,6 +332,7 @@
     "r"      'counsel-buffer-or-recentf
     "sh"     'eshell                    ; SHell
     "te"     'vterm                     ; TErm
+    "vt"     'vterm                     ; VTerm
     "bs"     'counsel-ibuffer
     "br"     'my-reload-buffer          ; BufferReload
     "bk"     'ido-kill-buffer
