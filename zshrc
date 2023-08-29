@@ -46,9 +46,18 @@ export PATH=$NODE_HOME/bin/:$PATH
 export JAVA_HOME=~/Sync/etc/graalvm-jdk-20.0.2+9.1
 export PATH=$JAVA_HOME/bin/:$PATH
 export LLVM_TOOLCHAIN=$(lli --print-toolchain-path)
-export PATH=$LLVM_TOOLCHAIN/:$PATH
+#export PATH=$LLVM_TOOLCHAIN/:$PATH
 
 export PATH=~/.local/bin/:~/bin/:$PATH
+
+# CUDA Stuff
+export CUDA_HOME=/usr/local/cuda
+export PATH=$CUDA_HOME/bin:$PATH
+export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$LD_LIBRARY_PATH
+
+# CUDA Compiler (nvcc)
+export CUDACXX=$CUDA_HOME/bin/nvcc
+
 
 # Put secret configuration settings in ~/.secrets
 if [[ -a ~/.secrets ]] then
