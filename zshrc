@@ -78,6 +78,12 @@ else
 fi
 unset __conda_setup
 # <<< conda initialize <<<
+#
+
+# vterm (emacs)
+if [[ "$INSIDE_EMACS" = 'vterm' ]]; then
+    alias clear='vterm_printf "51;Evterm-clear-scrollback";tput clear'
+fi
 
 eval "$(direnv hook zsh)"
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh

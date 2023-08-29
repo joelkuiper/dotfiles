@@ -230,7 +230,7 @@
   :after evil
   :diminish evil-collection-unimpaired-mode
   :init
-  (evil-collection-init '(cider company magit dired)))
+  (evil-collection-init '(cider company magit dired vterm)))
 
 (use-package evil
   :ensure t
