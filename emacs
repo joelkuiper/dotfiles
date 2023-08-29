@@ -166,6 +166,8 @@
 (use-package eldoc :diminish eldoc-mode)
 (use-package autorevert :diminish auto-revert-mode)
 
+(use-package vterm :ensure t)
+
 ;; Persist history over Emacs restarts.
 (use-package savehist :ensure t :init (savehist-mode))
 
@@ -307,6 +309,7 @@
     ";"      'swiper
     "r"      'counsel-buffer-or-recentf
     "sh"     'eshell                    ; SHell
+    "te"     'vterm                     ; TErm
     "bs"     'counsel-ibuffer
     "br"     'my-reload-buffer          ; BufferReload
     "bk"     'ido-kill-buffer
@@ -416,6 +419,8 @@
   :ensure t
   :init
   (vertico-mode)
+
+  (setq vertico-cycle t)
 
   ;; Show more candidates
   ;; (setq vertico-count 20)
