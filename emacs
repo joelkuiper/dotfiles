@@ -181,6 +181,7 @@
 ;; Highlights hex codes
 (use-package rainbow-mode
   :ensure t
+  :diminish rainbow-mode
   :hook (text-mode prog-mode))
 
 (use-package tao-theme
@@ -188,14 +189,12 @@
   :init
   (load-theme 'tao-yang t)
   :config
-  (setq tao-theme-use-boxes nil)
+  (my-set-font 'default 'minibuffer-prompt 'fixed-pitch)
 
   ;; Set the ansi-color-names-vector
   (setq ansi-color-names-vector
         ["#241f31" "#9C3328" "DarkOliveGreen" "DarkGoldenrod"
          "SkyBlue4" "magenta" "light blue" "#bbc2cf"])
-
-  (my-set-font 'default 'minibuffer-prompt 'fixed-pitch)
 
   (custom-theme-set-faces
    'tao-yang
@@ -208,7 +207,7 @@
    `(term-color-green ((t (:foreground "DarkOliveGreen" :background :inherit))))
    `(term-color-yellow ((t (:foreground "DarkGoldenrod" :background :inherit))))
    `(term-color-blue ((t (:foreground "SkyBlue4" :background :inherit))))
-   `(term-color-magenta ((t (:foreground "magenta" :background :inherit))))
+   `(term-color-magenta ((t (:foreground "DarkMagenta" :background :inherit))))
    `(term-color-cyan ((t (:foreground "light blue" :background :inherit))))))
 
 (use-package ligature
@@ -323,7 +322,6 @@
 
     "."      'er/expand-region
     ","      'er/contract-region
-    "/"      'comment-or-uncomment-region
     "x"      'counsel-M-x               ; eXecute
     "e"      'eval-expression
     "f"      'counsel-fzf
@@ -508,7 +506,6 @@
   :hook (web-mode . custom-web-mode-hook)
   :mode (("\\.html?\\'" . web-mode)
          ("\\.css\\'" . web-mode)
-         ("\\.less\\'" . web-mode)
          ("\\.js\\'" . web-mode))
   :init
   (defun custom-web-mode-hook ()
@@ -662,7 +659,8 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(ligature tao-theme company-prescient vertico-prescient vertico prescient web-mode vundo unicode-fonts magit lsp-mode ivy-rich highlight-parentheses flycheck-languagetool expand-region exec-path-from-shell evil-leader evil-collection evil-cleverparens ess direnv diminish counsel-projectile company cider almost-mono-themes aggressive-indent)))
+   '(ligature tao-theme company-prescient vertico-prescient vertico prescient web-mode vundo unicode-fonts magit lsp-mode ivy-rich highlight-parentheses flycheck-languagetool expand-region exec-path-from-shell evil-leader evil-collection evil-cleverparens ess direnv diminish counsel-projectile company cider almost-mono-themes aggressive-indent))
+ '(tao-theme-use-boxes nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
