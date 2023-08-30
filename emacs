@@ -191,19 +191,14 @@
   :config
   (my-set-font 'default 'minibuffer-prompt 'fixed-pitch)
 
-  ;; Set the ansi-color-names-vector
-  (setq ansi-color-names-vector
-        ["#241f31" "#9C3328" "DarkOliveGreen" "DarkGoldenrod"
-         "SkyBlue4" "magenta" "light blue" "#bbc2cf"])
-
   (custom-theme-set-faces
    'tao-yang
    `(default ((t (:background "#fafafa" :foreground "#241f31"))))
 
    ;; vterm colors customizations with :inherit background
-   `(term-color-white ((t (:foreground " #616161" :background :inherit))))
+   `(term-color-white ((t (:foreground "#616161" :background :inherit))))
    `(term-color-black ((t (:foreground "#241f31" :background :inherit))))
-   `(term-color-red ((t (:foreground " #9C3328" :background :inherit))))
+   `(term-color-red ((t (:foreground "#9C3328" :background :inherit))))
    `(term-color-green ((t (:foreground "DarkOliveGreen" :background :inherit))))
    `(term-color-yellow ((t (:foreground "DarkGoldenrod" :background :inherit))))
    `(term-color-blue ((t (:foreground "SkyBlue4" :background :inherit))))
