@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; personal configuration of emacs + evil
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -10,7 +10,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Packaging setup.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 (setq
  package-archives
  '(("gnu" . "https://elpa.gnu.org/packages/")
@@ -18,7 +17,6 @@
 
 (require 'package)
 (package-initialize)
-
 (setq byte-compile-warnings nil)
 (setq inhibit-startup-screen t)
 (setq inhibit-startup-echo-area-message t)
@@ -184,27 +182,6 @@
   :diminish rainbow-mode
   :hook (text-mode prog-mode))
 
-(use-package tao-theme
-  :ensure t
-  :init
-  (load-theme 'tao-yang t)
-  :config
-  (my-set-font 'default 'minibuffer-prompt 'fixed-pitch)
-
-  (custom-theme-set-faces
-   'tao-yang
-   `(default ((t (:background "#fafafa" :foreground "#241f31"))))
-
-   ;; vterm colors customizations with :inherit background
-   `(term-color-white ((t (:foreground "#616161" :background :inherit))))
-   `(term-color-black ((t (:foreground "#241f31" :background :inherit))))
-   `(term-color-red ((t (:foreground "#9C3328" :background :inherit))))
-   `(term-color-green ((t (:foreground "DarkOliveGreen" :background :inherit))))
-   `(term-color-yellow ((t (:foreground "DarkGoldenrod" :background :inherit))))
-   `(term-color-blue ((t (:foreground "SkyBlue4" :background :inherit))))
-   `(term-color-magenta ((t (:foreground "DarkMagenta" :background :inherit))))
-   `(term-color-cyan ((t (:foreground "light blue" :background :inherit))))))
-
 (use-package ligature
   :ensure t
   :config
@@ -238,6 +215,7 @@
   (global-ligature-mode t))
 
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Evil
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -246,7 +224,8 @@
   :after evil
   :diminish evil-collection-unimpaired-mode
   :init
-  (evil-collection-init '(cider company magit dired vterm)))
+  (evil-collection-init
+   '(cider corfu magit dired vterm vundo org)))
 
 (use-package evil
   :ensure t
@@ -274,7 +253,6 @@
 
   (define-key evil-normal-state-map [escape] 'keyboard-quit)
   (define-key evil-visual-state-map [escape] 'keyboard-quit)
-  (evil-define-key 'normal org-mode-map (kbd "<tab>") #'org-cycle)
 
   (define-key minibuffer-local-map [escape] 'minibuffer-keyboard-quit)
   (define-key minibuffer-local-ns-map [escape] 'minibuffer-keyboard-quit)
@@ -396,18 +374,15 @@
       (message "Watching log file: %s" logfile))))
 
 ;; Autocomplete
-;; Install corfu
 (use-package corfu
   :ensure t
   :config
   (setq corfu-auto t
         corfu-quit-no-match 'separator)
-  :custom
-  (corfu-cycle t)
   :init
   (global-corfu-mode))
 
-
+;; Projects
 (use-package projectile
   :ensure t
   :diminish projectile-mode
@@ -419,16 +394,6 @@
   (setq projectile-indexing-method 'alien)
   (setq projectile-globally-ignored-files
         '(".DS_Store" ".gitmodules" "kit-modules")))
-
-(use-package company
-  :ensure t
-  :diminish company-mode)
-
-(use-package company-prescient
-  :ensure t
-  :after counsel-projectile
-  :init
-  (company-prescient-mode))
 
 ;; Enable vertico
 (use-package vertico
@@ -566,7 +531,7 @@
   :hook ((clojure-mode . cider-mode)
          (clojurescript-mode . cider-mode)
          (clojurec-mode . cider-mode))
-  :init
+  :config
   (setq cider-eldoc-display-symbol-at-point nil)
   (setq cider-auto-select-error-buffer nil)
   (setq cider-repl-print-length 100)
@@ -630,6 +595,7 @@
     (sqlite . t))
   "Languages to enable in Org mode.")
 
+
 (defun my-org-confirm-babel-evaluate (lang body)
   (not (assoc-string lang my-org-babel-languages t))) ; don't ask for languages in my-org-babel-languages
 
@@ -638,12 +604,36 @@
 (use-package org
   :ensure t
   :mode (("\\.org\\'" . org-mode))
-  :init
+  :config
+  ;;
+  (org-completion-use-ido nil)
   ;; Enable specified languages
   (org-babel-do-load-languages 'org-babel-load-languages my-org-babel-languages)
 
   ;; Always redisplay inline images after executing SRC block
   (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Theme
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(use-package tao-theme
+  :ensure t
+  :config
+  (my-set-font 'default 'minibuffer-prompt 'fixed-pitch)
+  (custom-theme-set-faces
+   'tao-yang
+
+   ;; vterm colors customizations with :inherit background
+   `(term-color-white ((t (:foreground "#616161"))))
+   `(term-color-black ((t (:foreground "#241f31"))))
+   `(term-color-red ((t (:foreground "#9C3328"))))
+   `(term-color-green ((t (:foreground "DarkOliveGreen"))))
+   `(term-color-yellow ((t (:foreground "DarkGoldenrod"))))
+   `(term-color-blue ((t (:foreground "SkyBlue4"))))
+   `(term-color-magenta ((t (:foreground "DarkMagenta"))))
+   `(term-color-cyan ((t (:foreground "light blue")))))
+  :init
+  (load-theme 'tao-yang t))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Custom
@@ -653,8 +643,10 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   '("1ebdc6eee73f94084f1a7211d6e462c29a6fc902ceb38c450eadba0e984da193" "801a567c87755fe65d0484cb2bded31a4c5bb24fd1fe0ed11e6c02254017acb2" default))
  '(package-selected-packages
-   '(ligature tao-theme company-prescient vertico-prescient vertico prescient web-mode vundo unicode-fonts magit lsp-mode ivy-rich highlight-parentheses flycheck-languagetool expand-region exec-path-from-shell evil-leader evil-collection evil-cleverparens ess direnv diminish counsel-projectile company cider almost-mono-themes aggressive-indent))
+   '(ligature tao-theme vertico-prescient vertico prescient web-mode vundo unicode-fonts magit lsp-mode ivy-rich highlight-parentheses flycheck-languagetool expand-region exec-path-from-shell evil-leader evil-collection evil-cleverparens ess direnv diminish counsel-projectile cider almost-mono-themes aggressive-indent))
  '(tao-theme-use-boxes nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
