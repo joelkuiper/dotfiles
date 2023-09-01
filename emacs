@@ -374,6 +374,20 @@
       (message "Watching log file: %s" logfile))))
 
 ;; Autocomplete
+(require 'ffap)
+
+(defun my-ffap-completion-at-point ()
+  (let ((fn (ffap-guesser)))
+    (when (and fn (not (string-match " " fn)))
+      (let* ((dir (file-name-directory fn))
+             (file (file-name-nondirectory fn))
+             (files (and dir (file-name-all-completions file dir))))
+        (list (length file)
+              (point)
+              (mapcar (lambda (f) (concat dir f)) files))))))
+
+(add-to-list 'completion-at-point-functions 'my-ffap-completion-at-point)
+
 (use-package corfu
   :ensure t
   :config
