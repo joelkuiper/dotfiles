@@ -151,13 +151,6 @@
 
 
 ;; Packages
-(use-package exec-path-from-shell
-  :ensure t
-  :init
-  (exec-path-from-shell-initialize)
-  (exec-path-from-shell-copy-env "LC_ALL")
-  (exec-path-from-shell-copy-env "LANG"))
-
 (use-package vundo :ensure t)
 (use-package direnv :ensure t)
 (use-package diminish :ensure t)
@@ -213,8 +206,6 @@
      "|>>" "|-" "||-" "||=" "|)" "|]" "|-:" "|=:" "|-<" "|=<" "|--<"
      "|==<" "~=" "~>" "~~>" "~>>" "[[" "[|" "_|_" "]]"))
   (global-ligature-mode t))
-
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Evil
@@ -619,7 +610,6 @@
   :ensure t
   :mode (("\\.org\\'" . org-mode))
   :config
-  ;;
   (org-completion-use-ido nil)
   ;; Enable specified languages
   (org-babel-do-load-languages 'org-babel-load-languages my-org-babel-languages)
