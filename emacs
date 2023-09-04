@@ -156,6 +156,7 @@
 (use-package diminish :ensure t)
 (use-package eldoc :diminish eldoc-mode)
 (use-package autorevert :diminish auto-revert-mode)
+
 (use-package vterm :ensure t)
 
 ;; Persist history over Emacs restarts.
@@ -214,6 +215,7 @@
   :ensure t
   :after evil
   :diminish evil-collection-unimpaired-mode
+  :after (cider corfu magit dired vterm vundo org)
   :init
   (evil-collection-init
    '(cider corfu magit dired vterm vundo org)))
@@ -610,7 +612,6 @@
   :ensure t
   :mode (("\\.org\\'" . org-mode))
   :config
-  (org-completion-use-ido nil)
   ;; Enable specified languages
   (org-babel-do-load-languages 'org-babel-load-languages my-org-babel-languages)
 
