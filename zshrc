@@ -58,6 +58,8 @@ export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$LD_LIBRARY_PATH
 # CUDA Compiler (nvcc)
 export CUDACXX=$CUDA_HOME/bin/nvcc
 
+# Treesitter
+export LD_LIBRARY_PATH=/usr/local/lib/:$LD_LIBRARY_PATH
 
 # Put secret configuration settings in ~/.secrets
 if [[ -a ~/.secrets ]] then

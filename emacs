@@ -8,44 +8,23 @@
   (error "This setup requires Emacs v29, or higher. You have: v%d" emacs-major-version))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Packaging setup.
+;;; Startup.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (setq
  package-archives
  '(("gnu" . "https://elpa.gnu.org/packages/")
    ("melpa" . "https://melpa.org/packages/")))
 
-(require 'package)
-(package-initialize)
-(setq byte-compile-warnings nil)
+
+(setq gc-cons-threshold 10000000)
+(setq byte-compile-warnings '(not obsolete))
+(setq warning-suppress-log-types '((comp) (bytecomp)))
+
 (setq inhibit-startup-screen t)
 (setq inhibit-startup-echo-area-message t)
 (setq inhibit-startup-message t)
 (setq initial-scratch-message nil)
 (setq initial-major-mode 'fundamental-mode)
-
-(defvar my-packages
-  '(;; Core
-    use-package))
-
-(defun my-missing-packages ()
-  (let (missing-packages)
-    (dolist (package my-packages missing-packages)
-      (or (package-installed-p package)
-          (push package missing-packages)))))
-
-(let ((missing (my-missing-packages)))
-  (when missing
-    ;; Check for new packages (package versions)
-    (package-refresh-contents)
-    ;; Install the missing packages
-    (mapc (lambda (package)
-            (when (not (package-installed-p package))
-              (package-install package))) missing)
-    ;; Close the compilation log.
-    (let ((compile-window (get-buffer-window "*Compile-Log*")))
-      (if compile-window
-          (delete-window compile-window)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Utility functions.
@@ -110,23 +89,11 @@
   (set-keyboard-coding-system 'utf-8-unix)
   (prefer-coding-system 'utf-8-unix)
 
-  ;; Add prompt indicator to `completing-read-multiple'.
-  ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
-  (defun crm-indicator (args)
-    (cons (format "[CRM%s] %s"
-                  (replace-regexp-in-string
-                   "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
-                   crm-separator)
-                  (car args))
-          (cdr args)))
-  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
-
   (winner-mode 1)
   (setq vc-follow-symlinks nil)
   (setq create-lockfiles nil)
   (setq tramp-terminal-type "tramp")
 
-  (setq-default indent-tabs-mode nil)
   (setq backup-directory-alist `(("." . "~/.saves")))
   (setq backup-by-copying t)
   (setq backup-directory-alist
@@ -140,11 +107,14 @@
         '(read-only t cursor-intangible t face minibuffer-prompt))
   (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
 
+  (setq enable-recursive-minibuffers t)                ; Use the minibuffer whilst in the minibuffer
+  (setq completion-cycle-threshold 1)                  ; TAB cycles candidates
+  (setq completions-detailed t)                        ; Show annotations
+  (setq tab-always-indent 'complete)                   ; When I hit TAB, try to complete, otherwise, indent
+  (setq completion-styles '(basic initials substring)) ; Different styles to match input to candidates
 
   (put 'erase-buffer 'disabled nil)
   (setq tab-always-indent 'complete)
-  ;; Enable recursive minibuffers
-  (setq enable-recursive-minibuffers t)
 
   (setq scroll-step 1)
   (setq scroll-margin 3))
@@ -156,7 +126,6 @@
 (use-package diminish :ensure t)
 (use-package eldoc :diminish eldoc-mode)
 (use-package autorevert :diminish auto-revert-mode)
-
 (use-package vterm :ensure t)
 
 ;; Persist history over Emacs restarts.
@@ -211,15 +180,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Evil
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(use-package evil-collection
-  :ensure t
-  :after evil
-  :diminish evil-collection-unimpaired-mode
-  :after (cider corfu magit dired vterm vundo org)
-  :init
-  (evil-collection-init
-   '(cider corfu magit dired vterm vundo org)))
-
 (use-package evil
   :ensure t
   :init
@@ -243,6 +203,7 @@
     (evil-normal-state)
     (evil-visual-restore))
 
+  (setq evil-respect-visual-line-mode t)
 
   (define-key evil-normal-state-map [escape] 'keyboard-quit)
   (define-key evil-visual-state-map [escape] 'keyboard-quit)
@@ -263,6 +224,15 @@
   (define-key evil-normal-state-map (kbd "C-x <down>") 'windmove-down)
   (define-key evil-normal-state-map (kbd "C-x <up>") 'windmove-up))
 
+(use-package evil-collection
+  :ensure t
+  :after (evil)
+  :diminish evil-collection-unimpaired-mode
+  :after (cider corfu magit dired vterm vundo org)
+  :init
+  (evil-collection-init
+   '(cider corfu magit dired vterm vundo org)))
+
 (use-package evil-leader
   :ensure t
   :after evil
@@ -279,13 +249,7 @@
     "4"      (lambda () (interactive) (find-file "~/Sync/org/journal.org"))
     "5"      (lambda () (interactive) (find-file "~/Sync/org/repl.org"))
 
-    "*nl"    (lambda () (interactive)
-               (setq-local ispell-dictionary "nl"
-                           flycheck-languagetool-language "nl-NL"))
-    "*en"    (lambda () (interactive)
-               (setq-local ispell-dictionary "en_US"
-                           flycheck-languagetool-language "en-US"))
-
+    "/"      'comment-or-uncomment-region
     "."      'er/expand-region
     ","      'er/contract-region
     "x"      'counsel-M-x               ; eXecute
@@ -301,6 +265,9 @@
     "br"     'my-reload-buffer          ; BufferReload
     "bk"     'ido-kill-buffer
     "ws"     'whitespace-mode
+    "d"      'my-display-tree
+    "ln"     'display-line-numbers-mode
+
     "gg"     'magit
     "gd"     'magit-diff-unstaged
     "gs"     'magit-status
@@ -309,8 +276,6 @@
     "gl"     'magit-log-all
     "gP"     'magit-push-current-to-upstream
     "gp"     'magit-pull-from-upstream
-    "d"      'my-display-tree
-    "ln"     'display-line-numbers-mode
 
     "p;"     'counsel-projectile
     "pp"     'counsel-projectile
@@ -344,7 +309,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package magit :ensure t)
 (use-package direnv :ensure t)
-(use-package prescient :ensure t)
 
 (use-package counsel-projectile
   :ensure t
@@ -366,6 +330,19 @@
         (auto-revert-tail-mode t))
       (message "Watching log file: %s" logfile))))
 
+(use-package projectile
+  :ensure t
+  :diminish projectile-mode
+  :init
+  (projectile-global-mode)
+  :config
+  (setq projectile-project-search-path
+        '("~/Repositories" "~/Sync/Repositories" "~/Projects"))
+  (setq projectile-sort-order 'recently-active)
+  (setq projectile-indexing-method 'alien)
+  (setq projectile-globally-ignored-files
+        '(".DS_Store" ".gitmodules" "kit-modules")))
+
 ;; Autocomplete
 (require 'ffap)
 
@@ -381,47 +358,39 @@
 
 (add-to-list 'completion-at-point-functions 'my-ffap-completion-at-point)
 
-(use-package corfu
-  :ensure t
-  :config
-  (setq corfu-auto t
-        corfu-quit-no-match 'separator)
-  :init
-  (global-corfu-mode))
-
-;; Projects
-(use-package projectile
-  :ensure t
-  :diminish projectile-mode
-  :init
-  (projectile-global-mode)
-  (setq projectile-project-search-path
-        '("~/Repositories" "~/Sync/Repositories" "~/Projects"))
-  (setq projectile-sort-order 'recently-active)
-  (setq projectile-indexing-method 'alien)
-  (setq projectile-globally-ignored-files
-        '(".DS_Store" ".gitmodules" "kit-modules")))
-
-;; Enable vertico
+;; Vertico: better vertical completion for minibuffer commands
 (use-package vertico
   :ensure t
   :init
-  (vertico-mode)
+  ;; You'll want to make sure that e.g. fido-mode isn't enabled
+  (vertico-mode))
 
-  (setq vertico-cycle t)
-
-  ;; Show more candidates
-  ;; (setq vertico-count 20)
-
-  ;; Grow and shrink the Vertico minibuffer
-  ;; (setq vertico-resize t)
-  )
-
-(use-package vertico-prescient
-  :ensure t
+(use-package vertico-directory
   :after vertico
+  :bind (:map vertico-map
+              ("M-DEL" . vertico-directory-delete-word)))
+
+;; Marginalia: annotations for minibuffer
+(use-package marginalia
+  :ensure t
+  :config
+  (marginalia-mode))
+
+;; Popup completion-at-point
+(use-package corfu
+  :ensure t
   :init
-  (vertico-prescient-mode))
+  (global-corfu-mode)
+  :config
+  (setq corfu-auto t
+        corfu-quit-no-match 'separator))
+
+;; Orderless: powerful completion style
+(use-package orderless
+  :ensure t
+  :config
+  (setq completion-styles '(orderless)))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Programming
@@ -439,18 +408,28 @@
      (whitespace-cleanup)
      (delete-trailing-whitespace))))
 
+(use-package treesit-auto
+  :ensure t
+  :config
+  (setq treesit-auto-install 'prompt)
+  (global-treesit-auto-mode))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Languages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(use-package flycheck
-  :ensure t
-  :diminish flycheck-mode)
+(use-package flycheck :ensure t :diminish flycheck-mode)
+(use-package flymake :ensure t :diminish flymake-mode)
 
 (use-package lsp-mode
   :ensure t
   :commands lsp
-  :hook ((clojure-mode clojurescript-mode clojurec-mode) . lsp)
-  :init
+  :hook ((clojure-mode clojurescript-mode clojurec-mode R-mode markdown-mode) . lsp)
+  :config
+  (setq lsp-completion-provider :none)
+  (defun corfu-lsp-setup ()
+    (setq-local completion-styles '(orderless)
+                completion-category-defaults nil))
+  (add-hook 'lsp-completion-mode-hook #'corfu-lsp-setup)
   (setq
    ;;lsp-enable-completion-at-point nil
    lsp-lens-enable nil
@@ -470,6 +449,7 @@
 ;; Web stuff
 (use-package web-mode
   :ensure t
+  :defer t
   :hook (web-mode . custom-web-mode-hook)
   :mode (("\\.html?\\'" . web-mode)
          ("\\.css\\'" . web-mode)
@@ -477,18 +457,17 @@
   :init
   (defun custom-web-mode-hook ()
     "Hooks for Web mode."
-    (flycheck-mode)
     (toggle-truncate-lines t)))
 
-;; Emacs Speaks Statistics
+;; Emacs Speaks Statistics (R)
 (use-package ess
   :ensure t
+  :defer t
   :mode (("\\.R\\'" . R-mode)
          ("\\.r\\'" . R-mode))
   :init
   (setq ess-eval-visibly 'nowait)
   (setq ess-r-backend 'lsp))
-
 
 ;; Lisp
 (use-package aggressive-indent
@@ -572,17 +551,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Writing & Blogging (org mode)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(use-package flycheck-languagetool
-  :ensure t
-  :after (flycheck)
-  :init
-  (setq flycheck-languagetool-server-jar
-        "~/Sync/etc/LanguageTool/languagetool-server.jar")
-  (flycheck-languagetool-setup))
-
 (defun enable-write-utils ()
-  ;;(flycheck-mode)
-  (visual-line-mode 1))
+ (flyspell-mode)
+ (visual-line-mode 1))
 
 (dolist (hook '(text-mode-hook
                 org-mode-hook
@@ -590,28 +561,28 @@
                 latex-mode-hook))
   (add-hook hook 'enable-write-utils))
 
-(setq sentence-end-double-space nil)
-
-;; org-mode
-(defconst my-org-babel-languages
-  '((R . t)
-    (dot . t)
-    (clojure . t)
-    (emacs-lisp . t)
-    (shell . t)
-    (sqlite . t))
-  "Languages to enable in Org mode.")
-
-
-(defun my-org-confirm-babel-evaluate (lang body)
-  (not (assoc-string lang my-org-babel-languages t))) ; don't ask for languages in my-org-babel-languages
-
-(setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
+(setq org-directory "~/Sync/org/")
 
 (use-package org
   :ensure t
+  :defer t
   :mode (("\\.org\\'" . org-mode))
   :config
+  ;; org-mode
+  (defconst my-org-babel-languages
+    '((R . t)
+      (dot . t)
+      (clojure . t)
+      (emacs-lisp . t)
+      (shell . t)
+      (sqlite . t))
+    "Languages to enable in Org mode.")
+
+  (defun my-org-confirm-babel-evaluate (lang body)
+    (not (assoc-string lang my-org-babel-languages t))) ; don't ask for languages in my-org-babel-languages
+
+  (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
+
   ;; Enable specified languages
   (org-babel-do-load-languages 'org-babel-load-languages my-org-babel-languages)
 
@@ -624,7 +595,7 @@
 (use-package tao-theme
   :ensure t
   :config
-  (my-set-font 'default 'minibuffer-prompt 'fixed-pitch)
+  (my-set-font 'default)
   (custom-theme-set-faces
    'tao-yang
 
@@ -648,14 +619,13 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   '("1ebdc6eee73f94084f1a7211d6e462c29a6fc902ceb38c450eadba0e984da193" "801a567c87755fe65d0484cb2bded31a4c5bb24fd1fe0ed11e6c02254017acb2" default))
  '(package-selected-packages
-   '(ligature tao-theme vertico-prescient vertico prescient web-mode vundo unicode-fonts magit lsp-mode ivy-rich highlight-parentheses flycheck-languagetool expand-region exec-path-from-shell evil-leader evil-collection evil-cleverparens ess direnv diminish counsel-projectile cider almost-mono-themes aggressive-indent))
- '(tao-theme-use-boxes nil))
+   '(tao-theme cider highlight-parentheses evil-cleverparens paredit aggressive-indent ess web-mode orderless corfu marginalia vertico counsel-projectile magit expand-region evil-leader evil-collection ligature rainbow-mode vterm diminish direnv vundo)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(eglot-mode-line ((t (:foreground "#FCFCFC" :inherit font-lock-constant-face))))
+ '(help-key-binding ((t (:inherit default :background "grey96" :foreground "DarkBlue" :box (:line-width (-1 . -1) :color "grey80") :weight bold))))
+ '(minibuffer-prompt ((t (:foreground "#FCFCFC" :background "#616161" :inherit default)))))
