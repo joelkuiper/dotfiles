@@ -20,11 +20,16 @@
 (setq byte-compile-warnings '(not obsolete))
 (setq warning-suppress-log-types '((comp) (bytecomp)))
 
+(setq default-frame-alist
+      '((width . 205)
+        (height . 50)))
+
 (setq inhibit-startup-screen t)
 (setq inhibit-startup-echo-area-message t)
 (setq inhibit-startup-message t)
 (setq initial-scratch-message nil)
 (setq initial-major-mode 'fundamental-mode)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Utility functions.
@@ -101,7 +106,6 @@
   (setq auto-save-file-name-transforms
         `((".*" ,temporary-file-directory t)))
 
-
   ;; Do not allow the cursor in the minibuffer prompt
   (setq minibuffer-prompt-properties
         '(read-only t cursor-intangible t face minibuffer-prompt))
@@ -114,7 +118,6 @@
   (setq completion-styles '(basic initials substring)) ; Different styles to match input to candidates
 
   (put 'erase-buffer 'disabled nil)
-  (setq tab-always-indent 'complete)
 
   (setq scroll-step 1)
   (setq scroll-margin 3))
@@ -183,11 +186,12 @@
 (use-package evil
   :ensure t
   :init
+  (evil-mode 1)
+  :config
   (setq evil-undo-system 'undo-redo
         evil-want-keybinding nil ; https://github.com/emacs-evil/evil-collection
         evil-shift-width 2)
-  (evil-mode 1)
-  :config
+
   ;; Shift left/right functions and bindings
   (defun shift-left-visual ()
     "Shift left and restore visual selection."
@@ -237,10 +241,10 @@
   :ensure t
   :after evil
   :init
-  (setq evil-leader/in-all-states 1)
   (global-evil-leader-mode)
-  (evil-leader/set-leader ",")
   :config
+  (evil-leader/set-leader ",")
+  (setq evil-leader/in-all-states 1)
   ;; Leaders
   (evil-leader/set-key
     "1"      (lambda () (interactive) (find-file "~/.emacs"))
@@ -439,8 +443,8 @@
    lsp-headerline-breadcrumb-enable nil
    lsp-enable-indentation nil
    lsp-ui-sideline-enable nil
-   lsp-enable-semantic-highlighting nil
-   lsp-enable-symbol-highlighting nil
+   ;;lsp-enable-semantic-highlighting nil
+   ;;lsp-enable-symbol-highlighting nil
    lsp-modeline-code-actions-enable nil
    lsp-modeline-diagnostics-enable nil
    lsp-ui-doc-show-with-cursor nil
@@ -518,11 +522,10 @@
          (clojurescript-mode . cider-mode)
          (clojurec-mode . cider-mode))
   :config
-  (setq cider-eldoc-display-symbol-at-point nil)
-  (setq cider-auto-select-error-buffer nil)
-  (setq cider-repl-print-length 100)
-  (setq cider-repl-print-level 10)
-  (setq cider-repl-use-pretty-printing t))
+  (setq cider-eldoc-display-symbol-at-point nil
+        cider-auto-select-error-buffer nil
+        cider-repl-print-length 100
+        cider-repl-use-pretty-printing t))
 
 ;; Indentation and code style
 (defun my-setup-indent (n)
@@ -531,7 +534,6 @@
   ;; web development
   (setq javascript-indent-level n) ; javascript-mode
   (setq js-indent-level n) ; js-mode
-  (setq js2-basic-offset n) ; js2-mode, in latest js2-mode, it's alias of js-indent-level
   (setq web-mode-markup-indent-offset n) ; web-mode, html tag in html file
   (setq web-mode-css-indent-offset n) ; web-mode, css in html file
   (setq web-mode-code-indent-offset n) ; web-mode, js code in html file
@@ -595,7 +597,7 @@
 (use-package tao-theme
   :ensure t
   :config
-  (my-set-font 'default)
+  (my-set-font 'default 'fixed-pitch)
   (custom-theme-set-faces
    'tao-yang
 
@@ -626,6 +628,5 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(eglot-mode-line ((t (:foreground "#FCFCFC" :inherit font-lock-constant-face))))
  '(help-key-binding ((t (:inherit default :background "grey96" :foreground "DarkBlue" :box (:line-width (-1 . -1) :color "grey80") :weight bold))))
  '(minibuffer-prompt ((t (:foreground "#FCFCFC" :background "#616161" :inherit default)))))
