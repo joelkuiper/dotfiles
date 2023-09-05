@@ -327,8 +327,7 @@
   :diminish counsel-projectile-mode
   :after (projectile)
   :init
-  (counsel-projectile-mode +1)
-  )
+  (counsel-projectile-mode +1))
 
 (use-package projectile
   :ensure t
@@ -338,8 +337,7 @@
   :config
   (setq projectile-project-search-path
         '("~/Repositories" "~/Sync/Repositories" "~/Projects"))
-  (setq projectile-sort-order 'recently-active)
-  (setq projectile-indexing-method 'alien)
+  (setq projectile-indexing-method 'hybrid)
   (setq projectile-globally-ignored-files
         '(".DS_Store" ".gitmodules" "kit-modules")))
 
@@ -362,7 +360,6 @@
 (use-package vertico
   :ensure t
   :init
-  ;; You'll want to make sure that e.g. fido-mode isn't enabled
   (vertico-mode))
 
 (use-package vertico-directory
@@ -385,10 +382,22 @@
   (setq corfu-auto t
         corfu-quit-no-match 'separator))
 
-(use-package prescient :ensure t
-  :config (setq completion-styles '(prescient)))
-(use-package corfu-prescient :ensure t)
-(use-package company-prescient :ensure t)
+(use-package prescient
+  :ensure t
+  :config
+  (setq completion-styles '(prescient)))
+
+(use-package corfu-prescient
+  :ensure t
+  :requires (corfu prescient)
+  :init
+  (corfu-prescient-mode))
+
+(use-package vertico-prescient
+  :ensure t
+  :requires (vertico prescient)
+  :init
+  (vertico-prescient-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Programming
