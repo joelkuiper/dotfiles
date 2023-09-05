@@ -186,12 +186,11 @@
 (use-package evil
   :ensure t
   :init
-  (evil-mode 1)
-  :config
   (setq evil-undo-system 'undo-redo
         evil-want-keybinding nil ; https://github.com/emacs-evil/evil-collection
         evil-shift-width 2)
-
+  (evil-mode 1)
+  :config
   ;; Shift left/right functions and bindings
   (defun shift-left-visual ()
     "Shift left and restore visual selection."
