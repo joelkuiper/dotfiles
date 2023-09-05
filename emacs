@@ -230,7 +230,7 @@
 
 (use-package evil-collection
   :ensure t
-  :after (evil)
+  :requires (evil)
   :diminish evil-collection-unimpaired-mode
   :after (cider corfu magit dired vterm vundo org)
   :init
@@ -427,7 +427,7 @@
 (use-package lsp-mode
   :ensure t
   :commands lsp
-  :hook ((clojure-mode clojurescript-mode clojurec-mode R-mode markdown-mode) . lsp)
+  :hook ((clojure-mode clojurescript-mode clojurec-mode R-mode) . lsp)
   :config
   (setq lsp-completion-provider :none)
   (defun corfu-lsp-setup ()
