@@ -132,16 +132,10 @@
         '(read-only t cursor-intangible t face minibuffer-prompt))
   (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
 
-  ;; Do not allow the cursor in the minibuffer prompt
-  (setq minibuffer-prompt-properties
-        '(read-only t cursor-intangible t face minibuffer-prompt))
-  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
-
   (setq enable-recursive-minibuffers t)                ; Use the minibuffer whilst in the minibuffer
   (setq completion-cycle-threshold 1)                  ; TAB cycles candidates
   (setq completions-detailed t)                        ; Show annotations
   (setq tab-always-indent 'complete)                   ; When I hit TAB, try to complete, otherwise, indent
-  (setq completion-styles '(basic initials substring)) ; Different styles to match input to candidates
 
   (put 'erase-buffer 'disabled nil)
 
@@ -249,7 +243,6 @@
 
   (define-key evil-visual-state-map (kbd ">") 'shift-right-visual)
   (define-key evil-visual-state-map (kbd "<") 'shift-left-visual)
-  (define-key evil-visual-state-map (kbd ".") 'er/expand-region)
 
   (define-key evil-normal-state-map (kbd "C-x <right>") 'windmove-right)
   (define-key evil-normal-state-map (kbd "C-x <left>") 'windmove-left)
@@ -287,7 +280,7 @@
     "e"      'eval-expression
     "q"      'quit-window
     "x"      'execute-extended-command
-    ";"      'swiper
+    ";"      'consult-imenu
     "sh"     'eshell                    ; SHell
     "br"     'my-reload-buffer          ; BufferReload
     "bs"     'consult-buffer            ; BufferSwtich
@@ -331,6 +324,7 @@
 (use-package expand-region
   :ensure t
   :bind (:map evil-visual-state-map
+              ("." . 'er/expand-region)
               ("," . 'er/contract-region)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
