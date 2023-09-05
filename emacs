@@ -20,10 +20,6 @@
 (setq byte-compile-warnings '(not obsolete))
 (setq warning-suppress-log-types '((comp) (bytecomp)))
 
-(setq default-frame-alist
-      '((width . 205)
-        (height . 50)))
-
 (setq inhibit-startup-screen t)
 (setq inhibit-startup-echo-area-message t)
 (setq inhibit-startup-message t)
@@ -70,6 +66,19 @@
                           :height font-size
                           :weight font-weight
                           :width font-width))))
+
+(defun my-project-watch-log-file ()
+  "Open and watch a log file from the project."
+  (interactive)
+  (let* ((project-root (projectile-project-root))
+         (log-files (directory-files-recursively project-root "\\.log$"))
+         (logfile (completing-read "Select log file: " log-files nil t)))
+    (unless (file-exists-p logfile)
+      (error "Log file does not exist: %s" logfile))
+    (find-file logfile)
+    (let ((auto-revert-verbose nil)) ;; Suppress verbose revert messages
+      (auto-revert-tail-mode t))
+    (message "Watching log file: %s" logfile)))
 
 ;; esc quits
 (defun minibuffer-keyboard-quit ()
@@ -319,19 +328,7 @@
   :after (projectile)
   :init
   (counsel-projectile-mode +1)
-  :config
-  (defun project-watch-log-file ()
-    "Open and watch a log file from the project."
-    (interactive)
-    (let* ((project-root (projectile-project-root))
-           (log-files (directory-files-recursively project-root "\\.log$"))
-           (logfile (completing-read "Select log file: " log-files nil t)))
-      (unless (file-exists-p logfile)
-        (error "Log file does not exist: %s" logfile))
-      (find-file logfile)
-      (let ((auto-revert-verbose nil)) ;; Suppress verbose revert messages
-        (auto-revert-tail-mode t))
-      (message "Watching log file: %s" logfile))))
+  )
 
 (use-package projectile
   :ensure t
@@ -388,12 +385,10 @@
   (setq corfu-auto t
         corfu-quit-no-match 'separator))
 
-;; Orderless: powerful completion style
-(use-package orderless
-  :ensure t
-  :config
-  (setq completion-styles '(orderless)))
-
+(use-package prescient :ensure t
+  :config (setq completion-styles '(prescient)))
+(use-package corfu-prescient :ensure t)
+(use-package company-prescient :ensure t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Programming
@@ -430,7 +425,7 @@
   :config
   (setq lsp-completion-provider :none)
   (defun corfu-lsp-setup ()
-    (setq-local completion-styles '(orderless)
+    (setq-local completion-styles '(prescient)
                 completion-category-defaults nil))
   (add-hook 'lsp-completion-mode-hook #'corfu-lsp-setup)
   (setq
