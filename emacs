@@ -115,6 +115,21 @@
   (setq auto-save-file-name-transforms
         `((".*" ,temporary-file-directory t)))
 
+  ;; See https://github.com/minad/vertico
+  (defun crm-indicator (args)
+    (cons (format "[CRM%s] %s"
+                  (replace-regexp-in-string
+                   "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
+                   crm-separator)
+                  (car args))
+          (cdr args)))
+  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+
+  ;; Do not allow the cursor in the minibuffer prompt
+  (setq minibuffer-prompt-properties
+        '(read-only t cursor-intangible t face minibuffer-prompt))
+  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+
   ;; Do not allow the cursor in the minibuffer prompt
   (setq minibuffer-prompt-properties
         '(read-only t cursor-intangible t face minibuffer-prompt))
@@ -264,18 +279,13 @@
     "/"      'comment-or-uncomment-region
     "."      'er/expand-region
     ","      'er/contract-region
-    "x"      'counsel-M-x               ; eXecute
     "e"      'eval-expression
-    "f"      'counsel-fzf
     "q"      'quit-window
+    "x"      'execute-extended-command
     ";"      'swiper
-    "r"      'counsel-buffer-or-recentf
     "sh"     'eshell                    ; SHell
-    "te"     'vterm                     ; TErm
-    "vt"     'vterm                     ; VTerm
-    "bs"     'counsel-ibuffer
     "br"     'my-reload-buffer          ; BufferReload
-    "bk"     'ido-kill-buffer
+    "bs"     'consult-buffer            ; BufferSwtich
     "ws"     'whitespace-mode
     "d"      'my-display-tree
     "ln"     'display-line-numbers-mode
@@ -289,14 +299,14 @@
     "gP"     'magit-push-current-to-upstream
     "gp"     'magit-pull-from-upstream
 
-    "p;"     'counsel-projectile
-    "pp"     'counsel-projectile
-    "pf"     'counsel-projectile-find-file
-    "ps"     'counsel-projectile-switch-project
-    "pl"     'project-watch-log-file
+    "pl"     'my-project-watch-log-file
+    "p;"     'consult-project-buffer
+    "ps"     'projectile-switch-project
+    "pf"     'projectile-find-file
     "pd"     'projectile-dired
-    "pg"     'counsel-projectile-git-grep
-    "P"      'counsel-yank-pop
+    "pg"     'consult-git-grep
+    "vt"     'projectile-run-vterm      ; VTerm
+
 
     "ch"     'cider-repl-history
     "cb"     'cider-repl-clear-buffer
@@ -321,13 +331,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package magit :ensure t)
 (use-package direnv :ensure t)
-
-(use-package counsel-projectile
-  :ensure t
-  :diminish counsel-projectile-mode
-  :after (projectile)
-  :init
-  (counsel-projectile-mode +1))
 
 (use-package projectile
   :ensure t
@@ -373,6 +376,9 @@
   :config
   (marginalia-mode))
 
+(use-package consult
+  :ensure t)
+
 ;; Popup completion-at-point
 (use-package corfu
   :ensure t
@@ -385,7 +391,9 @@
 (use-package prescient
   :ensure t
   :config
-  (setq completion-styles '(prescient)))
+  (setq completion-styles '(prescient basic)
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles partial-completion)))))
 
 (use-package corfu-prescient
   :ensure t
@@ -625,7 +633,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(tao-theme cider highlight-parentheses evil-cleverparens paredit aggressive-indent ess web-mode orderless corfu marginalia vertico counsel-projectile magit expand-region evil-leader evil-collection ligature rainbow-mode vterm diminish direnv vundo)))
+   '(tao-theme cider highlight-parentheses evil-cleverparens paredit aggressive-indent ess web-mode orderless corfu marginalia vertico magit expand-region evil-leader evil-collection ligature rainbow-mode vterm diminish direnv vundo)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
