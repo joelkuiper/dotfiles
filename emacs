@@ -115,6 +115,8 @@
   (setq auto-save-file-name-transforms
         `((".*" ,temporary-file-directory t)))
 
+  (recentf-mode)
+
   ;; See https://github.com/minad/vertico
   (defun crm-indicator (args)
     (cons (format "[CRM%s] %s"
@@ -154,6 +156,9 @@
 (use-package eldoc :diminish eldoc-mode)
 (use-package autorevert :diminish auto-revert-mode)
 (use-package vterm :ensure t)
+(use-package exec-path-from-shell :ensure t
+  :init
+  (exec-path-from-shell-initialize))
 
 ;; Persist history over Emacs restarts.
 (use-package savehist :ensure t :init (savehist-mode))
@@ -289,6 +294,7 @@
     "ws"     'whitespace-mode
     "d"      'my-display-tree
     "ln"     'display-line-numbers-mode
+    "rf"     'consult-recent-file
 
     "gg"     'magit
     "gd"     'magit-diff-unstaged
@@ -300,7 +306,8 @@
     "gp"     'magit-pull-from-upstream
 
     "pl"     'my-project-watch-log-file
-    "p;"     'consult-project-buffer
+    "p;"     'consult-imenu-multi
+    "pp"     'consult-project-buffer
     "ps"     'projectile-switch-project
     "pf"     'projectile-find-file
     "pd"     'projectile-dired
@@ -391,6 +398,7 @@
 (use-package prescient
   :ensure t
   :config
+  (prescient-persist-mode)
   (setq completion-styles '(prescient basic)
         completion-category-defaults nil
         completion-category-overrides '((file (styles partial-completion)))))
@@ -454,7 +462,7 @@
    lsp-headerline-breadcrumb-enable nil
    lsp-enable-indentation nil
    lsp-ui-sideline-enable nil
-   ;;lsp-enable-semantic-highlighting nil
+   lsp-enable-semantic-highlighting nil
    ;;lsp-enable-symbol-highlighting nil
    lsp-modeline-code-actions-enable nil
    lsp-modeline-diagnostics-enable nil
