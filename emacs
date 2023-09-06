@@ -389,7 +389,8 @@
   :config
   (prescient-persist-mode)
   (setq completion-styles '(prescient basic)
-        completion-category-defaults nil))
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles partial-completion)))))
 
 (use-package corfu-prescient
   :ensure t
@@ -457,16 +458,18 @@
 (use-package lsp-mode
   :ensure t
   :commands lsp
-  :hook ((clojure-mode clojurescript-mode clojurec-mode R-mode) . lsp)
+  :hook ((lsp-completion-mode . my/lsp-mode-setup-completion)
+         ((clojure-ts-mode clojure-mode clojurescript-mode clojurec-mode R-mode) . lsp))
+  :custom
+  (lsp-completion-provider :none) ;; we use Corfu!
+  :init
+  (defun my/lsp-mode-setup-completion ()
+    (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+          '(prescient)))
   :config
-  (add-hook 'lsp-completion-mode-hook
-            (lambda ()
-              (setf (alist-get 'lsp-capf completion-category-defaults)
-                    '((styles . (prescient))))))
-
   (setq
    ;;lsp-enable-completion-at-point nil
-   lsp-completion-provider :none
+   lsp-enable-snippet nil
    lsp-lens-enable nil
    lsp-eldoc-enable-hover nil
    lsp-file-watch-threshold 10000
@@ -474,7 +477,7 @@
    lsp-headerline-breadcrumb-enable nil
    lsp-enable-indentation nil
    lsp-ui-sideline-enable nil
-   lsp-enable-semantic-highlighting nil
+   ;;lsp-enable-semantic-highlighting nil
    lsp-enable-symbol-highlighting nil
    lsp-modeline-code-actions-enable nil
    lsp-modeline-diagnostics-enable nil
