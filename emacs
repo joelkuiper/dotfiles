@@ -458,18 +458,17 @@
 (use-package lsp-mode
   :ensure t
   :commands lsp
-  :hook ((lsp-completion-mode . my/lsp-mode-setup-completion)
-         ((clojure-ts-mode clojure-mode clojurescript-mode clojurec-mode R-mode) . lsp))
-  :custom
-  (lsp-completion-provider :none) ;; we use Corfu!
   :init
   (defun my/lsp-mode-setup-completion ()
     (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
-          '(prescient)))
+          '(flex))) ;; Configure flex
+  :hook ((lsp-completion-mode . my/lsp-mode-setup-completion)
+         ((clojure-ts-mode R-mode) . lsp))
+  :custom
+  (lsp-completion-provider :none) ;
   :config
   (setq
    ;;lsp-enable-completion-at-point nil
-   lsp-enable-snippet nil
    lsp-lens-enable nil
    lsp-eldoc-enable-hover nil
    lsp-file-watch-threshold 10000
@@ -477,12 +476,13 @@
    lsp-headerline-breadcrumb-enable nil
    lsp-enable-indentation nil
    lsp-ui-sideline-enable nil
-   ;;lsp-enable-semantic-highlighting nil
+   lsp-enable-semantic-highlighting nil
    lsp-enable-symbol-highlighting nil
    lsp-modeline-code-actions-enable nil
    lsp-modeline-diagnostics-enable nil
    lsp-ui-doc-show-with-cursor nil
-   lsp-ui-sideline-show-code-actions nil))
+   lsp-ui-sideline-show-code-actions nil)
+  )
 
 ;; Web stuff
 (use-package web-mode
