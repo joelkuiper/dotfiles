@@ -93,16 +93,6 @@
 
   (recentf-mode)
 
-  ;; See https://github.com/minad/vertico
-  (defun crm-indicator (args)
-    (cons (format "[CRM%s] %s"
-                  (replace-regexp-in-string
-                   "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
-                   crm-separator)
-                  (car args))
-          (cdr args)))
-  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
-
   ;; Do not allow the cursor in the minibuffer prompt
   (setq minibuffer-prompt-properties
         '(read-only t cursor-intangible t face minibuffer-prompt))
@@ -417,8 +407,31 @@
   (vertico-prescient-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Programming
+;;; Programming & Development
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Indentation and code style
+(defun my-setup-indent (n)
+  ;; java/c/c++
+  (setq c-basic-offset n)
+  ;; web development
+  (setq javascript-indent-level n) ; javascript-mode
+  (setq js-indent-level n) ; js-mode
+  (setq web-mode-markup-indent-offset n) ; web-mode, html tag in html file
+  (setq web-mode-css-indent-offset n) ; web-mode, css in html file
+  (setq web-mode-code-indent-offset n) ; web-mode, js code in html file
+  (setq css-indent-offset n) ; css-mode
+  )
+
+(defun my-code-style ()
+  (interactive)
+  (setq-default
+   indent-tabs-mode nil
+   default-tab-width 2
+   evil-shift-width tab-width)
+  (my-setup-indent 2))
+
+(my-code-style)
+
 (use-package whitespace
   :ensure t
   :init
@@ -522,48 +535,30 @@
     ielm-mode
     cider-mode
     cider-repl-mode
-    clojurescript-mode
-    clojurec-mode
-    clojurex-mode
-    clojure-mode))
+    clojure-ts-mode))
 
 (dolist (mode lisps)
   (add-hook (intern (concat (symbol-name mode) "-hook")) 'enable-lisp-utils))
 
+;; Clojure
 (use-package cider
   :ensure t
   :commands cider-jack-in
-  :hook ((clojure-mode . cider-mode)
-         (clojurescript-mode . cider-mode)
-         (clojurec-mode . cider-mode))
+  :hook ((clojure-ts-mode . cider-mode))
   :config
   (setq cider-eldoc-display-symbol-at-point nil
         cider-auto-select-error-buffer nil
         cider-repl-print-length 100
         cider-repl-use-pretty-printing t))
 
-;; Indentation and code style
-(defun my-setup-indent (n)
-  ;; java/c/c++
-  (setq c-basic-offset n)
-  ;; web development
-  (setq javascript-indent-level n) ; javascript-mode
-  (setq js-indent-level n) ; js-mode
-  (setq web-mode-markup-indent-offset n) ; web-mode, html tag in html file
-  (setq web-mode-css-indent-offset n) ; web-mode, css in html file
-  (setq web-mode-code-indent-offset n) ; web-mode, js code in html file
-  (setq css-indent-offset n) ; css-mode
-  )
-
-(defun my-code-style ()
-  (interactive)
-  (setq-default
-   indent-tabs-mode nil
-   default-tab-width 2
-   evil-shift-width tab-width)
-  (my-setup-indent 2))
-
-(my-code-style)
+;;; Experimental treesitter (isn't caught by the auto somehow...)
+(use-package clojure-ts-mode
+  :ensure t
+  :hook ((clojure-mode . clojure-ts-mode)
+         (clojurescript-mode . clojure-ts-mode)
+         (clojurec-mode . clojure-ts-mode))
+  :config
+  (setq treesit-extra-load-path '("~/Sync/etc/tree-sitter-clojure/dist")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Writing & Blogging (org mode)
@@ -637,7 +632,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(tao-theme cider highlight-parentheses evil-cleverparens paredit aggressive-indent ess web-mode orderless corfu marginalia vertico magit expand-region evil-leader evil-collection ligature rainbow-mode vterm diminish direnv vundo)))
+   '(clojure-ts-mode tao-theme cider highlight-parentheses evil-cleverparens paredit aggressive-indent ess web-mode orderless corfu marginalia vertico magit expand-region evil-leader evil-collection ligature rainbow-mode vterm diminish direnv vundo)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
