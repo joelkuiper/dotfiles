@@ -216,6 +216,7 @@
   (define-key minibuffer-local-must-match-map [escape] 'minibuffer-keyboard-quit)
   (define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
 
+  (define-key evil-ex-completion-map (kbd "TAB") 'completion-at-point)
 
   (define-key evil-visual-state-map (kbd ">") 'shift-right-visual)
   (define-key evil-visual-state-map (kbd "<") 'shift-left-visual)
@@ -227,12 +228,12 @@
 
 (use-package evil-collection
   :ensure t
-  :requires (evil)
+  :after (evil)
   :diminish evil-collection-unimpaired-mode
-  :after (cider corfu magit dired vterm vundo org)
+  :after (cider corfu magit dired vterm vundo org vertico)
   :init
   (evil-collection-init
-   '(cider corfu magit dired vterm vundo org)))
+   '(cider corfu magit dired vterm vundo org vertico)))
 
 (use-package evil-leader
   :ensure t
@@ -295,6 +296,12 @@
     "<up>"   'windmove-up
     "<down>" 'windmove-down))
 
+(use-package evil-cleverparens
+  :ensure t
+  :after (evil paredit)
+  :diminish evil-cleverparens-mode
+  :commands evil-cleverparens-mode)
+
 (use-package expand-region
   :ensure t
   :bind (:map evil-visual-state-map
@@ -324,14 +331,29 @@
 
 ;; Vertico: better vertical completion for minibuffer commands
 (use-package vertico
-  :ensure t
   :init
-  (vertico-mode))
+  (vertico-mode)
+  (setq vertico-scroll-margin 0)
+  :custom
+  (vertico-cycle t)
+  :bind  (:map vertico-map
+               ("C-j" . vertico-next)
+               ("C-k" . vertico-previous)
+               ("TAB" . vertico-insert)
+               ("?" . minibuffer-completion-help)
+               ("C-'" . vertico-quick-jump)))
 
+;; Configure directory extension.
 (use-package vertico-directory
   :after vertico
+  :ensure nil
+  ;; More convenient directory navigation commands
   :bind (:map vertico-map
-              ("M-DEL" . vertico-directory-delete-word)))
+              ("RET" . vertico-directory-enter)
+              ("DEL" . vertico-directory-delete-char)
+              ("M-DEL" . vertico-directory-delete-word))
+  ;; Tidy shadowed file names
+  :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
 
 ;; Marginalia: annotations for minibuffer
 (use-package marginalia
@@ -339,8 +361,15 @@
   :config
   (marginalia-mode))
 
+(use-package embark-consult
+  :ensure t
+  :hook
+  (embark-collect-mode . consult-preview-at-point-mode))
+
 (use-package consult
-  :ensure t)
+  :ensure t
+  :config
+  (setq completion-in-region-function 'consult-completion-in-region))
 
 (use-package marginalia
   :ensure t
@@ -349,29 +378,15 @@
 
 (use-package embark
   :ensure t
-
-  :bind
-  (("C-." . embark-act)         ;; pick some comfortable binding
-   ("C-;" . embark-dwim)        ;; good alternative: M-.
-   ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
-
   :init
   ;; Optionally replace the key help with a completing-read interface
   (setq prefix-help-command #'embark-prefix-help-command)
-
   :config
   ;; Hide the mode line of the Embark live/completions buffers
   (add-to-list 'display-buffer-alist
                '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
                  nil
                  (window-parameters (mode-line-format . none)))))
-
-;; Consult users will also want the embark-consult package.
-(use-package embark-consult
-  :after (embark consult)
-  :ensure t ; only need to install it, embark loads it after consult if found
-  :hook
-  (embark-collect-mode . consult-preview-at-point-mode))
 
 ;; Popup completion-at-point
 (use-package corfu
@@ -387,18 +402,17 @@
   :config
   (prescient-persist-mode)
   (setq completion-styles '(prescient basic)
-        completion-category-defaults nil
-        completion-category-overrides '((file (styles partial-completion)))))
+        completion-category-defaults nil))
 
 (use-package corfu-prescient
   :ensure t
-  :requires (corfu prescient)
+  :after (corfu prescient)
   :init
   (corfu-prescient-mode))
 
 (use-package vertico-prescient
   :ensure t
-  :requires (vertico prescient)
+  :after (vertico prescient)
   :init
   (vertico-prescient-mode))
 
@@ -435,8 +449,14 @@
   :commands lsp
   :hook ((clojure-mode clojurescript-mode clojurec-mode R-mode) . lsp)
   :config
+  (add-hook 'lsp-completion-mode-hook
+            (lambda ()
+              (setf (alist-get 'lsp-capf completion-category-defaults)
+                    '((styles . (prescient))))))
+
   (setq
-   lsp-enable-completion-at-point nil
+   ;;lsp-enable-completion-at-point nil
+   lsp-completion-provider :none
    lsp-lens-enable nil
    lsp-eldoc-enable-hover nil
    lsp-file-watch-threshold 10000
@@ -484,12 +504,6 @@
   :ensure t
   :diminish paredit-mode
   :commands paredit-mode)
-
-(use-package evil-cleverparens
-  :ensure t
-  :after (evil)
-  :diminish evil-cleverparens-mode
-  :commands evil-cleverparens-mode)
 
 (use-package highlight-parentheses
   :ensure t
