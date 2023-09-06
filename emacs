@@ -91,8 +91,6 @@
   (setq auto-save-file-name-transforms
         `((".*" ,temporary-file-directory t)))
 
-  (recentf-mode)
-
   ;; Do not allow the cursor in the minibuffer prompt
   (setq minibuffer-prompt-properties
         '(read-only t cursor-intangible t face minibuffer-prompt))
@@ -253,7 +251,6 @@
     "bs"     'consult-buffer            ; BufferSwtich
     "ws"     'whitespace-mode
     "ln"     'display-line-numbers-mode
-    "rf"     'consult-recent-file
 
     "gg"     'magit
     "gd"     'magit-diff-unstaged
@@ -478,7 +475,7 @@
    lsp-enable-indentation nil
    lsp-ui-sideline-enable nil
    lsp-enable-semantic-highlighting nil
-   ;;lsp-enable-symbol-highlighting nil
+   lsp-enable-symbol-highlighting nil
    lsp-modeline-code-actions-enable nil
    lsp-modeline-diagnostics-enable nil
    lsp-ui-doc-show-with-cursor nil
@@ -558,6 +555,7 @@
          (clojurescript-mode . clojure-ts-mode)
          (clojurec-mode . clojure-ts-mode))
   :config
+  (add-hook 'clojure-ts-mode-hook #'clojure-mode-variables)
   (setq treesit-extra-load-path '("~/Sync/etc/tree-sitter-clojure/dist")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
