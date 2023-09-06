@@ -30,18 +30,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Utility functions.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defun my-display-tree ()
-  "Run the Unix tree command on the project root and display the output."
-  (interactive)
-  (let* ((project-root (projectile-project-root))
-         (current-file (buffer-file-name))
-         (tree-output
-          (shell-command-to-string
-           (format "tree %s -P '%s'" project-root
-                   (file-relative-name current-file project-root)))))
-    (with-output-to-temp-buffer "*tree*"
-      (princ tree-output))))
-
 (defun my-reload-buffer ()
   "revert-buffer without confirmation."
   (interactive)
@@ -61,24 +49,12 @@
          (font-weight 'normal)
          (font-width 'normal))
     (dolist (face faces)
-      (set-face-attribute face nil
-                          :family font-family
-                          :height font-size
-                          :weight font-weight
-                          :width font-width))))
-
-(defun my-project-watch-log-file ()
-  "Open and watch a log file from the project."
-  (interactive)
-  (let* ((project-root (projectile-project-root))
-         (log-files (directory-files-recursively project-root "\\.log$"))
-         (logfile (completing-read "Select log file: " log-files nil t)))
-    (unless (file-exists-p logfile)
-      (error "Log file does not exist: %s" logfile))
-    (find-file logfile)
-    (let ((auto-revert-verbose nil)) ;; Suppress verbose revert messages
-      (auto-revert-tail-mode t))
-    (message "Watching log file: %s" logfile)))
+      (set-face-attribute
+       face nil
+       :family font-family
+       :height font-size
+       :weight font-weight
+       :width font-width))))
 
 ;; esc quits
 (defun minibuffer-keyboard-quit ()
@@ -260,7 +236,7 @@
 
 (use-package evil-leader
   :ensure t
-  :after evil
+  :after (evil)
   :init
   (global-evil-leader-mode)
   :config
@@ -276,7 +252,7 @@
 
     "<SPC>"  'embark-act
     "."      'er/expand-region
-    ","      'er/contract-region
+    ","      'consult-imenu-multi
     "e"      'eval-expression
     "q"      'quit-window
     "x"      'execute-extended-command
@@ -285,7 +261,6 @@
     "br"     'my-reload-buffer          ; BufferReload
     "bs"     'consult-buffer            ; BufferSwtich
     "ws"     'whitespace-mode
-    "d"      'my-display-tree
     "ln"     'display-line-numbers-mode
     "rf"     'consult-recent-file
 
@@ -298,14 +273,13 @@
     "gP"     'magit-push-current-to-upstream
     "gp"     'magit-pull-from-upstream
 
-    "pl"     'my-project-watch-log-file
     "p;"     'consult-imenu-multi
     "pp"     'consult-project-buffer
-    "ps"     'projectile-switch-project
-    "pf"     'projectile-find-file
-    "pd"     'projectile-dired
+    "ps"     'project-switch-project
+    "pf"     'project-find-file
+    "pd"     'project-dired
     "pg"     'consult-git-grep
-    "vt"     'projectile-run-vterm      ; VTerm
+    "vt"     'vterm-other-window
 
 
     "ch"     'cider-repl-history
@@ -332,18 +306,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package magit :ensure t)
 (use-package direnv :ensure t)
-
-(use-package projectile
-  :ensure t
-  :diminish projectile-mode
-  :init
-  (projectile-global-mode)
-  :config
-  (setq projectile-project-search-path
-        '("~/Repositories" "~/Sync/Repositories" "~/Projects"))
-  (setq projectile-indexing-method 'hybrid)
-  (setq projectile-globally-ignored-files
-        '(".DS_Store" ".gitmodules" "kit-modules")))
 
 ;; Autocomplete
 (require 'ffap)
@@ -406,7 +368,7 @@
 
 ;; Consult users will also want the embark-consult package.
 (use-package embark-consult
-  :requires (embark consult)
+  :after (embark consult)
   :ensure t ; only need to install it, embark loads it after consult if found
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
@@ -473,13 +435,8 @@
   :commands lsp
   :hook ((clojure-mode clojurescript-mode clojurec-mode R-mode) . lsp)
   :config
-  (setq lsp-completion-provider :none)
-  (defun corfu-lsp-setup ()
-    (setq-local completion-styles '(prescient)
-                completion-category-defaults nil))
-  (add-hook 'lsp-completion-mode-hook #'corfu-lsp-setup)
   (setq
-   ;;lsp-enable-completion-at-point nil
+   lsp-enable-completion-at-point nil
    lsp-lens-enable nil
    lsp-eldoc-enable-hover nil
    lsp-file-watch-threshold 10000
