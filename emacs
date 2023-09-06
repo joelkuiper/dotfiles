@@ -461,15 +461,14 @@
   :init
   (defun my/lsp-mode-setup-completion ()
     (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
-          '(flex))) ;; Configure flex
+          '(prescient))) ;; Configure flex
   :hook ((lsp-completion-mode . my/lsp-mode-setup-completion)
          ((clojure-ts-mode R-mode) . lsp))
-  :custom
-  (lsp-completion-provider :none) ;
   :config
   (setq
    ;;lsp-enable-completion-at-point nil
    lsp-lens-enable nil
+   lsp-completion-provider :none ;
    lsp-eldoc-enable-hover nil
    lsp-file-watch-threshold 10000
    lsp-signature-auto-activate nil
@@ -477,7 +476,7 @@
    lsp-enable-indentation nil
    lsp-ui-sideline-enable nil
    lsp-enable-semantic-highlighting nil
-   lsp-enable-symbol-highlighting nil
+   ;;lsp-enable-symbol-highlighting nil
    lsp-modeline-code-actions-enable nil
    lsp-modeline-diagnostics-enable nil
    lsp-ui-doc-show-with-cursor nil
