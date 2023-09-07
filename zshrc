@@ -16,17 +16,18 @@ export CUDACXX=$CUDA_HOME/bin/nvcc
 export PATH=$PATH:$NODE_HOME/bin/:~/bin/:~/.local/bin/
 # export LLVM_TOOLCHAIN=$(lli --print-toolchain-path)
 
-source antigen.zsh
+source ~/dotfiles/antigen.zsh
+
+DISABLE_LS_COLORS="true"
 
 # Load the oh-my-zsh's library.
 antigen use oh-my-zsh
 
 # Bundles from the default repo (robbyrussell's oh-my-zsh).
 antigen bundle gitfast
+antigen bundle fzf
+antigen bundle history-substring-search
 antigen bundle jeffreytse/zsh-vi-mode
-
-# Syntax highlighting bundle.
-antigen bundle zsh-users/zsh-syntax-highlighting
 
 # Load the theme.
 antigen theme minimal
