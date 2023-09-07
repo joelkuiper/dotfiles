@@ -15,7 +15,6 @@
  '(("gnu" . "https://elpa.gnu.org/packages/")
    ("melpa" . "https://melpa.org/packages/")))
 
-
 (setq gc-cons-threshold 10000000)
 (setq byte-compile-warnings '(not obsolete))
 (setq warning-suppress-log-types '((comp) (bytecomp)))
@@ -108,6 +107,9 @@
 
 
 ;; Packages
+(use-package quelpa :ensure t)
+(use-package quelpa-use-package :ensure t)
+
 (use-package vundo :ensure t)
 (use-package direnv :ensure t)
 (use-package diminish :ensure t)
@@ -301,21 +303,6 @@
 (use-package magit :ensure t)
 (use-package direnv :ensure t)
 
-;; Autocomplete
-(require 'ffap)
-
-(defun my-ffap-completion-at-point ()
-  (let ((fn (ffap-guesser)))
-    (when (and fn (not (string-match " " fn)))
-      (let* ((dir (file-name-directory fn))
-             (file (file-name-nondirectory fn))
-             (files (and dir (file-name-all-completions file dir))))
-        (list (length file)
-              (point)
-              (mapcar (lambda (f) (concat dir f)) files))))))
-
-(add-to-list 'completion-at-point-functions 'my-ffap-completion-at-point)
-
 ;; Vertico: better vertical completion for minibuffer commands
 (use-package vertico
   :init
@@ -332,7 +319,7 @@
 
 ;; Configure directory extension.
 (use-package vertico-directory
-  :after vertico
+  :after (vertico)
   :ensure nil
   ;; More convenient directory navigation commands
   :bind (:map vertico-map
@@ -350,6 +337,7 @@
 
 (use-package embark-consult
   :ensure t
+  :after (embark consult)
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
 
@@ -455,9 +443,21 @@
 (use-package flycheck :ensure t :diminish flycheck-mode)
 (use-package flymake :ensure t :diminish flymake-mode)
 
+(use-package copilot
+  :quelpa (copilot :fetcher github
+                   :repo "zerolfx/copilot.el"
+                   :branch "main"
+                   :files ("dist" "*.el"))
+  :hook (prog-mode . copilot-mode)
+  :config
+  (setq copilot-idle-delay 0.15)
+  (define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
+  (define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion))
+
 (use-package lsp-mode
   :ensure t
   :commands lsp
+  :diminish lsp-mode
   :init
   (defun my/lsp-mode-setup-completion ()
     (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
@@ -468,9 +468,8 @@
   (setq
    ;;lsp-enable-completion-at-point nil
    lsp-lens-enable nil
-   lsp-completion-provider :none ;
+   lsp-completion-provider :none        ;
    lsp-eldoc-enable-hover nil
-   lsp-file-watch-threshold 10000
    lsp-signature-auto-activate nil
    lsp-headerline-breadcrumb-enable nil
    lsp-enable-indentation nil
@@ -534,6 +533,7 @@
     ielm-mode
     cider-mode
     cider-repl-mode
+    clojure-mode
     clojure-ts-mode))
 
 (dolist (mode lisps)
