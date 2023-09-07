@@ -123,5 +123,5 @@
   # http://gitfu.wordpress.com/2008/04/20/git-rerere-rereremember-what-you-did-last-time/
   enabled = true
 [user]
-  name = Joel Kuiper
-  email = me@joelkuiper.eu
+	email = me@joelkuiper.eu
+	name = Joel Kuiper

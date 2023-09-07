@@ -1,9 +1,0 @@
-[submodule "oh-my-zsh"]
-	path = oh-my-zsh
-	url = https://github.com/robbyrussell/oh-my-zsh.git
-[submodule "vim"]
-	path = vim
-	url = https://joelkuiper@github.com/joelkuiper/vimified.git 
-[submodule "tomorrow-theme"]
-	path = tomorrow-theme
-	url = https://github.com/chriskempson/tomorrow-theme.git
