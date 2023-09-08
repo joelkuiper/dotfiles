@@ -268,7 +268,7 @@
     "pg"     'consult-git-grep
     "vt"     'vterm-other-window
 
-
+    "cc"     'cider-connect
     "ch"     'cider-repl-history
     "cb"     'cider-repl-clear-buffer
     "o."     'org-time-stamp
@@ -447,7 +447,7 @@
   :init
   (defun my/lsp-mode-setup-completion ()
     (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
-          '(prescient))) ;; Configure flex
+          '(flex))) ;; Configure flex
   :hook ((lsp-completion-mode . my/lsp-mode-setup-completion)
          ((clojure-ts-mode R-mode) . lsp))
   :config
@@ -473,9 +473,7 @@
   :ensure t
   :defer t
   :hook (web-mode . custom-web-mode-hook)
-  :mode (("\\.html?\\'" . web-mode)
-         ("\\.css\\'" . web-mode)
-         ("\\.js\\'" . web-mode))
+  :mode (("\\.html?\\'" . web-mode))
   :init
   (defun custom-web-mode-hook ()
     "Hooks for Web mode."
