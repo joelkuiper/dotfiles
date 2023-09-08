@@ -107,9 +107,6 @@
 
 
 ;; Packages
-(use-package quelpa :ensure t)
-(use-package quelpa-use-package :ensure t)
-
 (use-package vundo :ensure t)
 (use-package direnv :ensure t)
 (use-package diminish :ensure t)
@@ -243,7 +240,7 @@
 
     "<SPC>"  'embark-act
     "."      'er/expand-region
-    ","      'consult-imenu-multi
+    ","      'consult-line-multi
     "e"      'eval-expression
     "q"      'quit-window
     "x"      'execute-extended-command
@@ -442,17 +439,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package flycheck :ensure t :diminish flycheck-mode)
 (use-package flymake :ensure t :diminish flymake-mode)
-
-(use-package copilot
-  :quelpa (copilot :fetcher github
-                   :repo "zerolfx/copilot.el"
-                   :branch "main"
-                   :files ("dist" "*.el"))
-  :hook (prog-mode . copilot-mode)
-  :config
-  (setq copilot-idle-delay 0.15)
-  (define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
-  (define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion))
 
 (use-package lsp-mode
   :ensure t
