@@ -428,45 +428,20 @@
      (whitespace-cleanup)
      (delete-trailing-whitespace))))
 
-(use-package treesit-auto
-  :ensure t
-  :config
-  (setq treesit-auto-install 'prompt)
-  (global-treesit-auto-mode))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Languages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package flycheck :ensure t :diminish flycheck-mode)
 (use-package flymake :ensure t :diminish flymake-mode)
 
-(use-package lsp-mode
-  :ensure t
-  :commands lsp
-  :diminish lsp-mode
-  :init
-  (defun my/lsp-mode-setup-completion ()
-    (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
-          '(flex))) ;; Configure flex
-  :hook ((lsp-completion-mode . my/lsp-mode-setup-completion)
-         ((clojure-ts-mode R-mode) . lsp))
-  :config
-  (setq
-   ;;lsp-enable-completion-at-point nil
-   lsp-lens-enable nil
-   lsp-completion-provider :none        ;
-   lsp-eldoc-enable-hover nil
-   lsp-signature-auto-activate nil
-   lsp-headerline-breadcrumb-enable nil
-   lsp-enable-indentation nil
-   lsp-ui-sideline-enable nil
-   lsp-enable-semantic-highlighting nil
-   ;;lsp-enable-symbol-highlighting nil
-   lsp-modeline-code-actions-enable nil
-   lsp-modeline-diagnostics-enable nil
-   lsp-ui-doc-show-with-cursor nil
-   lsp-ui-sideline-show-code-actions nil)
-  )
+;; (use-package eglot
+;;   :ensure t
+;;   :defer t
+;;   :hook (clojure-ts-mode . eglot-ensure)
+;;   :config
+;;   (add-to-list 'eglot-stay-out-of 'flymake)
+;;   (setq eldoc-echo-area-use-multiline-p nil)
+;;   (add-to-list 'eglot-server-programs '(clojure-ts-mode . ("clojure-lsp"))))
 
 ;; Web stuff
 (use-package web-mode
@@ -517,8 +492,7 @@
     ielm-mode
     cider-mode
     cider-repl-mode
-    clojure-mode
-    clojure-ts-mode))
+    clojure-mode))
 
 (dolist (mode lisps)
   (add-hook (intern (concat (symbol-name mode) "-hook")) 'enable-lisp-utils))
@@ -535,21 +509,21 @@
         cider-repl-use-pretty-printing t))
 
 ;;; Experimental treesitter (isn't caught by the auto somehow...)
-(use-package clojure-ts-mode
-  :ensure t
-  :hook ((clojure-mode . clojure-ts-mode)
-         (clojurescript-mode . clojure-ts-mode)
-         (clojurec-mode . clojure-ts-mode))
-  :config
-  (add-hook 'clojure-ts-mode-hook #'clojure-mode-variables)
-  (setq treesit-extra-load-path '("~/Sync/etc/tree-sitter-clojure/dist")))
+;; (use-package clojure-ts-mode
+;;   :ensure t
+;;   :hook ((clojure-mode . clojure-ts-mode)
+;;          (clojurescript-mode . clojure-ts-mode)
+;;          (clojurec-mode . clojure-ts-mode))
+;;   :config
+;;   (add-hook 'clojure-ts-mode-hook #'clojure-mode-variables)
+;;   (setq treesit-extra-load-path '("~/Sync/etc/tree-sitter-clojure/dist")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Writing & Blogging (org mode)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun enable-write-utils ()
- (flyspell-mode)
- (visual-line-mode 1))
+  (flyspell-mode)
+  (visual-line-mode 1))
 
 (dolist (hook '(text-mode-hook
                 org-mode-hook

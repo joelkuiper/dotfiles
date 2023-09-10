@@ -59,11 +59,7 @@ antigen theme minimal
 # Tell Antigen that you're done.
 antigen apply
 
-
 export EDITOR=vim
-
-export LC_ALL=en_US.UTF-8
-export LANG=en_US.UTF-8
 
 export NODE_HOME=~/Sync/etc/node-v20.5.1-linux-x64
 export JAVA_HOME=~/Sync/etc/graalvm-jdk-20.0.2+9.1
