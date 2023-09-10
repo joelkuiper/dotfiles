@@ -132,7 +132,8 @@
 (use-package rainbow-mode
   :ensure t
   :diminish rainbow-mode
-  :hook (text-mode prog-mode))
+  :hook ((prog-mode . rainbow-mode)
+         (text-mode . rainbow-mode)))
 
 (use-package ligature
   :ensure t
@@ -243,6 +244,7 @@
     ","      'consult-line-multi
     "e"      'eval-expression
     "q"      'quit-window
+    "/"      'comment-or-uncomment-region
     "x"      'execute-extended-command
     ";"      'consult-imenu
     "sh"     'eshell                    ; SHell
@@ -492,6 +494,7 @@
     ielm-mode
     cider-mode
     cider-repl-mode
+    clojure-ts-mode
     clojure-mode))
 
 (dolist (mode lisps)
@@ -501,7 +504,8 @@
 (use-package cider
   :ensure t
   :commands cider-jack-in
-  :hook ((clojure-ts-mode . cider-mode))
+  :hook ((clojure-ts-mode . cider-mode)
+         (clojure-mode . cider-mode))
   :config
   (setq cider-eldoc-display-symbol-at-point nil
         cider-auto-select-error-buffer nil
@@ -509,14 +513,14 @@
         cider-repl-use-pretty-printing t))
 
 ;;; Experimental treesitter (isn't caught by the auto somehow...)
-;; (use-package clojure-ts-mode
-;;   :ensure t
-;;   :hook ((clojure-mode . clojure-ts-mode)
-;;          (clojurescript-mode . clojure-ts-mode)
-;;          (clojurec-mode . clojure-ts-mode))
-;;   :config
-;;   (add-hook 'clojure-ts-mode-hook #'clojure-mode-variables)
-;;   (setq treesit-extra-load-path '("~/Sync/etc/tree-sitter-clojure/dist")))
+(use-package clojure-ts-mode
+  :ensure t
+  :hook ((clojure-mode . clojure-ts-mode)
+         (clojurescript-mode . clojure-ts-mode)
+         (clojurec-mode . clojure-ts-mode))
+  :config
+  (add-hook 'clojure-ts-mode-hook #'clojure-mode-variables)
+  (setq treesit-extra-load-path '("~/Sync/etc/tree-sitter-clojure/dist")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Writing & Blogging (org mode)
