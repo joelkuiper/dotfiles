@@ -50,9 +50,6 @@ antigen bundle fzf
 antigen bundle vi-mode
 antigen bundle history-substring-search
 
-# Load the theme.
-source ~/dotfiles/minimal.zsh-theme
-
 # Tell Antigen that you're done.
 antigen apply
 
@@ -73,6 +70,9 @@ export PATH=$PATH:$NODE_HOME/bin/:~/bin/:~/.local/bin/
 
 eval "$(direnv hook zsh)"
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# Load the theme.
+source ~/dotfiles/minimal.zsh-theme
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
