@@ -51,7 +51,7 @@ antigen bundle vi-mode
 antigen bundle history-substring-search
 
 # Load the theme.
-antigen theme minimal
+source ~/dotfiles/minimal.zsh-theme
 
 # Tell Antigen that you're done.
 antigen apply
