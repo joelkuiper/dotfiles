@@ -113,10 +113,11 @@
 (use-package vundo :ensure t)
 (use-package direnv :ensure t)
 (use-package diminish :ensure t)
+(use-package magit :ensure t)
 (use-package eldoc :diminish eldoc-mode)
 (use-package autorevert :diminish auto-revert-mode)
-(use-package vterm :ensure t)
-(use-package exec-path-from-shell :ensure t
+(use-package exec-path-from-shell
+  :ensure t
   :init
   (exec-path-from-shell-initialize))
 
@@ -275,7 +276,7 @@
     "pf"     'project-find-file
     "pd"     'project-dired
     "pg"     'consult-git-grep
-    "vt"     'vterm-other-window
+    "vt"     'multi-vterm-project
 
     "cc"     'cider-connect
     "ch"     'cider-repl-history
@@ -304,16 +305,13 @@
               ("," . 'er/contract-region)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Projects
+;;; Vertico, Prescient, Corfu
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(use-package magit :ensure t)
-(use-package direnv :ensure t)
-
 ;; Vertico: better vertical completion for minibuffer commands
 (use-package vertico
   :init
   (vertico-mode)
-  (setq vertico-scroll-margin 0)
+  (setq vertico-scroll-margin 1)
   :custom
   (vertico-cycle t)
   :bind  (:map vertico-map
@@ -381,12 +379,6 @@
   (setq corfu-auto t
         corfu-quit-no-match 'separator))
 
-;; Enable Corfu completion UI
-;; See the Corfu README for more configuration tips.
-(use-package corfu
-  :init
-  (global-corfu-mode))
-
 ;; Add extensions
 (use-package cape
   :ensure t
@@ -429,6 +421,43 @@
   :init
   (vertico-prescient-mode))
 
+(use-package multi-vterm
+  :after (vterm)
+  :ensure t
+  :config
+  (add-hook 'vterm-mode-hook
+	    (lambda () (evil-insert-state)))
+  (define-key vterm-mode-map [return]                      #'vterm-send-return)
+
+  (setq vterm-keymap-exceptions nil)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-e")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-f")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-a")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-v")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-b")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-w")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-u")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-d")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-n")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-m")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-p")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-j")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-k")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-r")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-t")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-g")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-c")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-SPC")    #'vterm--self-insert)
+  (evil-define-key 'normal vterm-mode-map (kbd "C-d")      #'vterm--self-insert)
+  (evil-define-key 'normal vterm-mode-map (kbd "i")        #'evil-insert-resume)
+  (evil-define-key 'normal vterm-mode-map (kbd "o")        #'evil-insert-resume)
+  (evil-define-key 'normal vterm-mode-map (kbd "<return>") #'evil-insert-resume))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Vterm
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(use-package vterm :ensure t)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Programming & Development
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -437,12 +466,12 @@
   ;; java/c/c++
   (setq c-basic-offset n)
   ;; web development
-  (setq javascript-indent-level n) ; javascript-mode
-  (setq js-indent-level n) ; js-mode
+  (setq javascript-indent-level n)       ; javascript-mode
+  (setq js-indent-level n)               ; js-mode
   (setq web-mode-markup-indent-offset n) ; web-mode, html tag in html file
-  (setq web-mode-css-indent-offset n) ; web-mode, css in html file
+  (setq web-mode-css-indent-offset n)    ; web-mode, css in html file
   (setq web-mode-code-indent-offset n) ; web-mode, js code in html file
-  (setq css-indent-offset n) ; css-mode
+  (setq css-indent-offset n)           ; css-mode
   )
 
 (defun my-code-style ()
@@ -503,7 +532,8 @@
          ("\\.r\\'" . R-mode))
   :init
   (setq ess-eval-visibly 'nowait)
-  (setq ess-r-backend 'lsp))
+  ;;(setq ess-r-backend 'lsp)
+  )
 
 ;; Lisp
 (use-package aggressive-indent
