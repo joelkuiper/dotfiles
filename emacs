@@ -428,9 +428,7 @@
   :after (vterm)
   :ensure t
   :config
-  (add-hook 'vterm-mode-hook
-	    (lambda () (evil-emacs-state)))
-  (define-key vterm-mode-map [return]                      #'vterm-send-return)
+  (define-key vterm-mode-map [return] #'vterm-send-return)
 
   (setq vterm-keymap-exceptions nil))
 
@@ -514,6 +512,7 @@
 ;; Lisp
 (use-package aggressive-indent
   :ensure t
+  :hook (prog-mode . aggressive-indent-mode)
   :diminish aggressive-indent-mode
   :commands aggressive-indent-mode)
 
@@ -528,7 +527,6 @@
   :commands highlight-parentheses-mode)
 
 (defun enable-lisp-utils ()
-  (aggressive-indent-mode)
   (paredit-mode)
   (evil-cleverparens-mode)
   (highlight-parentheses-mode t))
