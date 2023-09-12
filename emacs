@@ -506,8 +506,16 @@
          ("\\.r\\'" . R-mode))
   :init
   (setq ess-eval-visibly 'nowait)
+  (electric-pair-mode)
   ;;(setq ess-r-backend 'lsp)
   )
+
+(use-package js2-mode
+  :ensure t
+  :mode (("\\.js\\'" . js2-mode))
+  :config
+  (electric-pair-mode))
+
 
 ;; Lisp
 (use-package aggressive-indent
@@ -523,13 +531,13 @@
 
 (use-package highlight-parentheses
   :ensure t
+  :hook (prog-mode . highlight-parentheses-mode)
   :diminish highlight-parentheses-mode
   :commands highlight-parentheses-mode)
 
 (defun enable-lisp-utils ()
   (paredit-mode)
-  (evil-cleverparens-mode)
-  (highlight-parentheses-mode t))
+  (evil-cleverparens-mode))
 
 (defvar lisps
   '(emacs-lisp-mode
@@ -638,7 +646,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(clojure-ts-mode tao-theme cider highlight-parentheses evil-cleverparens paredit aggressive-indent ess web-mode orderless corfu marginalia vertico magit expand-region evil-leader evil-collection ligature rainbow-mode vterm diminish direnv vundo)))
+   '(js2-mode clojure-ts-mode tao-theme cider highlight-parentheses evil-cleverparens paredit aggressive-indent ess web-mode orderless corfu marginalia vertico magit expand-region evil-leader evil-collection ligature rainbow-mode vterm diminish direnv vundo)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
