@@ -275,7 +275,7 @@
     "pf"     'project-find-file
     "pd"     'project-dired
     "pg"     'consult-git-grep
-    "vt"     'multi-vterm-project
+    "vt"     'multi-vterm
 
     "cc"     'cider-connect
     "ch"     'cider-repl-history
