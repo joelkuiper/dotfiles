@@ -79,6 +79,7 @@
   (prefer-coding-system 'utf-8-unix)
 
   (winner-mode 1)
+  (desktop-save-mode 1)
   (global-set-key (kbd "C-s-<left>") 'winner-undo)
   (global-set-key (kbd "C-s-<right>") 'winner-redo)
 
@@ -149,13 +150,13 @@
      "[INFO ]" "[WARN ]" "[PASS ]" "[VERBOSE]" "[KO]" "[OK]" "[PASS]"
      "[ERROR]" "[DEBUG]" "[INFO]" "[WARN]" "[WARNING]" "[ERR]" "[FATAL]"
      "[TRACE]" "[FIXME]" "[TODO]" "[BUG]" "[NOTE]" "[HACK]" "[MARK]"
-     "[FAIL]" ))
+     "[FAIL]"  "<->" "<~>" "->" "<-" "~>" "<~" "=>"))
   ;; Enable all ligatures in programming modes
   (ligature-set-ligatures
    'prog-mode
    '( "!=" "!==" "!≡≡" "!=<" "#(" "#_" "#{" "#?" "##" "#_(" "#[" "%="
       "&%" "&&" "&+" "&-" "&/" "&=" "&&&" "$>" "(|" "*>" "++" "+++"
-      "+=" "+>" "++=" "--" "-<" "-<<" "-=" "->" "->>" "-->" "-+-"
+      "+=" "+>" "++=" "-<" "-<<" "-=" "->" "->>" "-->" "-+-"
       "-\\/" "-|>" "-<|" "->-" "-<-" "-|" "-||" "-|:" ".=" "//=" "/="
       "/==" "/-\\" "/-:" "/->" "/=>" "/-<" "/=<" "/=:" ":=" ":=" ":=>"
       ":-\\" ":=\\" ":-/" ":=/" ":-|" ":=|" ":|-" ":|=" "<$>" "<*"
@@ -282,6 +283,11 @@
     "cb"     'cider-repl-clear-buffer
     "o."     'org-time-stamp
     "oe"     'org-export
+
+    "fs"     'toggle-frame-fullscreen
+
+    "ds"     'desktop-save-in-desktop-dir
+    "dr"     'desktop-read
 
     "u"      'vundo
     "|"      'evil-window-vsplit
@@ -573,6 +579,15 @@
 ;;   :config
 ;;   (add-hook 'clojure-ts-mode-hook #'clojure-mode-variables)
 ;;   (setq treesit-extra-load-path '("~/Sync/etc/tree-sitter-clojure/dist")))
+
+(use-package flycheck-clj-kondo
+  :ensure t)
+
+;; then install the checker as soon as `clojure-mode' is loaded
+(use-package clojure-mode
+  :ensure t
+  :config
+  (require 'flycheck-clj-kondo))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Writing & Blogging (org mode)
