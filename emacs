@@ -289,6 +289,8 @@
     "ds"     'desktop-save-in-desktop-dir
     "dr"     'desktop-read
 
+    "XX"     'kill-emacs
+
     "u"      'vundo
     "|"      'evil-window-vsplit
     "_"      'evil-window-split
@@ -481,7 +483,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Languages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(use-package flycheck :ensure t :diminish flycheck-mode)
+(use-package flycheck
+  :ensure t
+  :diminish flycheck-mode
+  :hook ((clojure-ts-mode . flycheck-mode)
+         (clojure-mode . flycheck-mode)))
+
 (use-package flymake :ensure t :diminish flymake-mode)
 
 ;; (use-package eglot
