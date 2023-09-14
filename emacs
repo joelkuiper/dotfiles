@@ -520,6 +520,15 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Languages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; Code References
+
+(use-package xref
+  :ensure nil
+  :bind
+  ([remap xref-find-apropos] . xref-find-definitions)
+  ([remap xref-find-definitions] . xref-find-definitions-other-window))
+
+;;;; LSP Client
 (use-package eglot
   :ensure t
   :defer t
