@@ -437,7 +437,9 @@
   :ensure t
   :config
   (define-key vterm-mode-map [return] #'vterm-send-return)
-
+  ;;https://github.com/akermu/emacs-libvterm/issues/179#issuecomment-1045331359
+  ;; .screenrc => termcapinfo xterm* ti@:te@
+  (setq vterm-shell "screen")
   (setq vterm-keymap-exceptions nil))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
