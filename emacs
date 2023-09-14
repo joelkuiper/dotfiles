@@ -91,6 +91,9 @@
    ad-redefinition-action 'accept                   ;; Silence warnings for redefinitions
    auto-save-list-file-prefix nil                   ;; Prevent tracking for auto-saves
    backup-by-copying t                              ;; Backups never overwrite original
+   backup-directory-alist `(("." . "~/.backups"))     ;; Where are the backups ?
+   backup-directory-alist `((".*" . ,temporary-file-directory))
+   auto-save-file-name-transforms `((".*" ,temporary-file-directory t))
    comment-multi-line t                             ;; Continue comments when filling
    create-lockfiles nil                             ;; Locks are more nuisance than blessing
    cursor-in-non-selected-windows nil               ;; Hide the cursor in inactive windows
@@ -500,17 +503,10 @@
   (setq mode-line-misc-info
         (delete '(eglot--managed-mode (" [" eglot--mode-line-format "] "))
                 mode-line-misc-info))
-
   (setq eldoc-echo-area-use-multiline-p nil)
-  (add-to-list 'eglot-stay-out-of 'eldoc-documentation-strategy)
-  (put 'eglot-error 'flymake-overlay-control nil)
-  (put 'eglot-note 'flymake-overlay-control nil)
-  (put 'eglot-warning 'flymake-overlay-control nil)
   (add-to-list 'eglot-server-programs '(clojure-mode . ("clojure-lsp")))
-
   :custom
-  (eglot-autoshutdown t)
-  (eglot-events-buffer-size 0))
+  (eglot-autoshutdown t))
 
 ;; Web stuff
 (use-package web-mode
