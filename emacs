@@ -281,7 +281,10 @@
   (define-key evil-normal-state-map (kbd "C-x <right>") 'windmove-right)
   (define-key evil-normal-state-map (kbd "C-x <left>") 'windmove-left)
   (define-key evil-normal-state-map (kbd "C-x <down>") 'windmove-down)
-  (define-key evil-normal-state-map (kbd "C-x <up>") 'windmove-up))
+  (define-key evil-normal-state-map (kbd "C-x <up>") 'windmove-up)
+  (define-key evil-normal-state-map (kbd "C-c l") 'eglot-code-actions)
+
+  )
 
 (use-package evil-collection
   :ensure t
@@ -289,7 +292,7 @@
   :diminish evil-collection-unimpaired-mode
   :init
   (evil-collection-init
-   '(cider vterm corfu magit dired vundo org vertico)))
+   '(cider eglot vterm corfu magit dired vundo org vertico)))
 
 (use-package evil-leader
   :ensure t
@@ -538,6 +541,7 @@
         (delete '(eglot--managed-mode (" [" eglot--mode-line-format "] "))
                 mode-line-misc-info))
   (setq eldoc-echo-area-use-multiline-p nil)
+  (setq eglot-confirm-server-initiated-edits nil)
   (add-to-list 'eglot-server-programs '(clojure-mode . ("clojure-lsp")))
   :custom
   (eglot-autoshutdown t))
