@@ -185,13 +185,14 @@
   (desktop-read)
   (desktop-save-mode))
 
-;; Best thing ever
+;; Winner winner, chicken ...
 (use-package winner
   :config
   (winner-mode 1)
   (global-set-key (kbd "C-s-<left>") 'winner-undo)
   (global-set-key (kbd "C-s-<right>") 'winner-redo))
 
+;; It moves between splits in buffers like the wind
 (global-set-key (kbd "C-M-s-<right>") 'windmove-right)
 (global-set-key (kbd "C-M-s-<left>") 'windmove-left)
 (global-set-key (kbd "C-M-s-<down>") 'windmove-down)
@@ -212,6 +213,7 @@
   :hook ((prog-mode . rainbow-mode)
          (text-mode . rainbow-mode)))
 
+;; You'll see what it does below, if not harfbuzz is broken.
 (use-package ligature
   :ensure t
   :config
@@ -321,14 +323,14 @@
     "."      'er/expand-region
     ","      'consult-line-multi
     "e"      'eval-expression
-    "q"      'quit-window
+    "q"      'kill-buffer
     "/"      'consult-line
     "x"      'execute-extended-command
     ";"      'consult-imenu
     "sh"     'eshell                    ; SHell
     "br"     'my-reload-buffer          ; BufferReload
     "bs"     'consult-buffer            ; BufferSwtich
-    "bk"     'kill-buffer
+    "bk"     'kill-buffer               ; BufferKill
     "ws"     'whitespace-mode
     "ln"     'display-line-numbers-mode
 
@@ -503,17 +505,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Programming & Development
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Indentation and code style
-;; java/c/c++
-(setq c-basic-offset 2)
-;; web development
-(setq javascript-indent-level 2)       ; javascript-mode
-(setq js-indent-level 2)               ; js-mode
-(setq web-mode-markup-indent-offset 2) ; web-mode, html tag in html file
-(setq web-mode-css-indent-offset 2)    ; web-mode, css in html file
-(setq web-mode-code-indent-offset 2)   ; web-mode, js code in html file
-(setq css-indent-offset 2)             ; css-mode
-
 (use-package whitespace
   :ensure t
   :init
@@ -559,6 +550,11 @@
   :defer t
   :hook (web-mode . custom-web-mode-hook)
   :mode (("\\.html?\\'" . web-mode))
+  :config
+  (setq css-indent-offset 2)
+  (setq web-mode-markup-indent-offset 2) ; web-mode, html tag in html file
+  (setq web-mode-css-indent-offset 2)    ; web-mode, css in html file
+  (setq web-mode-code-indent-offset 2)   ; web-mode, js code in html file
   :init
   (defun custom-web-mode-hook ()
     "Hooks for Web mode."
@@ -575,20 +571,22 @@
   (electric-pair-mode)
   (setq ess-r-backend 'lsp))
 
+;; Javascript (as little as humanly possible)
 (use-package js2-mode
   :ensure t
   :mode (("\\.js\\'" . js2-mode))
   :config
+  (setq javascript-indent-level 2)       ; javascript-mode
+  (setq js-indent-level 2)               ; js-mode
   (electric-pair-mode))
 
-
-;; Lisp
 (use-package aggressive-indent
   :ensure t
   :hook (prog-mode . aggressive-indent-mode)
   :diminish aggressive-indent-mode
   :commands aggressive-indent-mode)
 
+;; Lisp
 (use-package paredit
   :ensure t
   :diminish paredit-mode
