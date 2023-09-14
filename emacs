@@ -67,10 +67,6 @@
   (set-keyboard-coding-system 'utf-8-unix)
   (prefer-coding-system 'utf-8-unix)
 
-  (winner-mode 1)
-  (global-set-key (kbd "C-s-<left>") 'winner-undo)
-  (global-set-key (kbd "C-s-<right>") 'winner-redo)
-
   (setq-default
    ;; Mostly from https://github.com/angrybacon/dotemacs/blob/master/lisp/use-defaults.el
    inhibit-startup-screen t                         ;; No startup screen
@@ -189,6 +185,18 @@
   (desktop-read)
   (desktop-save-mode))
 
+;; Best thing ever
+(use-package winner
+  :config
+  (winner-mode 1)
+  (global-set-key (kbd "C-s-<left>") 'winner-undo)
+  (global-set-key (kbd "C-s-<right>") 'winner-redo))
+
+(global-set-key (kbd "C-M-s-<right>") 'windmove-right)
+(global-set-key (kbd "C-M-s-<left>") 'windmove-left)
+(global-set-key (kbd "C-M-s-<down>") 'windmove-down)
+(global-set-key (kbd "C-M-s-<up>") 'windmove-up)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Visual.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -264,6 +272,10 @@
 
   (setq evil-respect-visual-line-mode t)
   (setq evil-shift-width tab-width)
+
+  (global-set-key (kbd "C-s-]") 'evil-window-vsplit) ;; ]
+  (global-set-key (kbd "s-ESC") 'evil-window-split) ;; [
+
   (define-key evil-normal-state-map [escape] 'keyboard-quit)
   (define-key evil-visual-state-map [escape] 'keyboard-quit)
 
@@ -278,13 +290,8 @@
   (define-key evil-visual-state-map (kbd ">") 'shift-right-visual)
   (define-key evil-visual-state-map (kbd "<") 'shift-left-visual)
 
-  (define-key evil-normal-state-map (kbd "C-x <right>") 'windmove-right)
-  (define-key evil-normal-state-map (kbd "C-x <left>") 'windmove-left)
-  (define-key evil-normal-state-map (kbd "C-x <down>") 'windmove-down)
-  (define-key evil-normal-state-map (kbd "C-x <up>") 'windmove-up)
   (define-key evil-normal-state-map (kbd "C-c l") 'eglot-code-actions)
-
-  )
+  (define-key evil-normal-state-map (kbd "C-c .") 'embark-act))
 
 (use-package evil-collection
   :ensure t
