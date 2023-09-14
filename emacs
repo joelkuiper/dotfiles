@@ -110,7 +110,7 @@
    read-process-output-max (* 1024 1024)            ;; Increase read size for data chunks
    recenter-positions '(5 bottom)                   ;; Set re-centering positions
    ring-bell-function 'ignore                       ;; Silence error bells
-   scroll-conservatively 101                        ;; Avoid recentering when scrolling far
+   ;; scroll-conservatively 101                        ;; Avoid recentering when scrolling far
    scroll-margin 3                                  ;; Add a margin when scrolling vertically
    scroll-step 1                                    ;; Add scroll step (like Vim)
    select-enable-clipboard t                        ;; Merge system's and Emacs' clipboard
@@ -281,7 +281,7 @@
     ","      'consult-line-multi
     "e"      'eval-expression
     "q"      'quit-window
-    "/"      'comment-or-uncomment-region
+    "/"      'consult-line
     "x"      'execute-extended-command
     ";"      'consult-imenu
     "sh"     'eshell                    ; SHell
