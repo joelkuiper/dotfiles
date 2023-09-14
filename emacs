@@ -15,10 +15,6 @@
  '(("gnu" . "https://elpa.gnu.org/packages/")
    ("melpa" . "https://melpa.org/packages/")))
 
-(setq gc-cons-threshold (* 8 1024 1024))
-(setq byte-compile-warnings '(not obsolete))
-(setq warning-suppress-log-types '((comp) (bytecomp)))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Utility functions.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -92,7 +88,6 @@
    auto-save-list-file-prefix nil                   ;; Prevent tracking for auto-saves
    backup-by-copying t                              ;; Backups never overwrite original
    backup-directory-alist `(("." . "~/.backups"))     ;; Where are the backups ?
-   backup-directory-alist `((".*" . ,temporary-file-directory))
    auto-save-file-name-transforms `((".*" ,temporary-file-directory t))
    comment-multi-line t                             ;; Continue comments when filling
    create-lockfiles nil                             ;; Locks are more nuisance than blessing
@@ -102,7 +97,6 @@
    custom-unlispify-menu-entries nil                ;; Prefer kebab-case for titles
    custom-unlispify-tag-names nil                   ;; Prefer kebab-case for symbols
    delete-by-moving-to-trash t                      ;; Delete files to trash
-   delete-old-versions t                            ;; Delete extra backups silently
    fill-column 80                                   ;; Set width for automatic line breaks
    gc-cons-threshold (* 8 1024 1024)                ;; We're not using Game Boys anymore
    help-window-select t                             ;; Focus new help windows when opened
@@ -110,6 +104,8 @@
    max-mini-window-height 10                        ;; Limit height for minibuffer transients
    mouse-yank-at-point t                            ;; Yank at point rather than pointer
    native-comp-async-report-warnings-errors 'silent ;; Skip error buffers
+   byte-compile-warnings '(not obsolete)            ;; Disable obsolete warnings when compiling
+   warning-suppress-log-types '((comp) (bytecomp))  ;; Suppress compiler warning messages
    read-process-output-max (* 1024 1024)            ;; Increase read size for data chunks
    recenter-positions '(5 bottom)                   ;; Set re-centering positions
    ring-bell-function 'ignore                       ;; Silence error bells
@@ -124,6 +120,7 @@
    use-short-answers t                              ;; Replace yes/no prompts with y/n
    vc-follow-symlinks t                             ;; Never prompt when visiting symlinks
    version-control t                                ;; Use numeric versions for backups
+   delete-old-versions t                            ;; Delete extra backups silently
    window-combination-resize t                      ;; Resize windows proportionally
    x-stretch-cursor t)                              ;; Stretch cursor to the glyph width
 
@@ -135,22 +132,56 @@
   (put 'erase-buffer 'disabled nil))
 
 
-;; Packages
-(use-package vundo :ensure t)
-(use-package direnv :ensure t)
-(use-package diminish :ensure t)
-(use-package magit :ensure t)
-(use-package eldoc :diminish eldoc-mode)
-(use-package autorevert :diminish auto-revert-mode)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Utility packages and setup.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Initialize and ensure that shell environment variables are set correctly.
+;; Ensures that the Emacs shell environment matches the system's.
 (use-package exec-path-from-shell
   :ensure t
   :init
   (exec-path-from-shell-initialize))
 
-;; Persist history over Emacs restarts.
-(use-package savehist :ensure t :init (savehist-mode))
+;; Provides undo/redo functionality.
+;; Enables undo and redo commands in Emacs.
+(use-package vundo
+  :ensure t)
 
+;; Integrates with direnv to load environment variables from .envrc.
+(use-package direnv
+  :ensure t)
 
+;; Hides minor modes from the mode line.
+(use-package diminish
+  :ensure t)
+
+;; Integrates Git version control into Emacs.
+(use-package magit
+  :ensure t)
+
+;; Hides eldoc minor mode from the mode line.
+(use-package eldoc
+  :diminish eldoc-mode)
+
+;; Hides auto-revert minor mode from the mode line.
+(use-package autorevert
+  :diminish auto-revert-mode)
+
+;; Hides flymake mode from the mode line.
+(use-package flymake
+  :diminish flymake-mode)
+
+;; Hides flycheck mode from the mode line.
+(use-package flycheck
+  :diminish flycheck-mode)
+
+;; Saves and restores command history over Emacs restarts.
+(use-package savehist
+  :ensure t
+  :init (savehist-mode))
+
+;; Manages session persistence for Emacs.
 (use-package desktop
   :ensure nil
   :defer 1
@@ -183,33 +214,30 @@
      "[INFO ]" "[WARN ]" "[PASS ]" "[VERBOSE]" "[KO]" "[OK]" "[PASS]"
      "[ERROR]" "[DEBUG]" "[INFO]" "[WARN]" "[WARNING]" "[ERR]" "[FATAL]"
      "[TRACE]" "[FIXME]" "[TODO]" "[BUG]" "[NOTE]" "[HACK]" "[MARK]"
-     "[FAIL]"  "<->" "<~>" "->" "<-" "~>" "<~" "=>"))
-  ;; Enable all ligatures in programming modes
-  (ligature-set-ligatures
-   'prog-mode
-   '( "!=" "!==" "!≡≡" "!=<" "#(" "#_" "#{" "#?" "##" "#_(" "#[" "%="
-      "&%" "&&" "&+" "&-" "&/" "&=" "&&&" "$>" "(|" "*>" "++" "+++"
-      "+=" "+>" "++=" "-<" "-<<" "-=" "->" "->>" "-->" "-+-"
-      "-\\/" "-|>" "-<|" "->-" "-<-" "-|" "-||" "-|:" ".=" "//=" "/="
-      "/==" "/-\\" "/-:" "/->" "/=>" "/-<" "/=<" "/=:" ":=" ":=" ":=>"
-      ":-\\" ":=\\" ":-/" ":=/" ":-|" ":=|" ":|-" ":|=" "<$>" "<*"
-      "<*>" "<+>" "<-" "<<=" "<=" "<=>" "<>" "<|>" "<<-" "<|" "<=<"
-      "<~" "<~~" "<<~" "<$" "<+" "<!>" "<@>" "<#>" "<%>" "<^>" "<&>"
-      "<?>" "<.>" "</>" "<\\>" "<\">" "<:>" "<~>" "<**>" "<<^" "<="
-      "<->" "<!--" "<--" "<~<" "<==>" "<|-" "<||" "<<|" "<-<" "<-->"
-      "<<==" "<==" "<-\\" "<-/" "<=\\" "<=/" "=<<" "==" "===" "==>"
-      "=>" "=~" "=>>" "=~=" "==>>" "=>=" "=<=" "=<" "==<" "=<|" "=/"
-      "=/=" "=/<" "=|" "=||" "=|:" ">-" ">=" ">>-" ">>=" ">=>" ">>^"
-      ">>|" ">!=" ">->" ">==" ">=" ">/=" ">-|" ">=|" ">-\\" ">=\\"
-      ">-/" ">=/" "?." "^=" "^^" "^<<" "^>>" "\\=" "\\==" "\\/-"
-      "\\-/" "\\-:" "\\->" "\\=>" "\\-<" "\\=<" "\\=:" "|=" "|>=" "|>"
-      "|+|" "|->" "|-->" "|=>" "|==>" "|>-" "|<<" "||>" "|>>" "|-"
-      "||-" "||=" "|)" "|]" "|-:" "|=:" "|-<" "|=<" "|--<" "|==<" "~="
-      "~>" "~~>" "~>>" "[[" "[|" "_|_" "]]"))
+     "[FAIL]"  "<->" "<~>" "->" "<-" "~>" "<~" "=>"
+     "!=" "!==" "!≡≡" "!=<" "#(" "#_" "#{" "#?" "##" "#_(" "#[" "%="
+     "&%" "&&" "&+" "&-" "&/" "&=" "&&&" "$>" "(|" "*>" "++" "+++"
+     "+=" "+>" "++=" "-<" "-<<" "-=" "->" "->>" "-->" "-+-"
+     "-\\/" "-|>" "-<|" "->-" "-<-" "-|" "-||" "-|:" ".=" "//=" "/="
+     "/==" "/-\\" "/-:" "/->" "/=>" "/-<" "/=<" "/=:" ":=" ":=" ":=>"
+     ":-\\" ":=\\" ":-/" ":=/" ":-|" ":=|" ":|-" ":|=" "<$>" "<*"
+     "<*>" "<+>" "<-" "<<=" "<=" "<=>" "<>" "<|>" "<<-" "<|" "<=<"
+     "<~" "<~~" "<<~" "<$" "<+" "<!>" "<@>" "<#>" "<%>" "<^>" "<&>"
+     "<?>" "<.>" "</>" "<\\>" "<\">" "<:>" "<~>" "<**>" "<<^" "<="
+     "<->" "<!--" "<--" "<~<" "<==>" "<|-" "<||" "<<|" "<-<" "<-->"
+     "<<==" "<==" "<-\\" "<-/" "<=\\" "<=/" "=<<" "==" "===" "==>"
+     "=>" "=~" "=>>" "=~=" "==>>" "=>=" "=<=" "=<" "==<" "=<|" "=/"
+     "=/=" "=/<" "=|" "=||" "=|:" ">-" ">=" ">>-" ">>=" ">=>" ">>^"
+     ">>|" ">!=" ">->" ">==" ">=" ">/=" ">-|" ">=|" ">-\\" ">=\\"
+     ">-/" ">=/" "?." "^=" "^^" "^<<" "^>>" "\\=" "\\==" "\\/-"
+     "\\-/" "\\-:" "\\->" "\\=>" "\\-<" "\\=<" "\\=:" "|=" "|>=" "|>"
+     "|+|" "|->" "|-->" "|=>" "|==>" "|>-" "|<<" "||>" "|>>" "|-"
+     "||-" "||=" "|)" "|]" "|-:" "|=:" "|-<" "|=<" "|--<" "|==<" "~="
+     "~>" "~~>" "~>>" "[[" "[|" "_|_" "]]"))
   (global-ligature-mode t))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Evil
+;;; Evil (Vim)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package evil
   :ensure t
@@ -458,6 +486,7 @@
   (define-key vterm-mode-map [return] #'vterm-send-return)
   ;;https://github.com/akermu/emacs-libvterm/issues/179#issuecomment-1045331359
   ;; .screenrc => termcapinfo xterm* ti@:te@
+  ;; It makes wrapping after resize work
   (setq vterm-shell "screen")
   (setq vterm-keymap-exceptions nil))
 
@@ -491,10 +520,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Languages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(use-package flymake :diminish flymake-mode)
-(use-package flycheck :diminish flycheck-mode)
-
-
 (use-package eglot
   :ensure t
   :defer t
@@ -591,16 +616,6 @@
         cider-repl-print-length 100
         cider-repl-display-help-banner nil
         cider-repl-use-pretty-printing t))
-
-;;; Experimental treesitter (isn't caught by the auto somehow...)
-;; (use-package clojure-ts-mode
-;;   :ensure t
-;;   :hook ((clojure-mode . clojure-ts-mode)
-;;          (clojurescript-mode . clojure-ts-mode)
-;;          (clojurec-mode . clojure-ts-mode))
-;;   :config
-;;   (add-hook 'clojure-ts-mode-hook #'clojure-mode-variables)
-;;   (setq treesit-extra-load-path '("~/Sync/etc/tree-sitter-clojure/dist")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Writing & Blogging (org mode)
