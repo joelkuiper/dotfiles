@@ -72,7 +72,6 @@
   (prefer-coding-system 'utf-8-unix)
 
   (winner-mode 1)
-  (desktop-save-mode 1)
   (global-set-key (kbd "C-s-<left>") 'winner-undo)
   (global-set-key (kbd "C-s-<right>") 'winner-redo)
 
@@ -147,6 +146,14 @@
 
 ;; Persist history over Emacs restarts.
 (use-package savehist :ensure t :init (savehist-mode))
+
+
+(use-package desktop
+  :ensure nil
+  :defer 1
+  :config
+  (desktop-read)
+  (desktop-save-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Visual.
@@ -263,7 +270,7 @@
   (setq evil-leader/in-all-states 1)
   ;; Leaders
   (evil-leader/set-key
-    "1"      (lambda () (interactive) (find-file "~/.emacs"))
+    "1"      (lambda () (interactive) (find-file "~/dotfiles/emacs"))
     "2"      (lambda () (interactive) (find-file "~/Sync/org/scratch.org"))
     "3"      (lambda () (interactive) (find-file "~/Sync/org/todo.org"))
     "4"      (lambda () (interactive) (find-file "~/Sync/org/journal.org"))
@@ -296,7 +303,7 @@
     "p;"     'consult-imenu-multi
     "pp"     'consult-project-buffer
     "ps"     'project-switch-project
-    "pf"     'consult-project-buffer
+    "pf"     'project-find-file
     "pd"     'project-dired
     "pg"     'consult-git-grep
     "vt"     'multi-vterm
@@ -308,9 +315,6 @@
     "oe"     'org-export
 
     "fs"     'toggle-frame-fullscreen
-
-    "ds"     'desktop-save-in-desktop-dir
-    "dr"     'desktop-read
 
     "XX"     'kill-emacs
 
@@ -484,22 +488,29 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Languages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(use-package flycheck
+(use-package flymake :diminish flymake-mode)
+(use-package flycheck :diminish flycheck-mode)
+
+
+(use-package eglot
   :ensure t
-  :diminish flycheck-mode
-  :hook ((clojure-ts-mode . flycheck-mode)
-         (clojure-mode . flycheck-mode)))
+  :defer t
+  :hook ((clojure-mode . eglot-ensure))
+  :config
+  (setq mode-line-misc-info
+        (delete '(eglot--managed-mode (" [" eglot--mode-line-format "] "))
+                mode-line-misc-info))
 
-(use-package flymake :ensure t :diminish flymake-mode)
+  (setq eldoc-echo-area-use-multiline-p nil)
+  (add-to-list 'eglot-stay-out-of 'eldoc-documentation-strategy)
+  (put 'eglot-error 'flymake-overlay-control nil)
+  (put 'eglot-note 'flymake-overlay-control nil)
+  (put 'eglot-warning 'flymake-overlay-control nil)
+  (add-to-list 'eglot-server-programs '(clojure-mode . ("clojure-lsp")))
 
-;; (use-package eglot
-;;   :ensure t
-;;   :defer t
-;;   :hook (clojure-ts-mode . eglot-ensure)
-;;   :config
-;;   (add-to-list 'eglot-stay-out-of 'flymake)
-;;   (setq eldoc-echo-area-use-multiline-p nil)
-;;   (add-to-list 'eglot-server-programs '(clojure-ts-mode . ("clojure-lsp"))))
+  :custom
+  (eglot-autoshutdown t)
+  (eglot-events-buffer-size 0))
 
 ;; Web stuff
 (use-package web-mode
@@ -521,8 +532,7 @@
   :init
   (setq ess-eval-visibly 'nowait)
   (electric-pair-mode)
-  ;;(setq ess-r-backend 'lsp)
-  )
+  (setq ess-r-backend 'lsp))
 
 (use-package js2-mode
   :ensure t
@@ -565,6 +575,14 @@
 (dolist (mode lisps)
   (add-hook (intern (concat (symbol-name mode) "-hook")) 'enable-lisp-utils))
 
+(defun set-emacs-lisp-mode ()
+  (let ((file-name (expand-file-name (buffer-file-name))))
+    (when (or (string= file-name (expand-file-name "~/dotfiles/emacs"))
+              (string= file-name (expand-file-name "~/.emacs")))
+      (emacs-lisp-mode))))
+
+(add-hook 'find-file-hook 'set-emacs-lisp-mode)
+
 ;; Clojure
 (use-package cider
   :ensure t
@@ -587,15 +605,6 @@
 ;;   :config
 ;;   (add-hook 'clojure-ts-mode-hook #'clojure-mode-variables)
 ;;   (setq treesit-extra-load-path '("~/Sync/etc/tree-sitter-clojure/dist")))
-
-(use-package flycheck-clj-kondo
-  :ensure t)
-
-;; then install the checker as soon as `clojure-mode' is loaded
-(use-package clojure-mode
-  :ensure t
-  :config
-  (require 'flycheck-clj-kondo))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Writing & Blogging (org mode)
