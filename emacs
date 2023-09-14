@@ -15,16 +15,9 @@
  '(("gnu" . "https://elpa.gnu.org/packages/")
    ("melpa" . "https://melpa.org/packages/")))
 
-(setq gc-cons-threshold 10000000)
+(setq gc-cons-threshold (* 8 1024 1024))
 (setq byte-compile-warnings '(not obsolete))
 (setq warning-suppress-log-types '((comp) (bytecomp)))
-
-(setq inhibit-startup-screen t)
-(setq inhibit-startup-echo-area-message t)
-(setq inhibit-startup-message t)
-(setq initial-scratch-message nil)
-(setq initial-major-mode 'fundamental-mode)
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Utility functions.
@@ -83,31 +76,61 @@
   (global-set-key (kbd "C-s-<left>") 'winner-undo)
   (global-set-key (kbd "C-s-<right>") 'winner-redo)
 
-  (setq vc-follow-symlinks nil)
-  (setq create-lockfiles nil)
-  (setq tramp-terminal-type "tramp")
-
-  (setq backup-directory-alist `(("." . "~/.saves")))
-  (setq backup-by-copying t)
-  (setq backup-directory-alist
-        `((".*" . ,temporary-file-directory)))
-  (setq auto-save-file-name-transforms
-        `((".*" ,temporary-file-directory t)))
+  (setq-default
+   ;; Mostly from https://github.com/angrybacon/dotemacs/blob/master/lisp/use-defaults.el
+   inhibit-startup-screen t                         ;; No startup screen
+   inhibit-startup-echo-area-message t              ;; No echo message
+   initial-scratch-message nil                      ;; What's in the *scratch* buffer
+   inhibit-startup-message t                        ;; No startup message
+   initial-major-mode 'fundamental-mode             ;; What Emacs opens with
+   enable-recursive-minibuffers t                   ;; Use the minibuffer whilst in the minibuffer
+   completion-cycle-threshold 1                     ;; TAB cycles candidates
+   completions-detailed t                           ;; Show annotations
+   tab-always-indent 'complete                      ;; When I hit TAB, try to complete, otherwise, indent
+   indent-tabs-mode nil                             ;; Prefer spaces over tabs to indent
+   tramp-terminal-type "tramp"                      ;; Tramp compatibility
+   ad-redefinition-action 'accept                   ;; Silence warnings for redefinitions
+   auto-save-list-file-prefix nil                   ;; Prevent tracking for auto-saves
+   backup-by-copying t                              ;; Backups never overwrite original
+   comment-multi-line t                             ;; Continue comments when filling
+   create-lockfiles nil                             ;; Locks are more nuisance than blessing
+   cursor-in-non-selected-windows nil               ;; Hide the cursor in inactive windows
+   cursor-type '(hbar . 2)                          ;; Underline-shaped cursor
+   custom-file null-device                          ;; Prevent littering
+   custom-unlispify-menu-entries nil                ;; Prefer kebab-case for titles
+   custom-unlispify-tag-names nil                   ;; Prefer kebab-case for symbols
+   delete-by-moving-to-trash t                      ;; Delete files to trash
+   delete-old-versions t                            ;; Delete extra backups silently
+   fill-column 80                                   ;; Set width for automatic line breaks
+   gc-cons-threshold (* 8 1024 1024)                ;; We're not using Game Boys anymore
+   help-window-select t                             ;; Focus new help windows when opened
+   isearch-allow-scroll t                           ;; Allow scroll commands while isearching
+   max-mini-window-height 10                        ;; Limit height for minibuffer transients
+   mouse-yank-at-point t                            ;; Yank at point rather than pointer
+   native-comp-async-report-warnings-errors 'silent ;; Skip error buffers
+   read-process-output-max (* 1024 1024)            ;; Increase read size for data chunks
+   recenter-positions '(5 bottom)                   ;; Set re-centering positions
+   ring-bell-function 'ignore                       ;; Silence error bells
+   scroll-conservatively 101                        ;; Avoid recentering when scrolling far
+   scroll-margin 3                                  ;; Add a margin when scrolling vertically
+   scroll-step 1                                    ;; Add scroll step (like Vim)
+   select-enable-clipboard t                        ;; Merge system's and Emacs' clipboard
+   sentence-end-double-space nil                    ;; Use a single space after dots
+   show-help-function nil                           ;; Disable help text everywhere
+   tab-always-indent 'complete                      ;; Indent first then try completions
+   uniquify-buffer-name-style 'forward              ;; Uniquify buffer names
+   use-short-answers t                              ;; Replace yes/no prompts with y/n
+   vc-follow-symlinks t                             ;; Never prompt when visiting symlinks
+   version-control t                                ;; Use numeric versions for backups
+   window-combination-resize t                      ;; Resize windows proportionally
+   x-stretch-cursor t)                              ;; Stretch cursor to the glyph width
 
   ;; Do not allow the cursor in the minibuffer prompt
   (setq minibuffer-prompt-properties
         '(read-only t cursor-intangible t face minibuffer-prompt))
   (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
 
-  (setq enable-recursive-minibuffers t)                ; Use the minibuffer whilst in the minibuffer
-  (setq completion-cycle-threshold 1)                  ; TAB cycles candidates
-  (setq completions-detailed t)                        ; Show annotations
-  (setq tab-always-indent 'complete)                   ; When I hit TAB, try to complete, otherwise, indent
-
-  (put 'erase-buffer 'disabled nil)
-
-  (setq scroll-step 1)
-  (setq scroll-margin 3))
+  (put 'erase-buffer 'disabled nil))
 
 
 ;; Packages
@@ -202,7 +225,7 @@
     (evil-visual-restore))
 
   (setq evil-respect-visual-line-mode t)
-
+  (setq evil-shift-width tab-width)
   (define-key evil-normal-state-map [escape] 'keyboard-quit)
   (define-key evil-visual-state-map [escape] 'keyboard-quit)
 
@@ -273,7 +296,7 @@
     "p;"     'consult-imenu-multi
     "pp"     'consult-project-buffer
     "ps"     'project-switch-project
-    "pf"     'project-find-file
+    "pf"     'consult-project-buffer
     "pd"     'project-dired
     "pg"     'consult-git-grep
     "vt"     'multi-vterm
@@ -320,13 +343,7 @@
   (vertico-mode)
   (setq vertico-scroll-margin 1)
   :custom
-  (vertico-cycle t)
-  :bind  (:map vertico-map
-               ("C-j" . vertico-next)
-               ("C-k" . vertico-previous)
-               ("TAB" . vertico-insert)
-               ("?" . minibuffer-completion-help)
-               ("C-'" . vertico-quick-jump)))
+  (vertico-cycle t))
 
 ;; Configure directory extension.
 (use-package vertico-directory
@@ -356,11 +373,6 @@
   :ensure t
   :config
   (setq completion-in-region-function 'consult-completion-in-region))
-
-(use-package marginalia
-  :ensure t
-  :config
-  (marginalia-mode))
 
 (use-package embark
   :ensure t
@@ -446,28 +458,15 @@
 ;;; Programming & Development
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Indentation and code style
-(defun my-setup-indent (n)
-  ;; java/c/c++
-  (setq c-basic-offset n)
-  ;; web development
-  (setq javascript-indent-level n)       ; javascript-mode
-  (setq js-indent-level n)               ; js-mode
-  (setq web-mode-markup-indent-offset n) ; web-mode, html tag in html file
-  (setq web-mode-css-indent-offset n)    ; web-mode, css in html file
-  (setq web-mode-code-indent-offset n) ; web-mode, js code in html file
-  (setq css-indent-offset n)           ; css-mode
-  )
-
-(defun my-code-style ()
-  (interactive)
-  (setq-default
-   indent-tabs-mode nil
-   default-tab-width 2
-   evil-shift-width tab-width)
-  (my-setup-indent 2))
-
-(my-code-style)
-
+;; java/c/c++
+(setq c-basic-offset 2)
+;; web development
+(setq javascript-indent-level 2)       ; javascript-mode
+(setq js-indent-level 2)               ; js-mode
+(setq web-mode-markup-indent-offset 2) ; web-mode, html tag in html file
+(setq web-mode-css-indent-offset 2)    ; web-mode, css in html file
+(setq web-mode-code-indent-offset 2)   ; web-mode, js code in html file
+(setq css-indent-offset 2)             ; css-mode
 
 (use-package whitespace
   :ensure t
@@ -669,6 +668,8 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   '("801a567c87755fe65d0484cb2bded31a4c5bb24fd1fe0ed11e6c02254017acb2" "dbade2e946597b9cda3e61978b5fcc14fa3afa2d3c4391d477bdaeff8f5638c5" default))
  '(package-selected-packages
    '(js2-mode clojure-ts-mode tao-theme cider highlight-parentheses evil-cleverparens paredit aggressive-indent ess web-mode orderless corfu marginalia vertico magit expand-region evil-leader evil-collection ligature rainbow-mode vterm diminish direnv vundo)))
 (custom-set-faces
