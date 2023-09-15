@@ -521,13 +521,25 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Languages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; Code References
 
+;;;; Code References
 (use-package xref
   :ensure nil
   :bind
   ([remap xref-find-apropos] . xref-find-definitions)
   ([remap xref-find-definitions] . xref-find-definitions-other-window))
+
+(use-package aggressive-indent
+  :ensure t
+  :hook (prog-mode . aggressive-indent-mode)
+  :diminish aggressive-indent-mode
+  :commands aggressive-indent-mode)
+
+(use-package highlight-parentheses
+  :ensure t
+  :hook (prog-mode . highlight-parentheses-mode)
+  :diminish highlight-parentheses-mode
+  :commands highlight-parentheses-mode)
 
 ;;;; LSP Client
 (use-package eglot
@@ -545,58 +557,39 @@
   (eglot-autoshutdown t))
 
 ;; Web stuff
-(use-package web-mode
-  :ensure t
-  :defer t
-  :hook (web-mode . custom-web-mode-hook)
-  :mode (("\\.html?\\'" . web-mode))
-  :config
-  (setq css-indent-offset 2)
-  (setq web-mode-markup-indent-offset 2) ; web-mode, html tag in html file
-  (setq web-mode-css-indent-offset 2)    ; web-mode, css in html file
-  (setq web-mode-code-indent-offset 2)   ; web-mode, js code in html file
-  :init
-  (defun custom-web-mode-hook ()
-    "Hooks for Web mode."
-    (toggle-truncate-lines t)))
+(use-package sgml-mode
+  :ensure nil
+  :hook
+  (html-mode . sgml-electric-tag-pair-mode)
+  (html-mode . sgml-name-8bit-mode)
+  :custom
+  (sgml-basic-offset 2))
 
 ;; Emacs Speaks Statistics (R)
 (use-package ess
   :ensure t
   :defer t
+  :hook ((R-mode . electric-pair-mode))
   :mode (("\\.R\\'" . R-mode)
          ("\\.r\\'" . R-mode))
-  :init
-  (setq ess-eval-visibly 'nowait)
-  (electric-pair-mode)
-  (setq ess-r-backend 'lsp))
+  :config
+  (setq ess-r-backend 'lsp)
+  (setq ess-eval-visibly 'nowait))
 
 ;; Javascript (as little as humanly possible)
 (use-package js2-mode
   :ensure t
   :mode (("\\.js\\'" . js2-mode))
+  :hook ((js2-mode . electric-pair-mode))
   :config
-  (setq javascript-indent-level 2)       ; javascript-mode
-  (setq js-indent-level 2)               ; js-mode
-  (electric-pair-mode))
-
-(use-package aggressive-indent
-  :ensure t
-  :hook (prog-mode . aggressive-indent-mode)
-  :diminish aggressive-indent-mode
-  :commands aggressive-indent-mode)
+  (setq javascript-indent-level 2)      ; javascript-mode
+  (setq js-indent-level 2))             ; js-mode
 
 ;; Lisp
 (use-package paredit
   :ensure t
   :diminish paredit-mode
   :commands paredit-mode)
-
-(use-package highlight-parentheses
-  :ensure t
-  :hook (prog-mode . highlight-parentheses-mode)
-  :diminish highlight-parentheses-mode
-  :commands highlight-parentheses-mode)
 
 (defun enable-lisp-utils ()
   (paredit-mode)
@@ -648,7 +641,6 @@
                 latex-mode-hook))
   (add-hook hook 'enable-write-utils))
 
-(setq org-directory "~/Sync/org/")
 
 (use-package org
   :ensure t
@@ -656,6 +648,7 @@
   :mode (("\\.org\\'" . org-mode))
   :config
   ;; org-mode
+  (setq org-directory "~/Sync/org/")
   (defconst my-org-babel-languages
     '((R . t)
       (dot . t)
