@@ -641,12 +641,14 @@
         cider-repl-use-pretty-printing t))
 
 ;; https://github.com/clojure-emacs/clojure-ts-mode
-(use-package clojure-ts-mode
-  :defer t
-  :mode (("\\.clj[s|c]?\\'" . clojure-ts-mode))
-  :config
-  ;; (setq clojure-ts-indent-style 'fixed) ;; semantic or fixed
-  (setq clojure-ts-ensure-grammars t))
+;; (use-package clojure-ts-mode
+;;   :defer t
+;;   :mode (("\\.clj[s|c]?\\'" . clojure-ts-mode))
+;;   :config
+;;   (setq clojure-ts-indent-style 'semantic) ;; or 'fixed
+;;   ;; [HACK] https://github.com/clojure-emacs/clojure-ts-mode/issues/9
+;;   (add-hook 'clojure-ts-mode-hook #'clojure-mode-variables)
+;;   (setq clojure-ts-ensure-grammars t))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Writing & Blogging (org mode)
