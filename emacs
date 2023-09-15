@@ -140,7 +140,6 @@
   (exec-path-from-shell-initialize))
 
 ;; Provides undo/redo functionality.
-;; Enables undo and redo commands in Emacs.
 (use-package vundo
   :ensure t)
 
@@ -193,10 +192,12 @@
   (global-set-key (kbd "C-s-<right>") 'winner-redo))
 
 ;; It moves between splits in buffers like the wind
-(global-set-key (kbd "C-M-s-<right>") 'windmove-right)
-(global-set-key (kbd "C-M-s-<left>") 'windmove-left)
-(global-set-key (kbd "C-M-s-<down>") 'windmove-down)
-(global-set-key (kbd "C-M-s-<up>") 'windmove-up)
+(use-package windmove
+  :config
+  (global-set-key (kbd "C-M-s-<right>") 'windmove-right)
+  (global-set-key (kbd "C-M-s-<left>") 'windmove-left)
+  (global-set-key (kbd "C-M-s-<down>") 'windmove-down)
+  (global-set-key (kbd "C-M-s-<up>") 'windmove-up))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Visual.
@@ -328,6 +329,7 @@
     "x"      'execute-extended-command
     ";"      'consult-imenu
     "sh"     'eshell                    ; SHell
+    "vt"     'multi-vterm
     "br"     'my-reload-buffer          ; BufferReload
     "bs"     'consult-buffer            ; BufferSwtich
     "bk"     'kill-buffer               ; BufferKill
@@ -349,7 +351,6 @@
     "pf"     'project-find-file
     "pd"     'project-dired
     "pg"     'consult-git-grep
-    "vt"     'multi-vterm
 
     "cc"     'cider-connect
     "ch"     'cider-repl-history
