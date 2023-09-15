@@ -546,7 +546,9 @@
 (use-package eglot
   :ensure t
   :defer t
-  :hook ((clojure-mode . eglot-ensure))
+  :hook ((R-mode . eglot-ensure)
+         (clojure-mode . eglot-ensure)
+         (clojure-ts-mode . eglot-ensure))
   :config
   (setq mode-line-misc-info
         (delete '(eglot--managed-mode (" [" eglot--mode-line-format "] "))
@@ -554,6 +556,7 @@
   (setq eldoc-echo-area-use-multiline-p nil)
   (setq eglot-confirm-server-initiated-edits nil)
   (add-to-list 'eglot-server-programs '(clojure-mode . ("clojure-lsp")))
+  (add-to-list 'eglot-server-programs '(clojure-ts-mode . ("clojure-lsp")))
   :custom
   (eglot-autoshutdown t))
 
@@ -622,14 +625,20 @@
   :ensure t
   :defer t
   :commands cider-jack-in
-  :hook ((clojure-ts-mode . cider-mode)
-         (clojure-mode . cider-mode))
+  :hook ((clojure-mode . cider-mode)
+         (clojure-ts-mode . cider-mode))
   :config
   (setq cider-eldoc-display-symbol-at-point nil
         cider-auto-select-error-buffer nil
         cider-repl-print-length 100
         cider-repl-display-help-banner nil
         cider-repl-use-pretty-printing t))
+
+(use-package clojure-ts-mode
+  :defer t
+  :mode (("\\.clj[s|c]?\\'" . clojure-ts-mode))
+  :config
+  (setq clojure-ts-ensure-grammars t))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Writing & Blogging (org mode)
@@ -707,7 +716,7 @@
  '(custom-safe-themes
    '("801a567c87755fe65d0484cb2bded31a4c5bb24fd1fe0ed11e6c02254017acb2" "dbade2e946597b9cda3e61978b5fcc14fa3afa2d3c4391d477bdaeff8f5638c5" default))
  '(package-selected-packages
-   '(js2-mode clojure-ts-mode tao-theme cider highlight-parentheses evil-cleverparens paredit aggressive-indent ess web-mode orderless corfu marginalia vertico magit expand-region evil-leader evil-collection ligature rainbow-mode vterm diminish direnv vundo)))
+   '(js2-mode tao-theme cider highlight-parentheses evil-cleverparens paredit aggressive-indent ess web-mode orderless corfu marginalia vertico magit expand-region evil-leader evil-collection ligature rainbow-mode vterm diminish direnv vundo)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
