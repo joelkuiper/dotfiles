@@ -179,7 +179,7 @@
 ;; Manages session persistence for Emacs.
 (use-package desktop
   :ensure nil
-  :defer 1
+  :defer t
   :config
   (desktop-read)
   (desktop-save-mode))
@@ -580,6 +580,7 @@
 ;; Javascript (as little as humanly possible)
 (use-package js2-mode
   :ensure t
+  :defer t
   :mode (("\\.js\\'" . js2-mode))
   :hook ((js2-mode . electric-pair-mode))
   :config
@@ -619,6 +620,7 @@
 ;; Clojure
 (use-package cider
   :ensure t
+  :defer t
   :commands cider-jack-in
   :hook ((clojure-ts-mode . cider-mode)
          (clojure-mode . cider-mode))
@@ -649,7 +651,9 @@
   :mode (("\\.org\\'" . org-mode))
   :config
   ;; org-mode
-  (setq org-directory "~/Sync/org/")
+  (setq org-directory "~/Sync/org/"
+        org-startup-folded 'content) ;; collapse all trees
+
   (defconst my-org-babel-languages
     '((R . t)
       (dot . t)
