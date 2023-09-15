@@ -83,7 +83,8 @@
    ad-redefinition-action 'accept                   ;; Silence warnings for redefinitions
    auto-save-list-file-prefix nil                   ;; Prevent tracking for auto-saves
    backup-by-copying t                              ;; Backups never overwrite original
-   backup-directory-alist `(("." . "~/.backups"))     ;; Where are the backups ?
+   version-control t                                ;; Use numeric versions for backups
+   backup-directory-alist `(("." . "~/.backups"))     ;; Where are the backups?
    auto-save-file-name-transforms `((".*" ,temporary-file-directory t))
    comment-multi-line t                             ;; Continue comments when filling
    create-lockfiles nil                             ;; Locks are more nuisance than blessing
@@ -115,7 +116,6 @@
    uniquify-buffer-name-style 'forward              ;; Uniquify buffer names
    use-short-answers t                              ;; Replace yes/no prompts with y/n
    vc-follow-symlinks t                             ;; Never prompt when visiting symlinks
-   version-control t                                ;; Use numeric versions for backups
    delete-old-versions t                            ;; Delete extra backups silently
    window-combination-resize t                      ;; Resize windows proportionally
    x-stretch-cursor t)                              ;; Stretch cursor to the glyph width
@@ -125,6 +125,7 @@
         '(read-only t cursor-intangible t face minibuffer-prompt))
   (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
 
+  ;; Enable the erase-buffer function to clear buffer contents without restrictions.
   (put 'erase-buffer 'disabled nil))
 
 
@@ -500,8 +501,8 @@
   ;;https://github.com/akermu/emacs-libvterm/issues/179#issuecomment-1045331359
   ;; .screenrc => termcapinfo xterm* ti@:te@
   ;; It makes wrapping after resize work
-  (setq vterm-shell "screen")
-  (setq vterm-keymap-exceptions nil))
+  (setq vterm-shell "screen"
+        vterm-keymap-exceptions nil))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Programming & Development
@@ -509,9 +510,10 @@
 (use-package whitespace
   :ensure t
   :init
-  (setq whitespace-line-column 80)
-  (setq whitespace-style
-        '(face lines-tail spaces tabs newline space-mark tab-mark newline-mark))
+  (setq
+   whitespace-line-column 80
+   whitespace-style
+   '(face lines-tail spaces tabs newline space-mark tab-mark newline-mark))
 
   (add-hook
    'before-save-hook
@@ -549,18 +551,22 @@
   :hook ((R-mode . eglot-ensure)
          (clojure-mode . eglot-ensure)
          (clojure-ts-mode . eglot-ensure))
+  :custom
+  (eglot-autoshutdown t)
   :config
+  ;;  Is there a way of making the the modeline not flicker? #1283
+  ;; https://github.com/joaotavora/eglot/discussions/1283
   (setq mode-line-misc-info
         (delete '(eglot--managed-mode (" [" eglot--mode-line-format "] "))
                 mode-line-misc-info))
-  (setq eldoc-echo-area-use-multiline-p nil)
-  (setq eglot-confirm-server-initiated-edits nil)
-  (add-to-list 'eglot-server-programs '(clojure-mode . ("clojure-lsp")))
-  (add-to-list 'eglot-server-programs '(clojure-ts-mode . ("clojure-lsp")))
-  :custom
-  (eglot-autoshutdown t))
 
-;; Web stuff
+  (setq eldoc-echo-area-use-multiline-p nil
+        eglot-confirm-server-initiated-edits nil)
+
+  (add-to-list 'eglot-server-programs '(clojure-mode . ("clojure-lsp")))
+  (add-to-list 'eglot-server-programs '(clojure-ts-mode . ("clojure-lsp"))))
+
+;; Webdev stuff
 (use-package sgml-mode
   :ensure nil
   :hook
@@ -568,17 +574,6 @@
   (html-mode . sgml-name-8bit-mode)
   :custom
   (sgml-basic-offset 2))
-
-;; Emacs Speaks Statistics (R)
-(use-package ess
-  :ensure t
-  :defer t
-  :hook ((R-mode . electric-pair-mode))
-  :mode (("\\.R\\'" . R-mode)
-         ("\\.r\\'" . R-mode))
-  :config
-  (setq ess-r-backend 'lsp)
-  (setq ess-eval-visibly 'nowait))
 
 ;; Javascript (as little as humanly possible)
 (use-package js2-mode
@@ -589,6 +584,17 @@
   :config
   (setq javascript-indent-level 2)      ; javascript-mode
   (setq js-indent-level 2))             ; js-mode
+
+;; Emacs Speaks Statistics (R) 🏴‍☠️
+(use-package ess
+  :ensure t
+  :defer t
+  :hook ((R-mode . electric-pair-mode))
+  :mode (("\\.R\\'" . R-mode)
+         ("\\.r\\'" . R-mode))
+  :config
+  (setq ess-r-backend 'lsp)
+  (setq ess-eval-visibly 'nowait))
 
 ;; Lisp
 (use-package paredit
@@ -634,10 +640,12 @@
         cider-repl-display-help-banner nil
         cider-repl-use-pretty-printing t))
 
+;; https://github.com/clojure-emacs/clojure-ts-mode
 (use-package clojure-ts-mode
   :defer t
   :mode (("\\.clj[s|c]?\\'" . clojure-ts-mode))
   :config
+  ;; (setq clojure-ts-indent-style 'fixed) ;; semantic or fixed
   (setq clojure-ts-ensure-grammars t))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
