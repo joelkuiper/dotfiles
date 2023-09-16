@@ -1,0 +1,32 @@
+live_config_reload = true
+window.opacity = 1.0
+
+[colors.normal]
+black = "#000000"
+blue = "#4A708B"
+cyan = "#68BFBF"
+green = "#556B2F"
+magenta = "#8B008B"
+red = "#9C3328"
+white = "#AAAAAA"
+yellow = "#B8860B"
+
+[colors.primary]
+background = "#F1F1F1"
+foreground = "#241f31"
+
+[colors.selection]
+background = "#616161"
+text = "#F6F6F6"
+
+[font]
+size = 14
+
+[font.normal]
+family = "PragmataPro Liga"
+style = "Regular"
+
+[[keyboard.bindings]]
+action = "SpawnNewInstance"
+key = "T"
+mods = "Control|Shift"

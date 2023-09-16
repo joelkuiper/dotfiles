@@ -47,8 +47,8 @@
 ;; esc quits
 (defun minibuffer-keyboard-quit ()
   "Abort recursive edit.
-  In Delete Selection mode, if the mark is active, just deactivate it;
-  then it takes a second \\[keyboard-quit] to abort the minibuffer."
+   In Delete Selection mode, if the mark is active, just deactivate it;
+   then it takes a second \\[keyboard-quit] to abort the minibuffer."
   (interactive)
   (if (and delete-selection-mode transient-mark-mode mark-active)
       (setq deactivate-mark  t)
@@ -155,6 +155,10 @@
 (use-package magit
   :ensure t)
 
+;;;; Code References
+(use-package xref
+  :ensure nil)
+
 ;; Hides eldoc minor mode from the mode line.
 (use-package eldoc
   :diminish eldoc-mode)
@@ -165,10 +169,12 @@
 
 ;; Hides flymake mode from the mode line.
 (use-package flymake
+  :defer t
   :diminish flymake-mode)
 
 ;; Hides flycheck mode from the mode line.
 (use-package flycheck
+  :defer t
   :diminish flycheck-mode)
 
 ;; Saves and restores command history over Emacs restarts.
@@ -178,8 +184,6 @@
 
 ;; Manages session persistence for Emacs.
 (use-package desktop
-  :ensure nil
-  :defer t
   :config
   (desktop-read)
   (desktop-save-mode))
@@ -199,9 +203,11 @@
   (global-set-key (kbd "C-M-s-<down>") 'windmove-down)
   (global-set-key (kbd "C-M-s-<up>") 'windmove-up))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Visual.
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+ ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ ;;; Visual.
+ ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (tool-bar-mode 0)
 (menu-bar-mode 0)
 (scroll-bar-mode 0)
@@ -252,9 +258,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package evil
   :ensure t
+  :custom
+  (evil-want-keybinding nil) ; https://github.com/emacs-evil/evil-collection
   :init
   (setq evil-undo-system 'undo-redo
-        evil-want-keybinding nil ; https://github.com/emacs-evil/evil-collection
         evil-shift-width 2)
   (evil-mode 1)
   :config
@@ -273,8 +280,10 @@
     (evil-normal-state)
     (evil-visual-restore))
 
-  (setq evil-respect-visual-line-mode t)
-  (setq evil-shift-width tab-width)
+  (setq
+   evil-shift-width tab-width
+   ;; evil-respect-visual-line-mode t
+   )
 
   (global-set-key (kbd "C-s-]") 'evil-window-vsplit) ;; ]
   (global-set-key (kbd "s-ESC") 'evil-window-split) ;; [
@@ -293,8 +302,20 @@
   (define-key evil-visual-state-map (kbd ">") 'shift-right-visual)
   (define-key evil-visual-state-map (kbd "<") 'shift-left-visual)
 
+
+  (define-key evil-normal-state-map (kbd "C-c d") 'xref-goto-xref)
   (define-key evil-normal-state-map (kbd "C-c l") 'eglot-code-actions)
   (define-key evil-normal-state-map (kbd "C-c .") 'embark-act))
+
+;; https://github.com/justbur/emacs-which-key
+(use-package which-key
+  :ensure t
+  :diminish which-key-mode
+  :after (evil)
+  :init
+  (which-key-mode)
+  :config
+  (setq which-key-allow-evil-operators t))
 
 (use-package evil-collection
   :ensure t
@@ -414,7 +435,7 @@
 
 (use-package embark-consult
   :ensure t
-  :after (embark consult)
+  :after (embark consult evil)
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
 
@@ -457,17 +478,16 @@
   ;; first function returning a result wins.  Note that the list of buffer-local
   ;; completion functions takes precedence over the global list.
   (add-to-list 'completion-at-point-functions #'dabbrev-capf)
-  (add-to-list 'completion-at-point-functions #'cape-file)
-  ;; (add-to-list 'completion-at-point-functions #'cape-history)
-  ;;(add-to-list 'completion-at-point-functions #'cape-keyword)
-  ;;(add-to-list 'completion-at-point-functions #'cape-tex)
-  ;;(add-to-list 'completion-at-point-functions #'cape-sgml)
-  ;;(add-to-list 'completion-at-point-functions #'cape-rfc1345)
-  ;;(add-to-list 'completion-at-point-functions #'cape-abbrev)
-  ;;(add-to-list 'completion-at-point-functions #'cape-dict)
-  ;;(add-to-list 'completion-at-point-functions #'cape-elisp-symbol)
-  ;;(add-to-list 'completion-at-point-functions #'cape-line)
-  )
+  (add-to-list 'completion-at-point-functions #'cape-file))
+;;(add-to-list 'completion-at-point-functions #'cape-history)
+;;(add-to-list 'completion-at-point-functions #'cape-keyword)
+;;(add-to-list 'completion-at-point-functions #'cape-tex)
+;;(add-to-list 'completion-at-point-functions #'cape-sgml)
+;;(add-to-list 'completion-at-point-functions #'cape-rfc1345)
+;;(add-to-list 'completion-at-point-functions #'cape-abbrev)
+;;(add-to-list 'completion-at-point-functions #'cape-dict)
+;;(add-to-list 'completion-at-point-functions #'cape-elisp-symbol)
+;;(add-to-list 'completion-at-point-functions #'cape-line)
 
 (use-package prescient
   :ensure t
@@ -476,12 +496,6 @@
   (setq completion-styles '(prescient basic)
         completion-category-defaults nil
         completion-category-overrides '((file (styles partial-completion)))))
-
-(use-package corfu-prescient
-  :ensure t
-  :after (corfu prescient)
-  :init
-  (corfu-prescient-mode))
 
 (use-package vertico-prescient
   :ensure t
@@ -501,8 +515,8 @@
   ;;https://github.com/akermu/emacs-libvterm/issues/179#issuecomment-1045331359
   ;; .screenrc => termcapinfo xterm* ti@:te@
   ;; It makes wrapping after resize work
-  (setq vterm-shell "screen"
-        vterm-keymap-exceptions nil))
+  (setq ;; vterm-shell "screen"
+   vterm-keymap-exceptions nil))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Programming & Development
@@ -525,13 +539,6 @@
 ;;; Languages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;;; Code References
-(use-package xref
-  :ensure nil
-  :bind
-  ([remap xref-find-apropos] . xref-find-definitions)
-  ([remap xref-find-definitions] . xref-find-definitions-other-window))
-
 (use-package aggressive-indent
   :ensure t
   :hook (prog-mode . aggressive-indent-mode)
@@ -545,6 +552,7 @@
   :commands highlight-parentheses-mode)
 
 ;;;; LSP Client
+
 (use-package eglot
   :ensure t
   :defer t
@@ -563,11 +571,16 @@
   (setq
    eldoc-echo-area-use-multiline-p nil
    eglot-extend-to-xref t
-   eglot-connect-timeout nil
+   eglot-connect-timeout 6000
    eglot-confirm-server-initiated-edits nil)
 
   (add-to-list 'eglot-server-programs '(clojure-mode . ("clojure-lsp")))
   (add-to-list 'eglot-server-programs '(clojure-ts-mode . ("clojure-lsp"))))
+
+;; https://github.com/joaotavora/eglot/issues/661
+(use-package jarchive :ensure t
+  :init
+  (jarchive-setup))
 
 ;; Webdev stuff
 (use-package sgml-mode
@@ -643,16 +656,6 @@
         cider-repl-display-help-banner nil
         cider-repl-use-pretty-printing t))
 
-;; https://github.com/clojure-emacs/clojure-ts-mode
-;; (use-package clojure-ts-mode
-;;   :defer t
-;;   :mode (("\\.clj[s|c]?\\'" . clojure-ts-mode))
-;;   :config
-;;   (setq clojure-ts-indent-style 'semantic) ;; or 'fixed
-;;   ;; [HACK] https://github.com/clojure-emacs/clojure-ts-mode/issues/9
-;;   (add-hook 'clojure-ts-mode-hook #'clojure-mode-variables)
-;;   (setq clojure-ts-ensure-grammars t))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Writing & Blogging (org mode)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -710,11 +713,11 @@
    `(term-color-white ((t (:foreground "#FAFAFA"))))
    `(term-color-black ((t (:foreground "#241f31"))))
    `(term-color-red ((t (:foreground "#9C3328"))))
-   `(term-color-green ((t (:foreground "DarkOliveGreen"))))
-   `(term-color-yellow ((t (:foreground "DarkGoldenrod"))))
-   `(term-color-blue ((t (:foreground "SkyBlue4"))))
-   `(term-color-magenta ((t (:foreground "DarkMagenta"))))
-   `(term-color-cyan ((t (:foreground "light blue")))))
+   `(term-color-green ((t (:foreground "#556B2F"))))
+   `(term-color-yellow ((t (:foreground "#B8860B"))))
+   `(term-color-blue ((t (:foreground "#4A708B"))))
+   `(term-color-magenta ((t (:foreground "#8B008B"))))
+   `(term-color-cyan ((t (:foreground "#68BFBF")))))
   :init
   (load-theme 'tao-yang t))
 
@@ -727,9 +730,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   '("801a567c87755fe65d0484cb2bded31a4c5bb24fd1fe0ed11e6c02254017acb2" "dbade2e946597b9cda3e61978b5fcc14fa3afa2d3c4391d477bdaeff8f5638c5" default))
- '(package-selected-packages
-   '(js2-mode tao-theme cider highlight-parentheses evil-cleverparens paredit aggressive-indent ess web-mode orderless corfu marginalia vertico magit expand-region evil-leader evil-collection ligature rainbow-mode vterm diminish direnv vundo)))
+   '("801a567c87755fe65d0484cb2bded31a4c5bb24fd1fe0ed11e6c02254017acb2" "dbade2e946597b9cda3e61978b5fcc14fa3afa2d3c4391d477bdaeff8f5638c5" default)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
