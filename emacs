@@ -342,67 +342,60 @@
     "4"      (lambda () (interactive) (find-file "~/Sync/org/scratch.org"))
     "5"      (lambda () (interactive) (find-file "~/Sync/org/repl.org"))
 
-    "<SPC>"  'embark-act                ; Do something
-    "."      'er/expand-region          ; See expand-region
-    ","      'consult-line-multi        ; Find a thing in all buffers
-    "/"      'consult-line              ; Like Vim / in current buffer
-    "x"      'execute-extended-command  ; eXecute
-    ":"      'emoji-search              ; :wink:
-    ";"      'consult-imenu             ; Navigate buffer
-    "e"      'eval-expression           ; Eval
-    "q"      'kill-buffer               ; Quit
-    "p"      'consult-yank-pop          ; Paste
-    "c"      'consult-mode-command      ; Command
-    "u"      'vundo                     ; Undo
+    "<SPC>"  'embark-act                                 ; Do something
+    "."      'er/expand-region                           ; See expand-region
+    ","      'consult-line-multi                         ; Find a thing in all buffers
+    "/"      'consult-line                               ; Like Vim / in current buffer
+    "x"      'execute-extended-command                   ; eXecute
+    ":"      'emoji-search                               ; :wink:
+    ";"      'consult-imenu                              ; Navigate buffer
+    "e"      'eval-expression                            ; Eval
+    "q"      'kill-current-buffer                        ; Quit
+    "y"      'consult-yank-pop                           ; Yank (well paste...)
+    "c"      'consult-mode-command                       ; Command
+    "u"      'vundo                                      ; Undo
+    "^"      'toggle-frame-fullscreen                    ; Goes up?
+    "?"      'eldoc                                      ; Help?
 
-    "sh"     'eshell                    ; SHell
-    "vt"     'multi-vterm               ; VTerm
-    "br"     'my-reload-buffer          ; BufferReload
-    "bs"     'consult-buffer            ; BufferSwtich
-    "bk"     'kill-buffer               ; BufferKill
-    "ws"     'whitespace-mode           ; WhiteSpace
-    "ln"     'display-line-numbers-mode ; LineNumbers
-    "ff"     'find-file                 ; Findfile
-    "www"    'eww                       ; WorldWideWeb
-    "wb"     'eww-browse-url            ; WebBrowse
-    "ai"     'gptel                     ; ArtificialIntelligence
-    "aai"    'gptel-menu                ; AnotherArtificialIntelligence
-    "fs"     'toggle-frame-fullscreen   ; FullScreen
-    "XX"     'kill-emacs                ; ...
-
-    ;; Magit
-    "gg"     'magit
-    "gd"     'magit-diff-unstaged
-    "gs"     'magit-status
-    "gb"     'magit-blame
-    "gc"     'magit-commit
-    "gl"     'magit-log-all
-    "gP"     'magit-push-current-to-upstream
-    "gp"     'magit-pull-from-upstream
-
-    ;; "Projects"
-    "p;"     'consult-imenu-multi
-    "pp"     'consult-project-buffer
-    "ps"     'project-switch-project
-    "pf"     'project-find-file
-    "pd"     'project-dired
-    "pg"     'consult-git-grep
-
-    ;; Language specific
-    "cc"     'cider-connect
-    "ch"     'cider-repl-history
-    "cb"     'cider-repl-clear-buffer
-    "o."     'org-time-stamp
-    "oe"     'org-export
-    "ota"    'org-table-align
+    "sh"     'eshell                                     ; SHell
+    "vt"     'multi-vterm                                ; VTerm
+    "br"     'my-reload-buffer                           ; BufferReload
+    "bs"     'consult-buffer                             ; BufferSwtich
+    "bk"     'kill-buffer                                ; BufferKill
+    "ws"     'whitespace-mode                            ; WhiteSpace
+    "ln"     'display-line-numbers-mode                  ; LineNumbers
+    "ff"     'find-file                                  ; Findfile
+    "fg"     'consult-ripgrep                            ; FindGrep
+    "www"    'eww                                        ; WorldWideWeb
+    "wb"     'eww-browse-url                             ; WebBrowse
+    "ai"     'gptel                                      ; ArtificialIntelligence
+    "aai"    'gptel-menu                                 ; AnotherArtificialIntelligence
+    "XX"     'kill-emacs                                 ; ...
 
     ;; Buffers
     "|"      'evil-window-vsplit
     "_"      'evil-window-split
-    "<left>" 'windmove-left
-    "<right>"'windmove-right
-    "<up>"   'windmove-up
-    "<down>" 'windmove-down))
+
+    ;; Magit
+    "gs"     'magit-status                               ; GitStatus
+    "gd"     'magit-diff-unstaged                        ; GitDiff
+    "gl"     'magit-log-all                              ; GitLog
+    "gP"     'magit-push-current-to-upstream             ; GitPUSH
+    "gp"     'magit-pull-from-upstream                   ; GitPull
+
+    ;; "Projects"
+    "pp"     'consult-project-buffer                     ; ProjectProjcet
+    "pg"     'consult-git-grep                           ; Project(git)Grep
+    "ps"     'project-switch-project                     ; ProjectSwitch
+    "pf"     'project-find-file                          ; ProjectFind
+    "pd"     'project-dired                              ; ProectDired
+
+    ;; Language specific
+    "o."     'org-time-stamp
+    "oe"     'org-export
+    "ota"    'org-table-align
+
+    ))
 
 (use-package expand-region
   :ensure t
