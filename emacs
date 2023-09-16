@@ -686,6 +686,7 @@
 
 (use-package markdown-mode
   :ensure t
+  :mode ("README\\.md\\'" . gfm-mode)
   :defer t
   :hook ((markdown-mode . visual-line-mode)
          (markdown-mode . flyspell-mode)))
