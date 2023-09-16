@@ -105,9 +105,8 @@
    read-process-output-max (* 1024 1024)            ;; Increase read size for data chunks
    recenter-positions '(5 bottom)                   ;; Set re-centering positions
    ring-bell-function 'ignore                       ;; Silence error bells
-   ;; scroll-conservatively 101                        ;; Avoid recentering when scrolling far
+   scroll-conservatively 101                        ;; Avoid recentering when scrolling far
    scroll-margin 5                                  ;; Add a margin when scrolling vertically
-   scroll-step 1                                    ;; Add scroll step (like Vim)
    select-enable-clipboard t                        ;; Merge system's and Emacs' clipboard
    sentence-end-double-space nil                    ;; Use a single space after dots
    show-help-function nil                           ;; Disable help text everywhere
@@ -195,7 +194,7 @@
   (global-set-key (kbd "C-s-<left>") 'winner-undo)
   (global-set-key (kbd "C-s-<right>") 'winner-redo))
 
-;; It moves between splits in buffers like the wind
+;; It moves between splits in buffers like the wind.
 (use-package windmove
   :config
   (global-set-key (kbd "C-M-s-<right>") 'windmove-right)
@@ -203,22 +202,43 @@
   (global-set-key (kbd "C-M-s-<down>") 'windmove-down)
   (global-set-key (kbd "C-M-s-<up>") 'windmove-up))
 
+;; which-key is a minor mode for Emacs that displays the key bindings following
+;; your currently entered incomplete command (a prefix) in a popup.
+(use-package which-key
+  :ensure t
+  :diminish which-key-mode
+  :init
+  (which-key-mode))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Theme
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(use-package tao-theme
+  :ensure t
+  :config
+  (my-set-font 'default 'fixed-pitch)
+  (custom-theme-set-faces
+   'tao-yang
 
- ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
- ;;; Visual.
- ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; vterm colors customizations with :inherit background
+   `(term-color-white ((t (:foreground "#FAFAFA"))))
+   `(term-color-black ((t (:foreground "#241f31"))))
+   `(term-color-red ((t (:foreground "#9C3328"))))
+   `(term-color-green ((t (:foreground "#556B2F"))))
+   `(term-color-yellow ((t (:foreground "#B8860B"))))
+   `(term-color-blue ((t (:foreground "#4A708B"))))
+   `(term-color-magenta ((t (:foreground "#8B008B"))))
+   `(term-color-cyan ((t (:foreground "#68BFBF")))))
+  :init
+  (load-theme 'tao-yang t))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Visual.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (tool-bar-mode 0)
 (menu-bar-mode 0)
 (scroll-bar-mode 0)
 (blink-cursor-mode 0)
-
-;; Highlights hex codes
-(use-package rainbow-mode
-  :ensure t
-  :diminish rainbow-mode
-  :hook ((prog-mode . rainbow-mode)
-         (text-mode . rainbow-mode)))
 
 ;; You'll see what it does below, if not harfbuzz is broken.
 (use-package ligature
@@ -260,9 +280,8 @@
   :ensure t
   :custom
   (evil-want-keybinding nil) ; https://github.com/emacs-evil/evil-collection
+  (evil-undo-system 'undo-redo)
   :init
-  (setq evil-undo-system 'undo-redo
-        evil-shift-width 2)
   (evil-mode 1)
   :config
   ;; Shift left/right functions and bindings
@@ -280,13 +299,7 @@
     (evil-normal-state)
     (evil-visual-restore))
 
-  (setq
-   evil-shift-width tab-width
-   ;; evil-respect-visual-line-mode t
-   )
-
-  (global-set-key (kbd "C-s-]") 'evil-window-vsplit) ;; ]
-  (global-set-key (kbd "s-ESC") 'evil-window-split) ;; [
+  (setq evil-shift-width 2)
 
   (define-key evil-normal-state-map [escape] 'keyboard-quit)
   (define-key evil-visual-state-map [escape] 'keyboard-quit)
@@ -300,22 +313,7 @@
   (define-key evil-ex-completion-map (kbd "TAB") 'completion-at-point)
 
   (define-key evil-visual-state-map (kbd ">") 'shift-right-visual)
-  (define-key evil-visual-state-map (kbd "<") 'shift-left-visual)
-
-
-  (define-key evil-normal-state-map (kbd "C-c d") 'xref-goto-xref)
-  (define-key evil-normal-state-map (kbd "C-c l") 'eglot-code-actions)
-  (define-key evil-normal-state-map (kbd "C-c .") 'embark-act))
-
-;; https://github.com/justbur/emacs-which-key
-(use-package which-key
-  :ensure t
-  :diminish which-key-mode
-  :after (evil)
-  :init
-  (which-key-mode)
-  :config
-  (setq which-key-allow-evil-operators t))
+  (define-key evil-visual-state-map (kbd "<") 'shift-left-visual))
 
 (use-package evil-collection
   :ensure t
@@ -357,6 +355,8 @@
     "ws"     'whitespace-mode
     "ln"     'display-line-numbers-mode
     "ff"     'find-file
+    "ai"     'gptel
+    "aai"    'gptel-menu
 
     "gg"     'magit
     "gd"     'magit-diff-unstaged
@@ -379,6 +379,7 @@
     "cb"     'cider-repl-clear-buffer
     "o."     'org-time-stamp
     "oe"     'org-export
+    "ota"    'org-table-align
 
     "fs"     'toggle-frame-fullscreen
 
@@ -391,12 +392,6 @@
     "<right>"'windmove-right
     "<up>"   'windmove-up
     "<down>" 'windmove-down))
-
-(use-package evil-cleverparens
-  :ensure t
-  :after (evil paredit)
-  :diminish evil-cleverparens-mode
-  :commands evil-cleverparens-mode)
 
 (use-package expand-region
   :ensure t
@@ -435,7 +430,7 @@
 
 (use-package embark-consult
   :ensure t
-  :after (embark consult evil)
+  :after (embark consult)
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
 
@@ -450,6 +445,8 @@
   ;; Optionally replace the key help with a completing-read interface
   (setq prefix-help-command #'embark-prefix-help-command)
   :config
+  (define-key evil-normal-state-map (kbd "C-c .") 'embark-act)
+
   ;; Hide the mode line of the Embark live/completions buffers
   (add-to-list 'display-buffer-alist
                '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
@@ -470,24 +467,30 @@
 
 ;; Add extensions
 ;; https://github.com/minad/cape
+;; Enable Corfu completion UI
+;; See the Corfu README for more configuration tips.
+(use-package corfu
+  :init
+  (global-corfu-mode))
+
+;; Add extensions
 (use-package cape
   :ensure t
+  ;; Bind dedicated completion commands
+  ;; Alternative prefix keys: C-c p, M-p, M-+, ...
+  :bind (("C-c p p" . completion-at-point) ;; capf
+         ("C-c p d" . cape-dabbrev)        ;; or dabbrev-completion
+         ("C-c p h" . cape-history)
+         ("C-c p f" . cape-file)
+         ("C-c p k" . cape-keyword)
+         ("C-c p e" . cape-emoji))
   :init
   ;; Add to the global default value of `completion-at-point-functions' which is
   ;; used by `completion-at-point'.  The order of the functions matters, the
   ;; first function returning a result wins.  Note that the list of buffer-local
   ;; completion functions takes precedence over the global list.
-  (add-to-list 'completion-at-point-functions #'dabbrev-capf)
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
   (add-to-list 'completion-at-point-functions #'cape-file))
-;;(add-to-list 'completion-at-point-functions #'cape-history)
-;;(add-to-list 'completion-at-point-functions #'cape-keyword)
-;;(add-to-list 'completion-at-point-functions #'cape-tex)
-;;(add-to-list 'completion-at-point-functions #'cape-sgml)
-;;(add-to-list 'completion-at-point-functions #'cape-rfc1345)
-;;(add-to-list 'completion-at-point-functions #'cape-abbrev)
-;;(add-to-list 'completion-at-point-functions #'cape-dict)
-;;(add-to-list 'completion-at-point-functions #'cape-elisp-symbol)
-;;(add-to-list 'completion-at-point-functions #'cape-line)
 
 (use-package prescient
   :ensure t
@@ -519,6 +522,20 @@
    vterm-keymap-exceptions nil))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; ChatGPT
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; https://github.com/karthink/gptel
+;; set machine api.openai.com login apikey password TOKEN in ~/.authinfo
+;; Also see https://github.com/karthink/gptel/wiki
+(use-package gptel
+  :ensure t
+  :bind (:map gptel-mode-map
+              ("C-<return>" . gptel-send))
+  :config
+  (define-key evil-visual-state-map (kbd "ai") 'gptel-send)
+  (setq gptel-default-mode 'org-mode))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Programming & Development
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package whitespace
@@ -535,10 +552,6 @@
      (whitespace-cleanup)
      (delete-trailing-whitespace))))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Languages
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 (use-package aggressive-indent
   :ensure t
   :hook (prog-mode . aggressive-indent-mode)
@@ -551,14 +564,21 @@
   :diminish highlight-parentheses-mode
   :commands highlight-parentheses-mode)
 
-;;;; LSP Client
+;; Colors hex codes of colors their colors in buffers
+(use-package rainbow-mode
+  :ensure t
+  :diminish rainbow-mode
+  :hook ((prog-mode . rainbow-mode)
+         (text-mode . rainbow-mode)))
 
+
+;; LSP Client
 (use-package eglot
   :ensure t
   :defer t
-  :hook ((R-mode . eglot-ensure)
-         (clojure-mode . eglot-ensure)
-         (clojure-ts-mode . eglot-ensure))
+  :hook ((clojure-mode . eglot-ensure)
+         (R-mode . eglot-ensure) ;; Untested
+         )
   :custom
   (eglot-autoshutdown t)
   :config
@@ -574,20 +594,21 @@
    eglot-connect-timeout 6000
    eglot-confirm-server-initiated-edits nil)
 
-  (add-to-list 'eglot-server-programs '(clojure-mode . ("clojure-lsp")))
-  (add-to-list 'eglot-server-programs '(clojure-ts-mode . ("clojure-lsp"))))
+  (define-key evil-normal-state-map (kbd "C-c l") 'eglot-code-actions)
+  (add-to-list 'eglot-server-programs '(clojure-mode . ("clojure-lsp"))))
 
 ;; https://github.com/joaotavora/eglot/issues/661
 (use-package jarchive :ensure t
   :init
   (jarchive-setup))
 
-;; Webdev stuff
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Languages
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package sgml-mode
   :ensure nil
   :hook
   (html-mode . sgml-electric-tag-pair-mode)
-  (html-mode . sgml-name-8bit-mode)
   :custom
   (sgml-basic-offset 2))
 
@@ -596,7 +617,7 @@
   :ensure t
   :defer t
   :mode (("\\.js\\'" . js2-mode))
-  :hook ((js2-mode . electric-pair-mode))
+  :hook (js2-mode . electric-pair-mode)
   :config
   (setq js-indent-level 2
         javascript-indent-level 2))
@@ -605,7 +626,7 @@
 (use-package ess
   :ensure t
   :defer t
-  :hook ((R-mode . electric-pair-mode))
+  :hook (R-mode . electric-pair-mode)
   :mode (("\\.R\\'" . R-mode)
          ("\\.r\\'" . R-mode))
   :config
@@ -615,40 +636,32 @@
 ;; Lisp
 (use-package paredit
   :ensure t
+  :defer t
+  :hook
+  ((lisp-mode . paredit-mode)
+   (cider-mode . paredit-mode)
+   (cider-repl-mode . paredit-mode)
+   (clojure-mode . paredit-mode)
+   (emacs-lisp-mode . paredit-mode))
   :diminish paredit-mode
   :commands paredit-mode)
 
-(defun enable-lisp-utils ()
-  (paredit-mode)
-  (evil-cleverparens-mode))
+(use-package evil-cleverparens
+  :ensure t
+  :hook (paredit-mode . evil-cleverparens-mode)
+  :diminish evil-cleverparens-mode
+  :commands evil-cleverparens-mode)
 
-(defvar lisps
-  '(emacs-lisp-mode
-    lisp-mode
-    ielm-mode
-    cider-mode
-    cider-repl-mode
-    clojure-ts-mode
-    clojure-mode))
-
-(dolist (mode lisps)
-  (add-hook (intern (concat (symbol-name mode) "-hook")) 'enable-lisp-utils))
-
-(defun set-emacs-lisp-mode ()
-  (let ((file-name (expand-file-name (buffer-file-name))))
-    (when (or (string= file-name (expand-file-name "~/dotfiles/emacs"))
-              (string= file-name (expand-file-name "~/.emacs")))
-      (emacs-lisp-mode))))
-
-(add-hook 'find-file-hook 'set-emacs-lisp-mode)
+(use-package emacs-lisp-mode
+  :mode (("emacs\\'" . emacs-lisp-mode)
+         ("\\.emacs\\'" . emacs-lisp-mode)))
 
 ;; Clojure
 (use-package cider
   :ensure t
   :defer t
   :commands cider-jack-in
-  :hook ((clojure-mode . cider-mode)
-         (clojure-ts-mode . cider-mode))
+  :hook (clojure-mode . cider-mode)
   :config
   (setq cider-eldoc-display-symbol-at-point nil
         cider-auto-select-error-buffer nil
@@ -659,20 +672,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Writing & Blogging (org mode)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defun enable-write-utils ()
-  (flyspell-mode)
-  (visual-line-mode 1))
-
-(dolist (hook '(text-mode-hook
-                org-mode-hook
-                markdown-mode-hook
-                latex-mode-hook))
-  (add-hook hook 'enable-write-utils))
-
-
 (use-package org
   :ensure t
   :defer t
+  :hook ((org-mode . visual-line-mode)
+         (org-mode . flyspell-mode))
   :mode (("\\.org\\'" . org-mode))
   :config
   ;; org-mode
@@ -699,27 +703,11 @@
   ;; Always redisplay inline images after executing SRC block
   (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Theme
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(use-package tao-theme
+(use-package markdown-mode
   :ensure t
-  :config
-  (my-set-font 'default 'fixed-pitch)
-  (custom-theme-set-faces
-   'tao-yang
-
-   ;; vterm colors customizations with :inherit background
-   `(term-color-white ((t (:foreground "#FAFAFA"))))
-   `(term-color-black ((t (:foreground "#241f31"))))
-   `(term-color-red ((t (:foreground "#9C3328"))))
-   `(term-color-green ((t (:foreground "#556B2F"))))
-   `(term-color-yellow ((t (:foreground "#B8860B"))))
-   `(term-color-blue ((t (:foreground "#4A708B"))))
-   `(term-color-magenta ((t (:foreground "#8B008B"))))
-   `(term-color-cyan ((t (:foreground "#68BFBF")))))
-  :init
-  (load-theme 'tao-yang t))
+  :defer t
+  :hook ((markdown-mode . visual-line-mode)
+         (markdown-mode . flyspell-mode)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Custom
