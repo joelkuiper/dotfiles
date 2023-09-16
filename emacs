@@ -77,7 +77,6 @@
    enable-recursive-minibuffers t                   ;; Use the minibuffer whilst in the minibuffer
    completion-cycle-threshold 1                     ;; TAB cycles candidates
    completions-detailed t                           ;; Show annotations
-   tab-always-indent 'complete                      ;; When I hit TAB, try to complete, otherwise, indent
    indent-tabs-mode nil                             ;; Prefer spaces over tabs to indent
    tramp-terminal-type "tramp"                      ;; Tramp compatibility
    ad-redefinition-action 'accept                   ;; Silence warnings for redefinitions
@@ -107,7 +106,7 @@
    recenter-positions '(5 bottom)                   ;; Set re-centering positions
    ring-bell-function 'ignore                       ;; Silence error bells
    ;; scroll-conservatively 101                        ;; Avoid recentering when scrolling far
-   scroll-margin 3                                  ;; Add a margin when scrolling vertically
+   scroll-margin 5                                  ;; Add a margin when scrolling vertically
    scroll-step 1                                    ;; Add scroll step (like Vim)
    select-enable-clipboard t                        ;; Merge system's and Emacs' clipboard
    sentence-end-double-space nil                    ;; Use a single space after dots
@@ -336,6 +335,7 @@
     "bk"     'kill-buffer               ; BufferKill
     "ws"     'whitespace-mode
     "ln"     'display-line-numbers-mode
+    "ff"     'find-file
 
     "gg"     'magit
     "gd"     'magit-diff-unstaged
@@ -448,6 +448,7 @@
         corfu-quit-no-match 'separator))
 
 ;; Add extensions
+;; https://github.com/minad/cape
 (use-package cape
   :ensure t
   :init
@@ -455,10 +456,9 @@
   ;; used by `completion-at-point'.  The order of the functions matters, the
   ;; first function returning a result wins.  Note that the list of buffer-local
   ;; completion functions takes precedence over the global list.
-  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  (add-to-list 'completion-at-point-functions #'dabbrev-capf)
   (add-to-list 'completion-at-point-functions #'cape-file)
-  (add-to-list 'completion-at-point-functions #'cape-history)
-  ;;(add-to-list 'completion-at-point-functions #'cape-history)
+  ;; (add-to-list 'completion-at-point-functions #'cape-history)
   ;;(add-to-list 'completion-at-point-functions #'cape-keyword)
   ;;(add-to-list 'completion-at-point-functions #'cape-tex)
   ;;(add-to-list 'completion-at-point-functions #'cape-sgml)
@@ -560,8 +560,11 @@
         (delete '(eglot--managed-mode (" [" eglot--mode-line-format "] "))
                 mode-line-misc-info))
 
-  (setq eldoc-echo-area-use-multiline-p nil
-        eglot-confirm-server-initiated-edits nil)
+  (setq
+   eldoc-echo-area-use-multiline-p nil
+   eglot-extend-to-xref t
+   eglot-connect-timeout nil
+   eglot-confirm-server-initiated-edits nil)
 
   (add-to-list 'eglot-server-programs '(clojure-mode . ("clojure-lsp")))
   (add-to-list 'eglot-server-programs '(clojure-ts-mode . ("clojure-lsp"))))
@@ -582,8 +585,8 @@
   :mode (("\\.js\\'" . js2-mode))
   :hook ((js2-mode . electric-pair-mode))
   :config
-  (setq javascript-indent-level 2)      ; javascript-mode
-  (setq js-indent-level 2))             ; js-mode
+  (setq js-indent-level 2
+        javascript-indent-level 2))
 
 ;; Emacs Speaks Statistics (R) 🏴‍☠️
 (use-package ess
@@ -593,8 +596,8 @@
   :mode (("\\.R\\'" . R-mode)
          ("\\.r\\'" . R-mode))
   :config
-  (setq ess-r-backend 'lsp)
-  (setq ess-eval-visibly 'nowait))
+  (setq ess-eval-visibly 'nowait
+        ess-r-backend 'lsp))
 
 ;; Lisp
 (use-package paredit
