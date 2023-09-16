@@ -166,10 +166,12 @@
 
 ;; Hides flymake mode from the mode line.
 (use-package flymake
+  :defer t
   :diminish flymake-mode)
 
 ;; Hides flycheck mode from the mode line.
 (use-package flycheck
+  :defer t
   :diminish flycheck-mode)
 
 ;; Saves and restores command history over Emacs restarts.
@@ -179,8 +181,6 @@
 
 ;; Manages session persistence for Emacs.
 (use-package desktop
-  :ensure nil
-  :defer t
   :config
   (desktop-read)
   (desktop-save-mode))
@@ -199,6 +199,8 @@
   (global-set-key (kbd "C-M-s-<left>") 'windmove-left)
   (global-set-key (kbd "C-M-s-<down>") 'windmove-down)
   (global-set-key (kbd "C-M-s-<up>") 'windmove-up))
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Visual.
@@ -253,9 +255,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package evil
   :ensure t
+  :custom
+  (evil-want-keybinding nil) ; https://github.com/emacs-evil/evil-collection
   :init
   (setq evil-undo-system 'undo-redo
-        evil-want-keybinding nil ; https://github.com/emacs-evil/evil-collection
         evil-shift-width 2)
   (evil-mode 1)
   :config
@@ -274,8 +277,10 @@
     (evil-normal-state)
     (evil-visual-restore))
 
-  (setq evil-respect-visual-line-mode t)
-  (setq evil-shift-width tab-width)
+  (setq
+   evil-shift-width tab-width
+   ;; evil-respect-visual-line-mode t
+   )
 
   (global-set-key (kbd "C-s-]") 'evil-window-vsplit) ;; ]
   (global-set-key (kbd "s-ESC") 'evil-window-split) ;; [
@@ -295,7 +300,20 @@
   (define-key evil-visual-state-map (kbd "<") 'shift-left-visual)
 
   (define-key evil-normal-state-map (kbd "C-c l") 'eglot-code-actions)
-  (define-key evil-normal-state-map (kbd "C-c .") 'embark-act))
+  (define-key evil-normal-state-map (kbd "C-c .") 'embark-act)
+  (define-key evil-normal-state-map (kbd "C-c d") 'evil-goto-definition)
+
+  )
+
+;; https://github.com/justbur/emacs-which-key
+(use-package which-key
+  :ensure t
+  :after (evil)
+  :init
+  (which-key-mode)
+  :config
+  (which-key-setup-minibuffer)
+  (setq which-key-allow-evil-operators t))
 
 (use-package evil-collection
   :ensure t
@@ -529,8 +547,7 @@
 (use-package xref
   :ensure nil
   :bind
-  ([remap xref-find-apropos] . xref-find-definitions)
-  ([remap xref-find-definitions] . xref-find-definitions-other-window))
+  ([remap xref-find-apropos] . xref-find-definitions))
 
 (use-package aggressive-indent
   :ensure t
@@ -561,10 +578,16 @@
                 mode-line-misc-info))
 
   (setq eldoc-echo-area-use-multiline-p nil
+        eglot-extend-to-xref t
         eglot-confirm-server-initiated-edits nil)
 
   (add-to-list 'eglot-server-programs '(clojure-mode . ("clojure-lsp")))
   (add-to-list 'eglot-server-programs '(clojure-ts-mode . ("clojure-lsp"))))
+
+;; https://github.com/joaotavora/eglot/issues/661
+(use-package jarchive :ensure t
+  :init
+  (jarchive-setup))
 
 ;; Webdev stuff
 (use-package sgml-mode
@@ -707,11 +730,11 @@
    `(term-color-white ((t (:foreground "#FAFAFA"))))
    `(term-color-black ((t (:foreground "#241f31"))))
    `(term-color-red ((t (:foreground "#9C3328"))))
-   `(term-color-green ((t (:foreground "DarkOliveGreen"))))
-   `(term-color-yellow ((t (:foreground "DarkGoldenrod"))))
-   `(term-color-blue ((t (:foreground "SkyBlue4"))))
-   `(term-color-magenta ((t (:foreground "DarkMagenta"))))
-   `(term-color-cyan ((t (:foreground "light blue")))))
+   `(term-color-green ((t (:foreground "#556B2F"))))
+   `(term-color-yellow ((t (:foreground "#B8860B"))))
+   `(term-color-blue ((t (:foreground "#4A708B"))))
+   `(term-color-magenta ((t (:foreground "#8B008B"))))
+   `(term-color-cyan ((t (:foreground "#68BFBF")))))
   :init
   (load-theme 'tao-yang t))
 
@@ -724,9 +747,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   '("801a567c87755fe65d0484cb2bded31a4c5bb24fd1fe0ed11e6c02254017acb2" "dbade2e946597b9cda3e61978b5fcc14fa3afa2d3c4391d477bdaeff8f5638c5" default))
- '(package-selected-packages
-   '(js2-mode tao-theme cider highlight-parentheses evil-cleverparens paredit aggressive-indent ess web-mode orderless corfu marginalia vertico magit expand-region evil-leader evil-collection ligature rainbow-mode vterm diminish direnv vundo)))
+   '("801a567c87755fe65d0484cb2bded31a4c5bb24fd1fe0ed11e6c02254017acb2" "dbade2e946597b9cda3e61978b5fcc14fa3afa2d3c4391d477bdaeff8f5638c5" default)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
