@@ -209,6 +209,10 @@
   :init
   (which-key-mode))
 
+;; Well it nice to image a better world sometimes
+(use-package eww
+  :ensure nil)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Theme & Visual.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -354,6 +358,8 @@
     "ws"     'whitespace-mode
     "ln"     'display-line-numbers-mode
     "ff"     'find-file
+    "www"    'eww
+    "wb"     'eww-browse-url
     "ai"     'gptel
     "aai"    'gptel-menu
 
@@ -451,7 +457,6 @@
                '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
                  nil
                  (window-parameters (mode-line-format . none)))))
-
 
 ;; Popup completion-at-point
 (use-package corfu
@@ -660,7 +665,6 @@
          (org-mode . flyspell-mode))
   :mode (("\\.org\\'" . org-mode))
   :config
-  ;; org-mode
   (setq org-directory "~/Sync/org/"
         org-startup-folded 'content) ;; collapse all trees
 
