@@ -65,7 +65,7 @@ export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$LD_LIBRARY_PATH
 # CUDA Compiler (nvcc)
 export CUDACXX=$CUDA_HOME/bin/nvcc
 
-export PATH=$PATH:$NODE_HOME/bin/:~/bin/:~/.local/bin/
+export PATH=$PATH:$NODE_HOME/bin/:~/bin/:~/.local/bin/:~/Sync/bin/
 # export LLVM_TOOLCHAIN=$(lli --print-toolchain-path)
 
 eval "$(direnv hook zsh)"

@@ -156,6 +156,10 @@
 (use-package magit
   :ensure t)
 
+;;;; Code References
+(use-package xref
+  :ensure nil)
+
 ;; Hides eldoc minor mode from the mode line.
 (use-package eldoc
   :diminish eldoc-mode)
@@ -299,20 +303,19 @@
   (define-key evil-visual-state-map (kbd ">") 'shift-right-visual)
   (define-key evil-visual-state-map (kbd "<") 'shift-left-visual)
 
-  (define-key evil-normal-state-map (kbd "C-c l") 'eglot-code-actions)
-  (define-key evil-normal-state-map (kbd "C-c .") 'embark-act)
-  (define-key evil-normal-state-map (kbd "C-c d") 'evil-goto-definition)
 
-  )
+  (define-key evil-normal-state-map (kbd "C-c d") 'xref-goto-xref)
+  (define-key evil-normal-state-map (kbd "C-c l") 'eglot-code-actions)
+  (define-key evil-normal-state-map (kbd "C-c .") 'embark-act))
 
 ;; https://github.com/justbur/emacs-which-key
 (use-package which-key
   :ensure t
+  :diminish which-key-mode
   :after (evil)
   :init
   (which-key-mode)
   :config
-  (which-key-setup-minibuffer)
   (setq which-key-allow-evil-operators t))
 
 (use-package evil-collection
@@ -432,7 +435,7 @@
 
 (use-package embark-consult
   :ensure t
-  :after (embark consult)
+  :after (embark consult evil)
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
 
@@ -474,18 +477,7 @@
   ;; first function returning a result wins.  Note that the list of buffer-local
   ;; completion functions takes precedence over the global list.
   (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-  (add-to-list 'completion-at-point-functions #'cape-file)
-  (add-to-list 'completion-at-point-functions #'cape-history)
-  ;;(add-to-list 'completion-at-point-functions #'cape-history)
-  ;;(add-to-list 'completion-at-point-functions #'cape-keyword)
-  ;;(add-to-list 'completion-at-point-functions #'cape-tex)
-  ;;(add-to-list 'completion-at-point-functions #'cape-sgml)
-  ;;(add-to-list 'completion-at-point-functions #'cape-rfc1345)
-  ;;(add-to-list 'completion-at-point-functions #'cape-abbrev)
-  ;;(add-to-list 'completion-at-point-functions #'cape-dict)
-  ;;(add-to-list 'completion-at-point-functions #'cape-elisp-symbol)
-  ;;(add-to-list 'completion-at-point-functions #'cape-line)
-  )
+  (add-to-list 'completion-at-point-functions #'cape-file))
 
 (use-package prescient
   :ensure t
@@ -494,12 +486,6 @@
   (setq completion-styles '(prescient basic)
         completion-category-defaults nil
         completion-category-overrides '((file (styles partial-completion)))))
-
-(use-package corfu-prescient
-  :ensure t
-  :after (corfu prescient)
-  :init
-  (corfu-prescient-mode))
 
 (use-package vertico-prescient
   :ensure t
@@ -519,7 +505,7 @@
   ;;https://github.com/akermu/emacs-libvterm/issues/179#issuecomment-1045331359
   ;; .screenrc => termcapinfo xterm* ti@:te@
   ;; It makes wrapping after resize work
-  (setq vterm-shell "screen"
+  (setq ;; vterm-shell "screen"
         vterm-keymap-exceptions nil))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -543,12 +529,6 @@
 ;;; Languages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;;; Code References
-(use-package xref
-  :ensure nil
-  :bind
-  ([remap xref-find-apropos] . xref-find-definitions))
-
 (use-package aggressive-indent
   :ensure t
   :hook (prog-mode . aggressive-indent-mode)
@@ -562,6 +542,7 @@
   :commands highlight-parentheses-mode)
 
 ;;;; LSP Client
+
 (use-package eglot
   :ensure t
   :defer t
@@ -580,6 +561,7 @@
   (setq eldoc-echo-area-use-multiline-p nil
         eglot-extend-to-xref t
         eglot-confirm-server-initiated-edits nil)
+
 
   (add-to-list 'eglot-server-programs '(clojure-mode . ("clojure-lsp")))
   (add-to-list 'eglot-server-programs '(clojure-ts-mode . ("clojure-lsp"))))
