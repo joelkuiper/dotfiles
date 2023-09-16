@@ -337,9 +337,9 @@
   ;; Leaders
   (evil-leader/set-key
     "1"      (lambda () (interactive) (find-file "~/dotfiles/emacs"))
-    "2"      (lambda () (interactive) (find-file "~/Sync/org/scratch.org"))
-    "3"      (lambda () (interactive) (find-file "~/Sync/org/todo.org"))
-    "4"      (lambda () (interactive) (find-file "~/Sync/org/journal.org"))
+    "2"      (lambda () (interactive) (find-file "~/Sync/org/todo.org"))
+    "3"      (lambda () (interactive) (find-file "~/Sync/org/journal.org"))
+    "4"      (lambda () (interactive) (find-file "~/Sync/org/scratch.org"))
     "5"      (lambda () (interactive) (find-file "~/Sync/org/repl.org"))
 
     "<SPC>"  'embark-act                ; Do something
@@ -347,6 +347,7 @@
     ","      'consult-line-multi        ; Find a thing in all buffers
     "/"      'consult-line              ; Like Vim / in current buffer
     "x"      'execute-extended-command  ; eXecute
+    ":"      'emoji-search              ; :wink:
     ";"      'consult-imenu             ; Navigate buffer
     "e"      'eval-expression           ; Eval
     "q"      'kill-buffer               ; Quit
