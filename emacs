@@ -342,27 +342,34 @@
     "4"      (lambda () (interactive) (find-file "~/Sync/org/journal.org"))
     "5"      (lambda () (interactive) (find-file "~/Sync/org/repl.org"))
 
-    "<SPC>"  'embark-act
-    "."      'er/expand-region
-    ","      'consult-line-multi
-    "e"      'eval-expression
-    "q"      'kill-buffer
-    "/"      'consult-line
-    "x"      'execute-extended-command
-    ";"      'consult-imenu
+    "<SPC>"  'embark-act                ; Do something
+    "."      'er/expand-region          ; See expand-region
+    ","      'consult-line-multi        ; Find a thing in all buffers
+    "/"      'consult-line              ; Like Vim / in current buffer
+    "x"      'execute-extended-command  ; eXecute
+    ";"      'consult-imenu             ; Navigate buffer
+    "e"      'eval-expression           ; Eval
+    "q"      'kill-buffer               ; Quit
+    "p"      'consult-yank-pop          ; Paste
+    "c"      'consult-mode-command      ; Command
+    "u"      'vundo                     ; Undo
+
     "sh"     'eshell                    ; SHell
-    "vt"     'multi-vterm
+    "vt"     'multi-vterm               ; VTerm
     "br"     'my-reload-buffer          ; BufferReload
     "bs"     'consult-buffer            ; BufferSwtich
     "bk"     'kill-buffer               ; BufferKill
-    "ws"     'whitespace-mode
-    "ln"     'display-line-numbers-mode
-    "ff"     'find-file
-    "www"    'eww
-    "wb"     'eww-browse-url
-    "ai"     'gptel
-    "aai"    'gptel-menu
+    "ws"     'whitespace-mode           ; WhiteSpace
+    "ln"     'display-line-numbers-mode ; LineNumbers
+    "ff"     'find-file                 ; Findfile
+    "www"    'eww                       ; WorldWideWeb
+    "wb"     'eww-browse-url            ; WebBrowse
+    "ai"     'gptel                     ; ArtificialIntelligence
+    "aai"    'gptel-menu                ; AnotherArtificialIntelligence
+    "fs"     'toggle-frame-fullscreen   ; FullScreen
+    "XX"     'kill-emacs                ; ...
 
+    ;; Magit
     "gg"     'magit
     "gd"     'magit-diff-unstaged
     "gs"     'magit-status
@@ -372,6 +379,7 @@
     "gP"     'magit-push-current-to-upstream
     "gp"     'magit-pull-from-upstream
 
+    ;; "Projects"
     "p;"     'consult-imenu-multi
     "pp"     'consult-project-buffer
     "ps"     'project-switch-project
@@ -379,6 +387,7 @@
     "pd"     'project-dired
     "pg"     'consult-git-grep
 
+    ;; Language specific
     "cc"     'cider-connect
     "ch"     'cider-repl-history
     "cb"     'cider-repl-clear-buffer
@@ -386,11 +395,7 @@
     "oe"     'org-export
     "ota"    'org-table-align
 
-    "fs"     'toggle-frame-fullscreen
-
-    "XX"     'kill-emacs
-
-    "u"      'vundo
+    ;; Buffers
     "|"      'evil-window-vsplit
     "_"      'evil-window-split
     "<left>" 'windmove-left
@@ -505,7 +510,7 @@
   (define-key vterm-mode-map [return] #'vterm-send-return)
   ;;https://github.com/akermu/emacs-libvterm/issues/179#issuecomment-1045331359
   ;; .screenrc => termcapinfo xterm* ti@:te@
-  ;; It makes wrapping after resize work
+  ;; It makes wrapping after resize work but you have to deal with screens everywhere
   (setq ;; vterm-shell "screen"
    vterm-keymap-exceptions nil))
 
@@ -558,7 +563,6 @@
   :diminish rainbow-mode
   :hook ((prog-mode . rainbow-mode)
          (text-mode . rainbow-mode)))
-
 
 ;; LSP Client
 (use-package eglot
