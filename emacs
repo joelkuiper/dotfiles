@@ -126,7 +126,6 @@
   ;; Enable the erase-buffer function to clear buffer contents without restrictions.
   (put 'erase-buffer 'disabled nil))
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Utility packages and setup.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -211,8 +210,13 @@
   (which-key-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Theme
+;;; Theme & Visual.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(tool-bar-mode 0)
+(menu-bar-mode 0)
+(scroll-bar-mode 0)
+(blink-cursor-mode 0)
+
 (use-package tao-theme
   :ensure t
   :config
@@ -232,13 +236,6 @@
   :init
   (load-theme 'tao-yang t))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Visual.
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(tool-bar-mode 0)
-(menu-bar-mode 0)
-(scroll-bar-mode 0)
-(blink-cursor-mode 0)
 
 ;; You'll see what it does below, if not harfbuzz is broken.
 (use-package ligature
@@ -278,12 +275,14 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package evil
   :ensure t
-  :custom
-  (evil-want-keybinding nil) ; https://github.com/emacs-evil/evil-collection
-  (evil-undo-system 'undo-redo)
   :init
-  (evil-mode 1)
+  (setq
+   evil-undo-system 'undo-redo
+   evil-want-keybinding nil
+   evil-want-integration t) ;; This is optional since it's already set to t by default.
   :config
+  (evil-mode 1)
+
   ;; Shift left/right functions and bindings
   (defun shift-left-visual ()
     "Shift left and restore visual selection."
@@ -319,7 +318,7 @@
   :ensure t
   :after (evil)
   :diminish evil-collection-unimpaired-mode
-  :init
+  :config
   (evil-collection-init
    '(cider eglot vterm corfu magit dired vundo org vertico)))
 
@@ -466,29 +465,13 @@
         corfu-quit-no-match 'separator))
 
 ;; Add extensions
-;; https://github.com/minad/cape
-;; Enable Corfu completion UI
-;; See the Corfu README for more configuration tips.
-(use-package corfu
-  :init
-  (global-corfu-mode))
-
-;; Add extensions
 (use-package cape
   :ensure t
-  ;; Bind dedicated completion commands
-  ;; Alternative prefix keys: C-c p, M-p, M-+, ...
-  :bind (("C-c p p" . completion-at-point) ;; capf
-         ("C-c p d" . cape-dabbrev)        ;; or dabbrev-completion
-         ("C-c p h" . cape-history)
-         ("C-c p f" . cape-file)
-         ("C-c p k" . cape-keyword)
-         ("C-c p e" . cape-emoji))
-  :init
   ;; Add to the global default value of `completion-at-point-functions' which is
   ;; used by `completion-at-point'.  The order of the functions matters, the
   ;; first function returning a result wins.  Note that the list of buffer-local
   ;; completion functions takes precedence over the global list.
+  :init
   (add-to-list 'completion-at-point-functions #'cape-dabbrev)
   (add-to-list 'completion-at-point-functions #'cape-file))
 
@@ -576,9 +559,7 @@
 (use-package eglot
   :ensure t
   :defer t
-  :hook ((clojure-mode . eglot-ensure)
-         (R-mode . eglot-ensure) ;; Untested
-         )
+  :hook ((clojure-mode . eglot-ensure))
   :custom
   (eglot-autoshutdown t)
   :config
