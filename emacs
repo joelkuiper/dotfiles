@@ -357,14 +357,14 @@
     "^"      'toggle-frame-fullscreen                    ; Goes up?
     "?"      'eldoc                                      ; Help?
 
-    "sh"     'eshell                                     ; SHell
+    "sh"     'term                                       ; SHell
     "vt"     'multi-vterm                                ; VTerm
     "br"     'my-reload-buffer                           ; BufferReload
     "bs"     'consult-buffer                             ; BufferSwtich
     "bk"     'kill-buffer                                ; BufferKill
     "ws"     'whitespace-mode                            ; WhiteSpace
     "ln"     'display-line-numbers-mode                  ; LineNumbers
-    "ff"     'find-file                                  ; Findfile
+    "ff"     'find-file                                  ; FindFile
     "fg"     'consult-ripgrep                            ; FindGrep
     "www"    'eww                                        ; WorldWideWeb
     "wb"     'eww-browse-url                             ; WebBrowse
@@ -384,18 +384,16 @@
     "gp"     'magit-pull-from-upstream                   ; GitPull
 
     ;; "Projects"
-    "pp"     'consult-project-buffer                     ; ProjectProjcet
+    "pp"     'consult-project-buffer                     ; ProjectProject
     "pg"     'consult-git-grep                           ; Project(git)Grep
     "ps"     'project-switch-project                     ; ProjectSwitch
     "pf"     'project-find-file                          ; ProjectFind
-    "pd"     'project-dired                              ; ProectDired
+    "pd"     'project-dired                              ; ProjectDired
 
     ;; Language specific
     "o."     'org-time-stamp
     "oe"     'org-export
-    "ota"    'org-table-align
-
-    ))
+    "ota"    'org-table-align))
 
 (use-package expand-region
   :ensure t
@@ -468,7 +466,6 @@
   (setq corfu-auto t
         corfu-quit-no-match 'separator))
 
-;; Add extensions
 (use-package cape
   :ensure t
   ;; Add to the global default value of `completion-at-point-functions' which is
@@ -512,7 +509,7 @@
 ;;; ChatGPT
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; https://github.com/karthink/gptel
-;; set machine api.openai.com login apikey password TOKEN in ~/.authinfo
+;; set `machine api.openai.com login apikey password TOKEN` in ~/.authinfo
 ;; Also see https://github.com/karthink/gptel/wiki
 (use-package gptel
   :ensure t
@@ -654,7 +651,7 @@
         cider-repl-use-pretty-printing t))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Writing & Blogging (org mode)
+;;; Writing & Blogging
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package org
   :ensure t
