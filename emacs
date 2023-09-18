@@ -19,7 +19,7 @@
 ;;; Utility functions.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun my-reload-buffer ()
-  "revert-buffer without confirmation."
+  "Revert-buffer without confirmation."
   (interactive)
   (revert-buffer t t))
 
@@ -44,17 +44,6 @@
        :weight font-weight
        :width font-width))))
 
-;; esc quits
-(defun minibuffer-keyboard-quit ()
-  "Abort recursive edit.
-   In Delete Selection mode, if the mark is active, just deactivate it;
-   then it takes a second \\[keyboard-quit] to abort the minibuffer."
-  (interactive)
-  (if (and delete-selection-mode transient-mark-mode mark-active)
-      (setq deactivate-mark  t)
-    (when (get-buffer "*Completions*") (delete-windows-on "*Completions*"))
-    (abort-recursive-edit)))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Core config.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -77,6 +66,7 @@
    auto-save-list-file-prefix nil                   ;; Prevent tracking for auto-saves
    backup-by-copying t                              ;; Backups never overwrite original
    version-control t                                ;; Use numeric versions for backups
+   delete-old-versions t                            ;; Delete extra backups silently
    backup-directory-alist `(("." . "~/.backups"))   ;; Where are the backups?
    auto-save-file-name-transforms `((".*" ,temporary-file-directory t))
    comment-multi-line t                             ;; Continue comments when filling
@@ -87,10 +77,8 @@
    custom-unlispify-menu-entries nil                ;; Prefer kebab-case for titles
    custom-unlispify-tag-names nil                   ;; Prefer kebab-case for symbols
    delete-by-moving-to-trash t                      ;; Delete files to trash
-   fill-column 80                                   ;; Set width for automatic line breaks
+   fill-column 120                                  ;; Set width for automatic line breaks
    gc-cons-threshold (* 8 1024 1024)                ;; We're not using Game Boys anymore
-   help-window-select t                             ;; Focus new help windows when opened
-   isearch-allow-scroll t                           ;; Allow scroll commands while isearching
    max-mini-window-height 10                        ;; Limit height for minibuffer transients
    mouse-yank-at-point t                            ;; Yank at point rather than pointer
    native-comp-async-report-warnings-errors 'silent ;; Skip error buffers
@@ -108,7 +96,6 @@
    uniquify-buffer-name-style 'forward              ;; Uniquify buffer names
    use-short-answers t                              ;; Replace yes/no prompts with y/n
    vc-follow-symlinks t                             ;; Never prompt when visiting symlinks
-   delete-old-versions t                            ;; Delete extra backups silently
    window-combination-resize t                      ;; Resize windows proportionally
    x-stretch-cursor t)                              ;; Stretch cursor to the glyph width
 
@@ -118,13 +105,16 @@
   (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
 
   ;; Enable the erase-buffer function to clear buffer contents without restrictions.
-  (put 'erase-buffer 'disabled nil))
+  (put 'erase-buffer 'disabled nil)
+
+  ;; Zoom in/out (text scale) for my poor eyes (and presentations)
+  (global-set-key (kbd "C-s--") 'text-scale-decrease)
+  (global-set-key (kbd "C-s-=") 'text-scale-increase))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Utility packages and setup.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Initialize and ensure that shell environment variables are set correctly.
 ;; Ensures that the Emacs shell environment matches the system's.
 (use-package exec-path-from-shell
   :ensure t
@@ -197,7 +187,7 @@
   :init
   (which-key-mode))
 
-;; Well it nice to image a better world sometimes
+;; Well it is nice to imagine a better world sometimes.
 (use-package eww
   :defer t
   :ensure nil)
@@ -271,8 +261,7 @@
   :init
   (setq
    evil-undo-system 'undo-redo
-   evil-want-keybinding nil
-   evil-want-integration t) ;; This is optional since it's already set to t by default.
+   evil-want-keybinding nil)
   :config
   (evil-mode 1)
 
@@ -292,6 +281,17 @@
     (evil-visual-restore))
 
   (setq evil-shift-width 2)
+
+  ;; esc quits
+  (defun minibuffer-keyboard-quit ()
+    "Abort recursive edit.
+   In Delete Selection mode, if the mark is active, just deactivate it;
+   then it takes a second \\[keyboard-quit] to abort the minibuffer."
+    (interactive)
+    (if (and delete-selection-mode transient-mark-mode mark-active)
+        (setq deactivate-mark  t)
+      (when (get-buffer "*Completions*") (delete-windows-on "*Completions*"))
+      (abort-recursive-edit)))
 
   (define-key evil-normal-state-map [escape] 'keyboard-quit)
   (define-key evil-visual-state-map [escape] 'keyboard-quit)
@@ -373,7 +373,7 @@
     "gp"     'magit-pull-from-upstream         ;; GitPull
 
     ;; "Projects"
-    "pp"     'consult-project-buffer           ;; ProjectProject
+    "pb"     'consult-project-buffer           ;; ProjectBuffer
     "pg"     'consult-git-grep                 ;; Project(git)Grep
     "ps"     'project-switch-project           ;; ProjectSwitch
     "pf"     'project-find-file                ;; ProjectFind
@@ -381,8 +381,7 @@
 
     ;; Org mode
     "o."     'org-time-stamp
-    "oe"     'org-export
-    "ota"    'org-table-align))
+    "oe"     'org-export))
 
 (use-package expand-region
   :ensure t
@@ -500,7 +499,7 @@
   (define-key vterm-mode-map [return] #'vterm-send-return)
   ;;https://github.com/akermu/emacs-libvterm/issues/179#issuecomment-1045331359
   ;; .screenrc => termcapinfo xterm* ti@:te@
-  ;; It makes wrapping after resize work but you have to deal with screens everywhere
+  ;; It makes wrapping after resize work but you now have to deal with screens everywhere
   (setq ;; vterm-shell "screen"
    vterm-keymap-exceptions nil))
 
