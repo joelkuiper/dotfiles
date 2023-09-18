@@ -60,15 +60,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package emacs
   :init
-  ;; Always, always, prefer UTF-8, anything else is insanity
-  (setq locale-coding-system 'utf-8)
-  (set-default-coding-systems 'utf-8-unix)
-  (set-terminal-coding-system 'utf-8-unix)
-  (set-keyboard-coding-system 'utf-8-unix)
-  (prefer-coding-system 'utf-8-unix)
-
   (setq-default
    ;; Mostly from https://github.com/angrybacon/dotemacs/blob/master/lisp/use-defaults.el
+   locale-coding-system 'utf-8                      ;; Always, always, prefer UTF-8, anything else is insanity
    inhibit-startup-screen t                         ;; No startup screen
    inhibit-startup-echo-area-message t              ;; No echo message
    initial-scratch-message nil                      ;; What's in the *scratch* buffer
@@ -83,7 +77,7 @@
    auto-save-list-file-prefix nil                   ;; Prevent tracking for auto-saves
    backup-by-copying t                              ;; Backups never overwrite original
    version-control t                                ;; Use numeric versions for backups
-   backup-directory-alist `(("." . "~/.backups"))     ;; Where are the backups?
+   backup-directory-alist `(("." . "~/.backups"))   ;; Where are the backups?
    auto-save-file-name-transforms `((".*" ,temporary-file-directory t))
    comment-multi-line t                             ;; Continue comments when filling
    create-lockfiles nil                             ;; Locks are more nuisance than blessing
@@ -211,6 +205,7 @@
 
 ;; Well it nice to image a better world sometimes
 (use-package eww
+  :defer t
   :ensure nil)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -324,7 +319,7 @@
   :diminish evil-collection-unimpaired-mode
   :config
   (evil-collection-init
-   '(cider eglot vterm corfu magit dired vundo org vertico)))
+   '(cider eglot vterm magit dired vundo org vertico)))
 
 (use-package evil-leader
   :ensure t
@@ -342,53 +337,54 @@
     "4"      (lambda () (interactive) (find-file "~/Sync/org/scratch.org"))
     "5"      (lambda () (interactive) (find-file "~/Sync/org/repl.org"))
 
-    "<SPC>"  'embark-act                                 ; Do something
-    "."      'er/expand-region                           ; See expand-region
-    ","      'consult-line-multi                         ; Find a thing in all buffers
-    "/"      'consult-line                               ; Like Vim / in current buffer
-    "x"      'execute-extended-command                   ; eXecute
-    ":"      'emoji-search                               ; :wink:
-    ";"      'consult-imenu                              ; Navigate buffer
-    "e"      'eval-expression                            ; Eval
-    "q"      'kill-current-buffer                        ; Quit
-    "y"      'consult-yank-pop                           ; Yank (well paste...)
-    "c"      'consult-mode-command                       ; Command
-    "u"      'vundo                                      ; Undo
-    "^"      'toggle-frame-fullscreen                    ; Goes up?
-    "?"      'eldoc                                      ; Help?
+    "<SPC>"  'embark-act                       ;; Do something
+    "."      'er/expand-region                 ;; See expand-region
+    ","      'consult-line-multi               ;; Find a thing in all buffers
+    "/"      'consult-line                     ;; Like Vim / in current buffer
+    "x"      'execute-extended-command         ;; eXecute
+    ":"      'emoji-search                     ;; :wink:
+    ";"      'consult-imenu                    ;; Navigate buffer
+    "e"      'eval-expression                  ;; Eval
+    "q"      'kill-current-buffer              ;; Quit
+    "y"      'consult-yank-pop                 ;; Yank (well paste...)
+    "c"      'consult-mode-command             ;; Command
+    "u"      'vundo                            ;; Undo
+    "^"      'toggle-frame-fullscreen          ;; Goes up?
+    "?"      'eldoc                            ;; Help?
+    "!"      'shell-command                    ;; Like [esc]:! in Vim
 
-    "sh"     'term                                       ; SHell
-    "vt"     'multi-vterm                                ; VTerm
-    "br"     'my-reload-buffer                           ; BufferReload
-    "bs"     'consult-buffer                             ; BufferSwtich
-    "bk"     'kill-buffer                                ; BufferKill
-    "ws"     'whitespace-mode                            ; WhiteSpace
-    "ln"     'display-line-numbers-mode                  ; LineNumbers
-    "ff"     'find-file                                  ; FindFile
-    "fg"     'consult-ripgrep                            ; FindGrep
-    "www"    'eww                                        ; WorldWideWeb
-    "wb"     'eww-browse-url                             ; WebBrowse
-    "ai"     'gptel                                      ; ArtificialIntelligence
-    "aai"    'gptel-menu                                 ; AnotherArtificialIntelligence
-    "XX"     'kill-emacs                                 ; ...
+    "sh"     'term                             ;; SHell
+    "vt"     'multi-vterm                      ;; VTerm
+    "br"     'my-reload-buffer                 ;; BufferReload
+    "bs"     'consult-buffer                   ;; BufferSwtich
+    "bk"     'kill-buffer                      ;; BufferKill
+    "ws"     'whitespace-mode                  ;; WhiteSpace
+    "ln"     'display-line-numbers-mode        ;; LineNumbers
+    "ff"     'find-file                        ;; FindFile
+    "fg"     'consult-ripgrep                  ;; FindGrep
+    "www"    'eww                              ;; WorldWideWeb
+    "wb"     'eww-browse-url                   ;; WebBrowse
+    "ai"     'gptel                            ;; ArtificialIntelligence
+    "aai"    'gptel-menu                       ;; AnotherArtificialIntelligence
+    "XX"     'kill-emacs                       ;; ...
 
     ;; Buffers
-    "|"      'evil-window-vsplit
-    "_"      'evil-window-split
+    "|"      'evil-window-vsplit               ;; :vsp
+    "_"      'evil-window-split                ;; :sp
 
     ;; Magit
-    "gs"     'magit-status                               ; GitStatus
-    "gd"     'magit-diff-unstaged                        ; GitDiff
-    "gl"     'magit-log-all                              ; GitLog
-    "gP"     'magit-push-current-to-upstream             ; GitPUSH
-    "gp"     'magit-pull-from-upstream                   ; GitPull
+    "gs"     'magit-status                     ;; GitStatus
+    "gd"     'magit-diff-unstaged              ;; GitDiff
+    "gl"     'magit-log-all                    ;; GitLog
+    "gP"     'magit-push-current-to-upstream   ;; GitPUSH
+    "gp"     'magit-pull-from-upstream         ;; GitPull
 
     ;; "Projects"
-    "pp"     'consult-project-buffer                     ; ProjectProject
-    "pg"     'consult-git-grep                           ; Project(git)Grep
-    "ps"     'project-switch-project                     ; ProjectSwitch
-    "pf"     'project-find-file                          ; ProjectFind
-    "pd"     'project-dired                              ; ProjectDired
+    "pp"     'consult-project-buffer           ;; ProjectProject
+    "pg"     'consult-git-grep                 ;; Project(git)Grep
+    "ps"     'project-switch-project           ;; ProjectSwitch
+    "pf"     'project-find-file                ;; ProjectFind
+    "pd"     'project-dired                    ;; ProjectDired
 
     ;; Language specific
     "o."     'org-time-stamp
@@ -430,12 +426,6 @@
   :config
   (marginalia-mode))
 
-(use-package embark-consult
-  :ensure t
-  :after (embark consult)
-  :hook
-  (embark-collect-mode . consult-preview-at-point-mode))
-
 (use-package consult
   :ensure t
   :config
@@ -455,16 +445,32 @@
                  nil
                  (window-parameters (mode-line-format . none)))))
 
-;; Popup completion-at-point
-(use-package corfu
+(use-package embark-consult
   :ensure t
+  :after (embark consult)
+  :hook
+  (embark-collect-mode . consult-preview-at-point-mode))
+
+;; Popup completion-at-point
+;; https://github.com/minad/corfu
+
+(defun my-corfu-quit-and-escape ()
+  "Call `corfu-quit' and then return to Normal State."
+  (interactive)
+  (call-interactively 'corfu-quit)
+  (evil-normal-state))
+
+(use-package corfu
+  :bind
+  (:map corfu-map
+        ("<escape>" . my-corfu-quit-and-escape))
   :custom
   (corfu-auto t)
   :init
   (global-corfu-mode)
   :config
-  (setq corfu-auto t
-        corfu-quit-no-match 'separator))
+  (require 'corfu-popupinfo)
+  (corfu-popupinfo-mode))
 
 (use-package cape
   :ensure t
@@ -517,6 +523,7 @@
               ("C-<return>" . gptel-send))
   :config
   (define-key evil-visual-state-map (kbd "ai") 'gptel-send)
+  (define-key evil-visual-state-map (kbd "aai") 'gptel-menu)
   (setq gptel-default-mode 'org-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -592,6 +599,11 @@
   (html-mode . sgml-electric-tag-pair-mode)
   :custom
   (sgml-basic-offset 2))
+
+(use-package css-mode
+  :ensure nil
+  :custom
+  (css-indent-offset 2))
 
 ;; Javascript (as little as humanly possible)
 (use-package js2-mode
