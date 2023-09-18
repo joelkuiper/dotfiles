@@ -174,12 +174,6 @@
   :ensure t
   :init (savehist-mode))
 
-;; Manages session persistence for Emacs.
-(use-package desktop
-  :config
-  (desktop-read)
-  (desktop-save-mode))
-
 ;; Winner winner, chicken ...
 (use-package winner
   :config
@@ -315,11 +309,11 @@
 
 (use-package evil-collection
   :ensure t
-  :after (evil)
+  :after (evil cider eglot vterm magit eww vundo org vertico)
   :diminish evil-collection-unimpaired-mode
   :config
   (evil-collection-init
-   '(cider eglot vterm magit dired vundo org vertico)))
+   '(cider eglot vterm magit eww vundo org vertico)))
 
 (use-package evil-leader
   :ensure t
@@ -362,8 +356,7 @@
     "ln"     'display-line-numbers-mode        ;; LineNumbers
     "ff"     'find-file                        ;; FindFile
     "fg"     'consult-ripgrep                  ;; FindGrep
-    "www"    'eww                              ;; WorldWideWeb
-    "wb"     'eww-browse-url                   ;; WebBrowse
+    "wb"     'eww                              ;; WebBrowse
     "ai"     'gptel                            ;; ArtificialIntelligence
     "aai"    'gptel-menu                       ;; AnotherArtificialIntelligence
     "XX"     'kill-emacs                       ;; ...
@@ -386,7 +379,7 @@
     "pf"     'project-find-file                ;; ProjectFind
     "pd"     'project-dired                    ;; ProjectDired
 
-    ;; Language specific
+    ;; Org mode
     "o."     'org-time-stamp
     "oe"     'org-export
     "ota"    'org-table-align))
