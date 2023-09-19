@@ -665,6 +665,8 @@
   :mode (("\\.org\\'" . org-mode))
   :config
   (setq org-directory "~/Sync/org/"
+        ;; https://orgmode.org/worg/org-contrib/babel/examples/fontify-src-code-blocks.html
+        org-src-fontify-natively t ;; font-lock src-block
         org-startup-folded 'content) ;; collapse all trees
 
   (defconst my-org-babel-languages
