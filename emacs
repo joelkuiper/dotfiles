@@ -56,54 +56,54 @@
   :init
   (setq-default
    ;; Mostly from https://github.com/angrybacon/dotemacs/blob/master/lisp/use-defaults.el
-   locale-coding-system 'utf-8                      ;; Always, always, prefer UTF-8, anything else is insanity
-   inhibit-startup-screen t                         ;; No startup screen
-   inhibit-startup-message t                        ;; No startup message
-   inhibit-startup-echo-area-message t              ;; No echo message
-   initial-scratch-message nil                      ;; What's in the *scratch* buffer
-   initial-major-mode 'fundamental-mode             ;; What major-mode Emacs opens with
-   enable-recursive-minibuffers t                   ;; Use the minibuffer whilst in the minibuffer
-   completion-cycle-threshold 1                     ;; TAB cycles candidates
-   completions-detailed t                           ;; Show annotations
-   tab-always-indent 'complete                      ;; Indent first then try completions
-   indent-tabs-mode nil                             ;; Prefer spaces over tabs to indent
-   tramp-terminal-type "tramp"                      ;; Tramp compatibility
-   ad-redefinition-action 'accept                   ;; Silence warnings for redefinitions
-   auto-save-list-file-prefix nil                   ;; Prevent tracking for auto-saves
-   backup-by-copying t                              ;; Backups never overwrite original
-   version-control t                                ;; Use numeric versions for backups
-   delete-old-versions t                            ;; Delete extra backups silently
-   backup-directory-alist `(("." . "~/.backups"))   ;; Where are the backups?
-   auto-save-file-name-transforms `((".*" ,temporary-file-directory t))
-   comment-multi-line t                             ;; Continue comments when filling
-   create-lockfiles nil                             ;; Locks are more nuisance than blessing
-   cursor-in-non-selected-windows nil               ;; Hide the cursor in inactive windows
-   cursor-type '(hbar . 2)                          ;; Underline-shaped cursor
-   custom-file null-device                          ;; Prevent littering
-   custom-unlispify-menu-entries nil                ;; Prefer kebab-case for titles
-   custom-unlispify-tag-names nil                   ;; Prefer kebab-case for symbols
-   delete-by-moving-to-trash t                      ;; Delete files to trash
-   fill-column 120                                  ;; Set width for automatic line breaks
-   gc-cons-threshold (* 8 1024 1024)                ;; We're not using Game Boys anymore
-   max-mini-window-height 10                        ;; Limit height for minibuffer transients
-   mouse-yank-at-point t                            ;; Yank at point rather than pointer
-   native-comp-async-report-warnings-errors 'silent ;; Skip error buffers
-   byte-compile-warnings '(not obsolete)            ;; Disable obsolete warnings when compiling
-   warning-suppress-log-types '((comp) (bytecomp))  ;; Suppress compiler warning messages
-   read-process-output-max (* 1024 1024)            ;; Increase read size for data chunks
-   recenter-positions '(5 bottom)                   ;; Set re-centering positions
-   ring-bell-function 'ignore                       ;; Silence error bells
-   scroll-conservatively 101                        ;; Avoid recentering when scrolling far
-   scroll-margin 5                                  ;; Add a margin when scrolling vertically
-   select-enable-clipboard t                        ;; Merge system's and Emacs' clipboard
-   sentence-end-double-space nil                    ;; Use a single space after dots
-   show-help-function nil                           ;; Disable help text everywhere
-   uniquify-buffer-name-style 'forward              ;; Uniquify buffer names
-   use-short-answers t                              ;; Replace yes/no prompts with y/n
-   vc-follow-symlinks t                             ;; Never prompt when visiting symlinks
-   window-combination-resize t                      ;; Resize windows proportionally
-   x-stretch-cursor t                               ;; Stretch cursor to the glyph width
-   browse-url-browser-function 'eww-browse-url)     ;; Click a hyperlink, open eww (or 'browse-url-default-browser)
+   locale-coding-system 'utf-8                       ;; Always, always, prefer UTF-8, anything else is insanity
+   inhibit-startup-screen t                          ;; No startup screen
+   inhibit-startup-message t                         ;; No startup message
+   inhibit-startup-echo-area-message t               ;; No echo message
+   initial-scratch-message nil                       ;; What's in the *scratch* buffer
+   initial-major-mode 'fundamental-mode              ;; What major-mode Emacs opens with
+   enable-recursive-minibuffers t                    ;; Use the minibuffer whilst in the minibuffer
+   completion-cycle-threshold 1                      ;; TAB cycles candidates
+   completions-detailed t                            ;; Show annotations
+   tab-always-indent 'complete                       ;; Indent first then try completions
+   indent-tabs-mode nil                              ;; Prefer spaces over tabs to indent
+   tramp-terminal-type "tramp"                       ;; Tramp compatibility
+   ad-redefinition-action 'accept                    ;; Silence warnings for redefinitions
+   auto-save-list-file-prefix nil                    ;; Prevent tracking for auto-saves
+   backup-by-copying t                               ;; Backups never overwrite original
+   version-control t                                 ;; Use numeric versions for backups
+   delete-old-versions t                             ;; Delete extra backups silently
+   backup-directory-alist `(("." . "~/.backups"))    ;; Where are the backups?
+   auto-save-file-name-transforms `((".*" ,temporary-file-directory t)) ;; Auto save in tmp
+   comment-multi-line t                              ;; Continue comments when filling
+   create-lockfiles nil                              ;; Locks are more nuisance than blessing
+   cursor-in-non-selected-windows nil                ;; Hide the cursor in inactive windows
+   cursor-type '(hbar . 2)                           ;; Underline-shaped cursor
+   custom-file null-device                           ;; Prevent littering
+   custom-unlispify-menu-entries nil                 ;; Prefer kebab-case for titles
+   custom-unlispify-tag-names nil                    ;; Prefer kebab-case for symbols
+   delete-by-moving-to-trash t                       ;; Delete files to trash
+   fill-column 120                                   ;; Set width for automatic line breaks
+   gc-cons-threshold (* 8 1024 1024)                 ;; We're not using Game Boys anymore
+   max-mini-window-height 10                         ;; Limit height for minibuffer transients
+   mouse-yank-at-point t                             ;; Yank at point rather than pointer
+   native-comp-async-report-warnings-errors 'silent  ;; Skip error buffers
+   byte-compile-warnings '(not obsolete)             ;; Disable obsolete warnings when compiling
+   warning-suppress-log-types '((comp) (bytecomp))   ;; Suppress compiler warning messages
+   read-process-output-max (* 1024 1024)             ;; Increase read size for data chunks
+   recenter-positions '(5 bottom)                    ;; Set re-centering positions
+   ring-bell-function 'ignore                        ;; Silence error bells
+   scroll-conservatively 101                         ;; Avoid recentering when scrolling far
+   scroll-margin 5                                   ;; Add a margin when scrolling vertically
+   select-enable-clipboard t                         ;; Merge system's and Emacs' clipboard
+   sentence-end-double-space nil                     ;; Use a single space after dots
+   show-help-function nil                            ;; Disable help text everywhere
+   uniquify-buffer-name-style 'forward               ;; Uniquify buffer names
+   use-short-answers t                               ;; Replace yes/no prompts with y/n
+   vc-follow-symlinks t                              ;; Never prompt when visiting symlinks
+   window-combination-resize t                       ;; Resize windows proportionally
+   x-stretch-cursor t                                ;; Stretch cursor to the glyph width
+   browse-url-browser-function 'eww-browse-url)      ;; Click hyperlink, open eww (or use ,wB)
 
   ;; Do not allow the cursor in the minibuffer prompt
   (setq minibuffer-prompt-properties
@@ -198,6 +198,11 @@
   :defer t
   :ensure nil)
 
+;; Recent files, distant memories
+(use-package recentf
+  :init
+  (recentf-mode 1))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Theme & Visual.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -212,8 +217,6 @@
   (mode-line ((t (:foreground "#3C3C3C" :background "#F1F1F1"))))
   (powerline-active1 ((t (:foreground "#3C3C3C" :background "#DADADA"))))
   (powerline-active2 ((t (:foreground "#3C3C3C" :background "#F1F1F1"))))
-
-
   (powerline-inactive1 ((t (:foreground "#3C3C3C" :background "#F1F1F1"))))
   (powerline-inactive2 ((t (:foreground "#3C3C3C" :background "#F1F1F1"))))
   (mode-line-inactive ((t (:foreground "#3C3C3C" :background "#F1F1F1"))))
@@ -315,16 +318,17 @@
 
   (define-key evil-ex-completion-map (kbd "TAB") 'completion-at-point)
 
+  (define-key evil-visual-state-map (kbd "g/") 'comment-or-uncomment-region)
   (define-key evil-visual-state-map (kbd ">") 'shift-right-visual)
   (define-key evil-visual-state-map (kbd "<") 'shift-left-visual))
 
 (use-package evil-collection
   :ensure t
-  :after (evil cider eglot vterm magit eww vundo org vertico)
+  :after (evil corfu cider eglot vterm magit eww vundo org vertico)
   :diminish evil-collection-unimpaired-mode
   :config
   (evil-collection-init
-   '(cider eglot vterm magit eww vundo org vertico)))
+   '(corfu cider eglot vterm magit eww vundo org vertico)))
 
 (use-package evil-leader
   :ensure t
@@ -344,15 +348,17 @@
 
     "<SPC>"  'embark-act                       ;; Do something
     "."      'er/expand-region                 ;; See expand-region
-    ","      'consult-line-multi               ;; Find a thing in all buffers
+    ","      'consult-imenu-multi              ;; Find a thing in all buffers
+    ";"      'consult-imenu                    ;; Navigate buffer
+    "'"      'consult-line-multi               ;; Find ALL the lines
     "/"      'consult-line                     ;; Like Vim / in current buffer
     "x"      'execute-extended-command         ;; eXecute
     ":"      'emoji-search                     ;; :wink:
-    ";"      'consult-imenu                    ;; Navigate buffer
     "e"      'eval-expression                  ;; Eval
     "q"      'kill-current-buffer              ;; Quit
     "y"      'consult-yank-pop                 ;; Yank (well paste...)
     "c"      'consult-mode-command             ;; Command
+    "r"      'consult-recent-file              ;; Recentf
     "u"      'vundo                            ;; Undo
     "^"      'toggle-frame-fullscreen          ;; Goes up?
     "?"      'eldoc                            ;; Help?
@@ -392,6 +398,7 @@
     "ps"     'project-switch-project           ;; ProjectSwitch
     "pf"     'project-find-file                ;; ProjectFind
     "pd"     'project-dired                    ;; ProjectDired
+    "p!"     'project-shell-command            ;; like ! but p!
 
     ;; Org mode
     "o."     'org-time-stamp
@@ -457,44 +464,32 @@
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
 
-;; Popup completion-at-point
-;; https://github.com/minad/corfu
-
 (defun my-corfu-quit-and-escape ()
   "Call `corfu-quit' and then return to Normal State."
   (interactive)
   (call-interactively 'corfu-quit)
   (evil-normal-state))
 
+;; Popup completion-at-point
+;; https://github.com/minad/corfu
 (use-package corfu
   :bind
   (:map corfu-map
-        ("<escape>" . my-corfu-quit-and-escape))
-  :custom
-  (corfu-auto t)
+        (("<escape>" . my-corfu-quit-and-escape)
+         ;; Free the RET key for less intrusive behavior.
+         ;; ("RET" . nil)
+         ("SPC" . corfu-insert-separator)))
   :init
   (global-corfu-mode)
   :config
   (require 'corfu-popupinfo)
   (corfu-popupinfo-mode))
 
-(use-package cape
-  :ensure t
-  ;; Add to the global default value of `completion-at-point-functions' which is
-  ;; used by `completion-at-point'.  The order of the functions matters, the
-  ;; first function returning a result wins.  Note that the list of buffer-local
-  ;; completion functions takes precedence over the global list.
-  :init
-  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-  (add-to-list 'completion-at-point-functions #'cape-file))
-
+;; https://github.com/radian-software/prescient.el
 (use-package prescient
   :ensure t
   :config
-  (prescient-persist-mode)
-  (setq completion-styles '(prescient basic)
-        completion-category-defaults nil
-        completion-category-overrides '((file (styles partial-completion)))))
+  (prescient-persist-mode))
 
 (use-package vertico-prescient
   :ensure t
@@ -507,6 +502,16 @@
   :after (corfu prescient)
   :init
   (corfu-prescient-mode))
+
+;; https://github.com/minad/cape
+(use-package cape
+  :ensure t
+  ;; Add to the global default value of `completion-at-point-functions' which is
+  ;; used by `completion-at-point'.  The order of the functions matters, the
+  ;; first function returning a result wins.  Note that the list of buffer-local
+  ;; completion functions takes precedence over the global list.
+  :init
+  (add-to-list 'completion-at-point-functions #'cape-file))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Vterm
@@ -569,7 +574,7 @@
 
 (use-package aggressive-indent
   :ensure t
-  :hook (prog-mode . aggressive-indent-mode)
+  :hook (paredit-mode . aggressive-indent-mode)
   :diminish aggressive-indent-mode
   :commands aggressive-indent-mode)
 
@@ -634,7 +639,8 @@
   :ensure t
   :defer t
   :mode (("\\.js\\'" . js2-mode))
-  :hook (js2-mode . electric-pair-mode)
+  :hook ((js2-mode . electric-pair-mode)
+         (js2-mode . electric-indent-mode))
   :config
   (setq js-indent-level 2
         javascript-indent-level 2))
@@ -643,7 +649,8 @@
 (use-package ess
   :ensure t
   :defer t
-  :hook (R-mode . electric-pair-mode)
+  :hook ((R-mode . electric-pair-mode)
+         (R-mode . electric-indent-mode))
   :mode (("\\.R\\'" . R-mode)
          ("\\.r\\'" . R-mode))
   :config
