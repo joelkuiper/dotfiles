@@ -44,6 +44,11 @@
        :weight font-weight
        :width font-width))))
 
+(defun my-open-wikipedia (search-term)
+  "Open Wikipedia for the given SEARCH-TERM using eww."
+  (interactive "sEnter search term: ")
+  (eww (format "https://en.wikipedia.org/wiki/%s" search-term)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Core config.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -97,7 +102,8 @@
    use-short-answers t                              ;; Replace yes/no prompts with y/n
    vc-follow-symlinks t                             ;; Never prompt when visiting symlinks
    window-combination-resize t                      ;; Resize windows proportionally
-   x-stretch-cursor t)                              ;; Stretch cursor to the glyph width
+   x-stretch-cursor t                               ;; Stretch cursor to the glyph width
+   browse-url-browser-function 'eww-browse-url)     ;; Click a hyperlink, open eww (or 'browse-url-default-browser)
 
   ;; Do not allow the cursor in the minibuffer prompt
   (setq minibuffer-prompt-properties
@@ -212,7 +218,6 @@
   (powerline-inactive2 ((t (:foreground "#3C3C3C" :background "#F1F1F1"))))
   (mode-line-inactive ((t (:foreground "#3C3C3C" :background "#F1F1F1"))))
   :config
-
   (setq spaceline-highlight-face-func 'spaceline-highlight-face-evil-state
         spaceline-buffer-size-p nil
         spaceline-buffer-encoding-abbrev-p nil)
@@ -359,10 +364,13 @@
     "bs"     'consult-buffer                   ;; BufferSwtich
     "bk"     'kill-buffer                      ;; BufferKill
     "ws"     'whitespace-mode                  ;; WhiteSpace
+    "wb"     'eww                              ;; WebBrowse
+    "wB"     'browse-url-xdg-open              ;; WebBROWSE (with anger)
+    "wi"     'my-open-wikipedia                ;; WIki
     "ln"     'display-line-numbers-mode        ;; LineNumbers
     "ff"     'find-file                        ;; FindFile
     "fg"     'consult-ripgrep                  ;; FindGrep
-    "wb"     'eww                              ;; WebBrowse
+
     "ai"     'gptel                            ;; ArtificialIntelligence
     "aai"    'gptel-menu                       ;; AnotherArtificialIntelligence
     "XX"     'kill-emacs                       ;; ...
@@ -521,7 +529,7 @@
   :ensure t
   :config
   (define-key vterm-mode-map [return] #'vterm-send-return)
-  ;;https://github.com/akermu/emacs-libvterm/issues/179#issuecomment-1045331359
+  ;; https://github.com/akermu/emacs-libvterm/issues/179#issuecomment-1045331359
   ;; .screenrc => termcapinfo xterm* ti@:te@
   ;; It makes wrapping after resize work but you now have to deal with screens everywhere
   (setq ;; vterm-shell "screen"
