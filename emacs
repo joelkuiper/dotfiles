@@ -53,13 +53,14 @@
    ;; Mostly from https://github.com/angrybacon/dotemacs/blob/master/lisp/use-defaults.el
    locale-coding-system 'utf-8                      ;; Always, always, prefer UTF-8, anything else is insanity
    inhibit-startup-screen t                         ;; No startup screen
+   inhibit-startup-message t                        ;; No startup message
    inhibit-startup-echo-area-message t              ;; No echo message
    initial-scratch-message nil                      ;; What's in the *scratch* buffer
-   inhibit-startup-message t                        ;; No startup message
-   initial-major-mode 'fundamental-mode             ;; What Emacs opens with
+   initial-major-mode 'fundamental-mode             ;; What major-mode Emacs opens with
    enable-recursive-minibuffers t                   ;; Use the minibuffer whilst in the minibuffer
    completion-cycle-threshold 1                     ;; TAB cycles candidates
    completions-detailed t                           ;; Show annotations
+   tab-always-indent 'complete                      ;; Indent first then try completions
    indent-tabs-mode nil                             ;; Prefer spaces over tabs to indent
    tramp-terminal-type "tramp"                      ;; Tramp compatibility
    ad-redefinition-action 'accept                   ;; Silence warnings for redefinitions
@@ -92,7 +93,6 @@
    select-enable-clipboard t                        ;; Merge system's and Emacs' clipboard
    sentence-end-double-space nil                    ;; Use a single space after dots
    show-help-function nil                           ;; Disable help text everywhere
-   tab-always-indent 'complete                      ;; Indent first then try completions
    uniquify-buffer-name-style 'forward              ;; Uniquify buffer names
    use-short-answers t                              ;; Replace yes/no prompts with y/n
    vc-follow-symlinks t                             ;; Never prompt when visiting symlinks
@@ -200,25 +200,31 @@
 (scroll-bar-mode 0)
 (blink-cursor-mode 0)
 
+(use-package spaceline
+  :ensure t
+  :custom-face
+  (mode-line ((t (:foreground "#3C3C3C" :background "#F1F1F1"))))
+  (powerline-active1 ((t (:foreground "#3C3C3C" :background "#DADADA"))))
+  (powerline-active2 ((t (:foreground "#3C3C3C" :background "#F1F1F1"))))
+
+
+  (powerline-inactive1 ((t (:foreground "#3C3C3C" :background "#F1F1F1"))))
+  (powerline-inactive2 ((t (:foreground "#3C3C3C" :background "#F1F1F1"))))
+  (mode-line-inactive ((t (:foreground "#3C3C3C" :background "#F1F1F1"))))
+  :config
+
+  (setq spaceline-highlight-face-func 'spaceline-highlight-face-evil-state
+        spaceline-buffer-size-p nil
+        spaceline-buffer-encoding-abbrev-p nil)
+  :init
+  (spaceline-emacs-theme))
+
 (use-package tao-theme
   :ensure t
   :config
   (my-set-font 'default 'fixed-pitch)
-  (custom-theme-set-faces
-   'tao-yang
-
-   ;; vterm colors customizations with :inherit background
-   `(term-color-white ((t (:foreground "#FAFAFA"))))
-   `(term-color-black ((t (:foreground "#241f31"))))
-   `(term-color-red ((t (:foreground "#9C3328"))))
-   `(term-color-green ((t (:foreground "#556B2F"))))
-   `(term-color-yellow ((t (:foreground "#B8860B"))))
-   `(term-color-blue ((t (:foreground "#4A708B"))))
-   `(term-color-magenta ((t (:foreground "#8B008B"))))
-   `(term-color-cyan ((t (:foreground "#68BFBF")))))
   :init
   (load-theme 'tao-yang t))
-
 
 ;; You'll see what it does below, if not harfbuzz is broken.
 (use-package ligature
@@ -488,9 +494,27 @@
   :init
   (vertico-prescient-mode))
 
+(use-package corfu-prescient
+  :ensure t
+  :after (corfu prescient)
+  :init
+  (corfu-prescient-mode))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Vterm
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(use-package term
+  :custom-face
+  ;; vterm colors customizations with :inherit background
+  (term-color-white ((t (:foreground "#FAFAFA"))))
+  (term-color-black ((t (:foreground "#241f31"))))
+  (term-color-red ((t (:foreground "#9C3328"))))
+  (term-color-green ((t (:foreground "#556B2F"))))
+  (term-color-yellow ((t (:foreground "#B8860B"))))
+  (term-color-blue ((t (:foreground "#4A708B"))))
+  (term-color-magenta ((t (:foreground "#8B008B"))))
+  (term-color-cyan ((t (:foreground "#68BFBF")))))
+
 (use-package vterm :ensure t)
 (use-package multi-vterm
   :after (vterm)
