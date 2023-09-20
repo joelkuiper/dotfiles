@@ -217,9 +217,12 @@
   (mode-line ((t (:foreground "#3C3C3C" :background "#F1F1F1"))))
   (powerline-active1 ((t (:foreground "#3C3C3C" :background "#DADADA"))))
   (powerline-active2 ((t (:foreground "#3C3C3C" :background "#F1F1F1"))))
-  (powerline-inactive1 ((t (:foreground "#3C3C3C" :background "#F1F1F1"))))
-  (powerline-inactive2 ((t (:foreground "#3C3C3C" :background "#F1F1F1"))))
-  (mode-line-inactive ((t (:foreground "#3C3C3C" :background "#F1F1F1"))))
+  (powerline-inactive1
+   ((t (:foreground "#3C3C3C" :background "#DADADA"))))
+  (powerline-inactive2
+   ((t (:foreground "#3C3C3C" :background "#DADADA"))))
+  (mode-line-inactive
+   ((t (:foreground "#3C3C3C" :background "#DADADA"))))
   :config
   (setq spaceline-highlight-face-func 'spaceline-highlight-face-evil-state
         spaceline-buffer-size-p nil
