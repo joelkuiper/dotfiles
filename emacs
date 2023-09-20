@@ -15,7 +15,6 @@
  '(("gnu" . "https://elpa.gnu.org/packages/")
    ("melpa" . "https://melpa.org/packages/")))
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Utility functions.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -495,11 +494,7 @@
 (use-package prescient
   :ensure t
   :config
-  (prescient-persist-mode)
-  (setq completion-styles '(prescient basic)
-        completion-category-defaults nil
-        completion-category-overrides '((file (styles partial-completion)))))
-
+  (prescient-persist-mode))
 
 (use-package vertico-prescient
   :ensure t
@@ -509,7 +504,7 @@
 
 (use-package corfu-prescient
   :ensure t
-  :after (corfu prescient)
+  :after (corfu prescient eglot)
   :init
   (corfu-prescient-mode))
 
@@ -612,6 +607,22 @@
   :custom
   (eglot-autoshutdown t)
   :config
+
+  (setq completion-category-overrides '((eglot (styles prescient))))
+  ;; https://github.com/minad/corfu/wiki#continuously-update-the-candidates
+  ;; Enable cache busting, depending on if your server returns
+  ;; sufficiently many candidates in the first place.
+  (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
+
+  (defun my-eglot-capf ()
+    ;; https://github.com/minad/corfu/wiki#making-a-cape-super-capf-for-eglot
+    (setq-local completion-at-point-functions
+                (list (cape-super-capf #'eglot-completion-at-point)
+                      #'cape-dabbrev
+                      #'cape-file)))
+
+  (add-hook 'eglot-managed-mode-hook #'my-eglot-capf)
+
   ;;  Is there a way of making the the modeline not flicker? #1283
   ;; https://github.com/joaotavora/eglot/discussions/1283
   (setq mode-line-misc-info
