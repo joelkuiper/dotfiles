@@ -214,7 +214,8 @@
 (use-package spaceline
   :ensure t
   :custom-face
-  (mode-line ((t (:foreground "#3C3C3C" :background "#F1F1F1"))))
+  (mode-line
+   ((t (:foreground "#3C3C3C" :background "#DADADA"))))
   (powerline-active1 ((t (:foreground "#3C3C3C" :background "#DADADA"))))
   (powerline-active2 ((t (:foreground "#3C3C3C" :background "#F1F1F1"))))
   (powerline-inactive1
