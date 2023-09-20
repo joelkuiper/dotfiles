@@ -528,17 +528,20 @@
   (term-color-magenta ((t (:foreground "#8B008B"))))
   (term-color-cyan ((t (:foreground "#68BFBF")))))
 
-(use-package vterm :ensure t)
-(use-package multi-vterm
-  :after (vterm)
+(use-package vterm
   :ensure t
   :config
   (define-key vterm-mode-map [return] #'vterm-send-return)
   ;; https://github.com/akermu/emacs-libvterm/issues/179#issuecomment-1045331359
   ;; .screenrc => termcapinfo xterm* ti@:te@
   ;; It makes wrapping after resize work but you now have to deal with screens everywhere
-  (setq ;; vterm-shell "screen"
-   vterm-keymap-exceptions nil))
+  ;; (setq vterm-shell "screen")
+
+  )
+
+(use-package multi-vterm
+  :after vterm
+  :ensure t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; ChatGPT
