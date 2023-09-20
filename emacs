@@ -340,12 +340,14 @@
   (setq evil-leader/in-all-states 1)
   ;; Leaders
   (evil-leader/set-key
+    ;; File jump
     "1"      (lambda () (interactive) (find-file "~/dotfiles/emacs"))
     "2"      (lambda () (interactive) (find-file "~/Sync/org/todo.org"))
     "3"      (lambda () (interactive) (find-file "~/Sync/org/journal.org"))
     "4"      (lambda () (interactive) (find-file "~/Sync/org/scratch.org"))
     "5"      (lambda () (interactive) (find-file "~/Sync/org/repl.org"))
 
+    ;; General
     "<SPC>"  'embark-act                       ;; Do something
     "."      'er/expand-region                 ;; See expand-region
     ","      'consult-imenu-multi              ;; Find a thing in all buffers
@@ -353,7 +355,7 @@
     "'"      'consult-line-multi               ;; Find ALL the lines
     "/"      'consult-line                     ;; Like Vim / in current buffer
     "x"      'execute-extended-command         ;; eXecute
-    ":"      'emoji-search                     ;; :wink:
+    ":"      'emoji-search                     ;; :melting-face: => 🫠
     "e"      'eval-expression                  ;; Eval
     "q"      'kill-current-buffer              ;; Quit
     "y"      'consult-yank-pop                 ;; Yank (well paste...)
@@ -363,12 +365,8 @@
     "^"      'toggle-frame-fullscreen          ;; Goes up?
     "?"      'eldoc                            ;; Help?
     "!"      'shell-command                    ;; Like [esc]:! in Vim
-
     "sh"     'term                             ;; SHell
     "vt"     'multi-vterm                      ;; VTerm
-    "br"     'my-reload-buffer                 ;; BufferReload
-    "bs"     'consult-buffer                   ;; BufferSwtich
-    "bk"     'kill-buffer                      ;; BufferKill
     "ws"     'whitespace-mode                  ;; WhiteSpace
     "wb"     'eww                              ;; WebBrowse
     "wB"     'browse-url-xdg-open              ;; WebBROWSE (with anger)
@@ -376,7 +374,6 @@
     "ln"     'display-line-numbers-mode        ;; LineNumbers
     "ff"     'find-file                        ;; FindFile
     "fg"     'consult-ripgrep                  ;; FindGrep
-
     "ai"     'gptel                            ;; ArtificialIntelligence
     "aai"    'gptel-menu                       ;; AnotherArtificialIntelligence
     "XX"     'kill-emacs                       ;; ...
@@ -384,6 +381,9 @@
     ;; Buffers
     "|"      'evil-window-vsplit               ;; :vsp
     "_"      'evil-window-split                ;; :sp
+    "br"     'my-reload-buffer                 ;; BufferReload
+    "bs"     'consult-buffer                   ;; BufferSwtich
+    "bk"     'kill-buffer                      ;; BufferKill
 
     ;; Magit
     "gs"     'magit-status                     ;; GitStatus
@@ -398,7 +398,7 @@
     "ps"     'project-switch-project           ;; ProjectSwitch
     "pf"     'project-find-file                ;; ProjectFind
     "pd"     'project-dired                    ;; ProjectDired
-    "p!"     'project-shell-command            ;; like ! but p!
+    "p!"     'project-shell-command            ;; Like ! but p!
 
     ;; Org mode
     "o."     'org-time-stamp
@@ -536,7 +536,6 @@
   ;; .screenrc => termcapinfo xterm* ti@:te@
   ;; It makes wrapping after resize work but you now have to deal with screens everywhere
   ;; (setq vterm-shell "screen")
-
   )
 
 (use-package multi-vterm
@@ -574,12 +573,6 @@
    (lambda ()
      (whitespace-cleanup)
      (delete-trailing-whitespace))))
-
-(use-package aggressive-indent
-  :ensure t
-  :hook (paredit-mode . aggressive-indent-mode)
-  :diminish aggressive-indent-mode
-  :commands aggressive-indent-mode)
 
 (use-package highlight-parentheses
   :ensure t
@@ -678,6 +671,12 @@
   :hook (paredit-mode . evil-cleverparens-mode)
   :diminish evil-cleverparens-mode
   :commands evil-cleverparens-mode)
+
+(use-package aggressive-indent
+  :ensure t
+  :hook (paredit-mode . aggressive-indent-mode)
+  :diminish aggressive-indent-mode
+  :commands aggressive-indent-mode)
 
 (use-package emacs-lisp-mode
   :mode (("emacs\\'" . emacs-lisp-mode)
