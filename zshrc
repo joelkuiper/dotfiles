@@ -56,11 +56,11 @@ antigen apply
 export EDITOR=vim
 
 export NODE_HOME=~/Sync/etc/node-v20.5.1-linux-x64
-export JAVA_HOME=~/Sync/etc/graalvm-jdk-20.0.2+9.1
+export JAVA_HOME=~/Sync/etc/graalvm-jdk-21+35.1
 
 # CUDA Stuff
 export CUDA_HOME=/usr/local/cuda
-export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=$CUDA_HOME/lib64/:$LD_LIBRARY_PATH
 
 # CUDA Compiler (nvcc)
 export CUDACXX=$CUDA_HOME/bin/nvcc
