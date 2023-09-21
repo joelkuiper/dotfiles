@@ -587,12 +587,17 @@
   ;; sufficiently many candidates in the first place.
   (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
 
+
+  ;; https://github.com/minad/corfu/wiki#making-a-cape-super-capf-for-eglot
   (defun my-eglot-capf ()
-    ;; https://github.com/minad/corfu/wiki#making-a-cape-super-capf-for-eglot
     (setq-local completion-at-point-functions
-                (list (cape-super-capf #'eglot-completion-at-point)
-                      #'cape-dabbrev
-                      #'cape-file)))
+                (list
+                 ;; Bit of a hack to get Cider and Eglot to play
+                 (when (and (boundp 'cider-mode) cider-mode)
+                   (cape-super-capf #'cider-complete-at-point))
+                 (cape-super-capf #'eglot-completion-at-point)
+                 #'cape-dabbrev
+                 #'cape-file)))
 
   (add-hook 'eglot-managed-mode-hook #'my-eglot-capf)
 
