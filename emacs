@@ -62,7 +62,7 @@
    custom-unlispify-menu-entries nil                 ;; Prefer kebab-case for titles
    custom-unlispify-tag-names nil                    ;; Prefer kebab-case for symbols
    delete-by-moving-to-trash t                       ;; Delete files to trash
-   fill-column 120                                   ;; Set width for automatic line breaks
+   fill-column 80                                    ;; Set width for automatic line breaks
    gc-cons-threshold (* 8 1024 1024)                 ;; We're not using Game Boys anymore
    max-mini-window-height 10                         ;; Limit height for minibuffer transients
    mouse-yank-at-point t                             ;; Yank at point rather than pointer
@@ -144,11 +144,6 @@
 (use-package flymake
   :defer t
   :diminish flymake-mode)
-
-;; Hides flycheck mode from the mode line.
-(use-package flycheck
-  :defer t
-  :diminish flycheck-mode)
 
 ;; Saves and restores command history over Emacs restarts.
 (use-package savehist
@@ -319,7 +314,7 @@
   :diminish evil-collection-unimpaired-mode
   :init
   (evil-collection-init
-   '(corfu cider eglot vterm magit eww vundo org vertico)))
+   '(corfu cider eglot dired vterm magit eww vundo org vertico)))
 
 (use-package evil-leader
   :ensure t
@@ -349,6 +344,7 @@
     ":"      'emoji-search                     ;; :melting-face: => 🫠
     "e"      'eval-expression                  ;; Eval
     ">"      'ffap                             ;; > FindFileAtPoint
+    "<"      'consult-buffer                   ;; < Been there before
     "q"      'kill-current-buffer              ;; Quit
     "y"      'consult-yank-pop                 ;; Yank (well paste...)
     "c"      'consult-mode-command             ;; Command
