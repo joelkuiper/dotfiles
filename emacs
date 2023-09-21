@@ -23,27 +23,6 @@
   (interactive)
   (revert-buffer t t))
 
-(defun my-determine-font-size ()
-  "Determine the font size based on the hostname."
-  (let ((hostname (system-name)))
-    (cond ((string-equal hostname "Aether") 160)
-          ((string-equal hostname "Theseus") 140)
-          (t 140)))) ; Default font size
-
-(defun my-set-font (&rest faces)
-  "Set font attributes for the given FACES."
-  (let* ((font-size (my-determine-font-size))
-         (font-family "PragmataPro Liga")
-         (font-weight 'normal)
-         (font-width 'normal))
-    (dolist (face faces)
-      (set-face-attribute
-       face nil
-       :family font-family
-       :height font-size
-       :weight font-weight
-       :width font-width))))
-
 (defun my-open-wikipedia (search-term)
   "Open Wikipedia for the given SEARCH-TERM using eww."
   (interactive "sEnter search term: ")
@@ -112,6 +91,9 @@
 
   ;; Enable the erase-buffer function to clear buffer contents without restrictions.
   (put 'erase-buffer 'disabled nil)
+
+  ;; Esc quits.
+  (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
   ;; Zoom in/out (text scale) for my poor eyes (and presentations)
   (global-set-key (kbd "C-s--") 'text-scale-decrease)
@@ -211,6 +193,37 @@
 (scroll-bar-mode 0)
 (blink-cursor-mode 0)
 
+(defvar my-font)
+
+(defun my-determine-font-height ()
+  "Determine the font size based on the hostname."
+  (let ((hostname (system-name)))
+    (cond ((string-equal hostname "Aether") 160)
+          ((string-equal hostname "Theseus") 140)
+          (t 140)))) ; Default font size
+
+(defun my-set-font-faces ()
+  (let* ((main-font "PragmataPro Liga")
+         (fallback "monospace")
+         (font (if (x-list-fonts main-font) main-font fallback))
+         (faces `(default fixed-pitch)))
+    (dolist (face faces)
+      (set-face-attribute
+       face nil
+       :family font
+       :height (my-determine-font-height)))))
+
+(if (daemonp)
+    (add-hook 'after-make-frame-functions
+              (lambda (frame)
+                (with-selected-frame frame (my-set-font-faces))))
+  (my-set-font-faces))
+
+(use-package tao-theme
+  :ensure t
+  :init
+  (load-theme 'tao-yang t))
+
 (use-package spaceline
   :ensure t
   :custom-face
@@ -230,13 +243,6 @@
         spaceline-buffer-encoding-abbrev-p nil)
   :init
   (spaceline-emacs-theme))
-
-(use-package tao-theme
-  :ensure t
-  :config
-  (my-set-font 'default 'fixed-pitch)
-  :init
-  (load-theme 'tao-yang t))
 
 ;; You'll see what it does below, if not harfbuzz is broken.
 (use-package ligature
@@ -279,10 +285,10 @@
   :init
   (setq
    evil-undo-system 'undo-redo
-   evil-want-keybinding nil)
+   evil-want-keybinding nil
+   evil-shift-width 2)
   :config
   (evil-mode 1)
-
   ;; Shift left/right functions and bindings
   (defun shift-left-visual ()
     "Shift left and restore visual selection."
@@ -298,28 +304,6 @@
     (evil-normal-state)
     (evil-visual-restore))
 
-  (setq evil-shift-width 2)
-
-  ;; esc quits
-  (defun minibuffer-keyboard-quit ()
-    "Abort recursive edit.
-   In Delete Selection mode, if the mark is active, just deactivate it;
-   then it takes a second \\[keyboard-quit] to abort the minibuffer."
-    (interactive)
-    (if (and delete-selection-mode transient-mark-mode mark-active)
-        (setq deactivate-mark  t)
-      (when (get-buffer "*Completions*") (delete-windows-on "*Completions*"))
-      (abort-recursive-edit)))
-
-  (define-key evil-normal-state-map [escape] 'keyboard-quit)
-  (define-key evil-visual-state-map [escape] 'keyboard-quit)
-
-  (define-key minibuffer-local-map [escape] 'minibuffer-keyboard-quit)
-  (define-key minibuffer-local-ns-map [escape] 'minibuffer-keyboard-quit)
-  (define-key minibuffer-local-completion-map [escape] 'minibuffer-keyboard-quit)
-  (define-key minibuffer-local-must-match-map [escape] 'minibuffer-keyboard-quit)
-  (define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
-
   (define-key evil-ex-completion-map (kbd "TAB") 'completion-at-point)
 
   (define-key evil-visual-state-map (kbd "g/") 'comment-or-uncomment-region)
@@ -328,15 +312,15 @@
 
 (use-package evil-collection
   :ensure t
-  :after (evil corfu cider eglot vterm magit eww vundo org vertico)
+  :after evil
   :diminish evil-collection-unimpaired-mode
-  :config
+  :init
   (evil-collection-init
    '(corfu cider eglot vterm magit eww vundo org vertico)))
 
 (use-package evil-leader
   :ensure t
-  :after (evil)
+  :after evil
   :init
   (global-evil-leader-mode)
   :config
@@ -512,18 +496,7 @@
   :ensure t
   :init
   (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-  (add-to-list 'completion-at-point-functions #'cape-file)
-  (add-to-list 'completion-at-point-functions #'cape-elisp-block)
-  ;;(add-to-list 'completion-at-point-functions #'cape-history)
-  ;;(add-to-list 'completion-at-point-functions #'cape-keyword)
-  ;;(add-to-list 'completion-at-point-functions #'cape-tex)
-  ;;(add-to-list 'completion-at-point-functions #'cape-sgml)
-  ;;(add-to-list 'completion-at-point-functions #'cape-rfc1345)
-  ;;(add-to-list 'completion-at-point-functions #'cape-abbrev)
-  ;;(add-to-list 'completion-at-point-functions #'cape-dict)
-  ;;(add-to-list 'completion-at-point-functions #'cape-elisp-symbol)
-  ;;(add-to-list 'completion-at-point-functions #'cape-line)
-  )
+  (add-to-list 'completion-at-point-functions #'cape-file))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Vterm
