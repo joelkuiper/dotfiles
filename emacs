@@ -95,7 +95,10 @@
   ;; Esc quits.
   (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
-  ;; Zoom in/out (text scale) for my poor eyes (and presentations)
+  ;; Right click context menu.
+  (context-menu-mode)
+
+  ;; Zoom in/out (text scale) for my poor eyes (and presentations).
   (global-set-key (kbd "C-s--") 'text-scale-decrease)
   (global-set-key (kbd "C-s-=") 'text-scale-increase))
 
@@ -351,7 +354,6 @@
     "c"      'consult-mode-command             ;; Command
     "r"      'consult-recent-file              ;; Recentf
     "u"      'vundo                            ;; Undo
-    "^"      'toggle-frame-fullscreen          ;; Goes up?
     "?"      'eldoc                            ;; Help?
     "!"      'shell-command                    ;; Like [esc]:! in Vim
     "sh"     'term                             ;; SHell
