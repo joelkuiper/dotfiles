@@ -572,8 +572,14 @@
          (text-mode . rainbow-mode)))
 
 ;; C/C++
-;; https://www.reddit.com/r/emacs/comments/u8szz6/help_me_get_c_tab_completion_working/
-(with-eval-after-load 'cc-mode
+(use-package cc-mode
+  :defer t
+  :hook ((c++-mode . electric-pair-mode)
+         (c++-mode . electric-indent-mode)
+         (c-mode . electric-pair-mode)
+         (c-mode . electric-indent-mode))
+  :config
+  ;; https://www.reddit.com/r/emacs/comments/u8szz6/help_me_get_c_tab_completion_working/
   (defun c-indent-then-complete ()
     (interactive)
     (if (= 0 (c-indent-line-or-region))
