@@ -494,7 +494,8 @@
   :ensure t
   :init
   (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-  (add-to-list 'completion-at-point-functions #'cape-file))
+  (add-to-list 'completion-at-point-functions #'cape-file)
+  (add-to-list 'completion-at-point-functions #'cape-keyword))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Vterm
@@ -570,11 +571,23 @@
   :hook ((prog-mode . rainbow-mode)
          (text-mode . rainbow-mode)))
 
+;; C/C++
+;; https://www.reddit.com/r/emacs/comments/u8szz6/help_me_get_c_tab_completion_working/
+(with-eval-after-load 'cc-mode
+  (defun c-indent-then-complete ()
+    (interactive)
+    (if (= 0 (c-indent-line-or-region))
+	(completion-at-point)))
+  (dolist (map (list c-mode-map c++-mode-map))
+    (define-key map (kbd "<tab>") #'c-indent-then-complete)))
+
 ;; LSP Client
 (use-package eglot
   :ensure t
   :defer t
-  :hook ((clojure-mode . eglot-ensure))
+  :hook ((clojure-mode . eglot-ensure)
+         (c-mode . eglot-ensure)
+         (c++-mode . eglot-ensure))
   :custom
   (eglot-autoshutdown t)
   :config
@@ -589,13 +602,14 @@
   ;; https://github.com/minad/corfu/wiki#making-a-cape-super-capf-for-eglot
   (defun my-eglot-capf ()
     (setq-local completion-at-point-functions
-                (list
-                 ;; Bit of a hack to get Cider and Eglot to play
+                ;; Bit of a hack to get Cider and Eglot to play
+                (append
                  (when (and (boundp 'cider-mode) cider-mode)
-                   (cape-super-capf #'cider-complete-at-point))
-                 (cape-super-capf #'eglot-completion-at-point)
-                 #'cape-dabbrev
-                 #'cape-file)))
+                   (list (cape-super-capf #'cider-complete-at-point)))
+                 (list (cape-super-capf #'eglot-completion-at-point)
+                       #'cape-dabbrev
+                       #'cape-file
+                       #'cape-keyword))))
 
   (add-hook 'eglot-managed-mode-hook #'my-eglot-capf)
 
@@ -612,6 +626,9 @@
    eglot-confirm-server-initiated-edits nil)
 
   (define-key evil-normal-state-map (kbd "C-c l") 'eglot-code-actions)
+
+  ;; Languages
+  (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd-14"))
   (add-to-list 'eglot-server-programs '(clojure-mode . ("clojure-lsp"))))
 
 ;; https://github.com/joaotavora/eglot/issues/661
