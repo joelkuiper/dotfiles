@@ -604,7 +604,6 @@
   ;; sufficiently many candidates in the first place.
   (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
 
-
   ;; https://github.com/minad/corfu/wiki#making-a-cape-super-capf-for-eglot
   (defun my-eglot-capf ()
     (setq-local completion-at-point-functions
