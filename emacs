@@ -763,6 +763,23 @@
   :hook ((markdown-mode . visual-line-mode)
          (markdown-mode . flyspell-mode)))
 
+;; https://github.com/PillFall/languagetool.el
+(use-package languagetool
+  :ensure t
+  :defer t
+  :commands (languagetool-check
+             languagetool-clear-suggestions
+             languagetool-correct-at-point
+             languagetool-correct-buffer
+             languagetool-set-language
+             languagetool-server-mode
+             languagetool-server-start
+             languagetool-server-stop)
+  :config
+  (setq languagetool-java-arguments '("-Dfile.encoding=UTF-8")
+        languagetool-console-command "~/Sync/etc/LanguageTool/languagetool-commandline.jar"
+        languagetool-server-command "~/Sync/etc/LanguageTool/languagetool-server.jar"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Custom
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
