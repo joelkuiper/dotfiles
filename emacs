@@ -81,6 +81,8 @@
    use-short-answers t                               ;; Replace yes/no prompts with y/n
    vc-follow-symlinks t                              ;; Never prompt when visiting symlinks
    window-combination-resize t                       ;; Resize windows proportionally
+   frame-inhibit-implied-resize t                    ;; Whether frames should be resized implicitly
+   pixel-scroll-precision-mode t                     ;; Scroll by pixel
    x-stretch-cursor t                                ;; Stretch cursor to the glyph width
    browse-url-browser-function 'eww-browse-url)      ;; Click hyperlink, open eww (or use ,wB)
 
@@ -570,6 +572,13 @@
   :diminish rainbow-mode
   :hook ((prog-mode . rainbow-mode)
          (text-mode . rainbow-mode)))
+
+;; From https://idiomdrottning.org/bad-emacs-defaults
+;; https://github.com/jscheid/dtrt-indent/
+(use-package dtrt-indent
+  :ensure t
+  :config
+  (setq dtrt-indent-global-mode t))
 
 ;; C/C++
 (use-package cc-mode
