@@ -54,6 +54,9 @@ antigen bundle history-substring-search
 antigen apply
 
 export EDITOR=vim
+# sorry
+alias nano='vim'
+alias reallynano='/usr/bin/nano'
 
 export NODE_HOME=~/Sync/etc/node-v20.5.1-linux-x64
 export JAVA_HOME=~/Sync/etc/graalvm-jdk-21+35.1

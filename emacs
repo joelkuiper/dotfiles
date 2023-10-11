@@ -638,6 +638,7 @@
 
 ;; https://github.com/joaotavora/eglot/issues/661
 (use-package jarchive :ensure t
+  :diminish jarchive-mode
   :init
   (jarchive-setup))
 
@@ -715,9 +716,7 @@
   :commands cider-jack-in
   :hook (clojure-mode . cider-mode)
   :config
-  (setq cider-eldoc-display-symbol-at-point nil
-        cider-auto-select-error-buffer nil
-        cider-repl-print-length 100
+  (setq cider-auto-select-error-buffer nil
         cider-repl-display-help-banner nil
         cider-repl-use-pretty-printing t))
 
