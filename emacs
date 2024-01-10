@@ -180,7 +180,7 @@
   :defer t
   :ensure nil)
 
-;; Recent files, distant memories
+;; Recent files, distant memories.
 (use-package recentf
   :init
   (recentf-mode 1))
@@ -188,36 +188,37 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Theme & Visual.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(tool-bar-mode 0)
-(menu-bar-mode 0)
-(scroll-bar-mode 0)
-(blink-cursor-mode 0)
+(when (display-graphic-p)
+  (tool-bar-mode 0)
+  (menu-bar-mode 0)
+  (scroll-bar-mode 0)
+  (blink-cursor-mode 0)
 
-(defvar my-font)
+  (defvar my-font)
 
-(defun my-determine-font-height ()
-  "Determine the font size based on the hostname."
-  (let ((hostname (system-name)))
-    (cond ((string-equal hostname "Aether") 160)
-          ((string-equal hostname "Theseus") 140)
-          (t 140)))) ; Default font size
+  (defun my-determine-font-height ()
+    "Determine the font size based on the hostname."
+    (let ((hostname (system-name)))
+      (cond ((string-equal hostname "Aether") 160)
+            ((string-equal hostname "Theseus") 140)
+            (t 140)))) ; Default font size
 
-(defun my-set-font-faces ()
-  (let* ((main-font "PragmataPro Liga")
-         (fallback "monospace")
-         (font (if (x-list-fonts main-font) main-font fallback))
-         (faces `(default fixed-pitch)))
-    (dolist (face faces)
-      (set-face-attribute
-       face nil
-       :family font
-       :height (my-determine-font-height)))))
+  (defun my-set-font-faces ()
+    (let* ((main-font "PragmataPro Liga") ;; This font I will use forever.
+           (fallback "monospace")
+           (font (if (x-list-fonts main-font) main-font fallback))
+           (faces `(default fixed-pitch)))
+      (dolist (face faces)
+        (set-face-attribute
+         face nil
+         :family font
+         :height (my-determine-font-height)))))
 
-(if (daemonp)
-    (add-hook 'after-make-frame-functions
-              (lambda (frame)
-                (with-selected-frame frame (my-set-font-faces))))
-  (my-set-font-faces))
+  (if (daemonp)
+      (add-hook 'after-make-frame-functions
+                (lambda (frame)
+                  (with-selected-frame frame (my-set-font-faces))))
+    (my-set-font-faces)))
 
 (use-package tao-theme
   :ensure t
@@ -353,7 +354,7 @@
     "r"      'consult-recent-file              ;; Recentf
     "u"      'vundo                            ;; Undo
     "?"      'eldoc                            ;; Help?
-    "!"      'shell-command                    ;; Like [esc]:! in Vim
+    "!"      'async-shell-command              ;; Like [esc]:! in Vim
     "sh"     'term                             ;; SHell
     "vt"     'multi-vterm                      ;; VTerm
     "ws"     'whitespace-mode                  ;; WhiteSpace
@@ -486,11 +487,6 @@
   :init
   (vertico-prescient-mode))
 
-(use-package corfu-prescient
-  :ensure t
-  :after (corfu prescient eglot)
-  :init
-  (corfu-prescient-mode))
 
 (use-package cape
   :ensure t
@@ -619,8 +615,8 @@
                 ;; Bit of a hack to get Cider and Eglot to play
                 (append
                  (when (and (boundp 'cider-mode) cider-mode)
-                   (list (cape-super-capf #'cider-complete-at-point)))
-                 (list (cape-super-capf #'eglot-completion-at-point)
+                   (list (cape-capf-super #'cider-complete-at-point)))
+                 (list (cape-capf-super #'eglot-completion-at-point)
                        #'cape-dabbrev
                        #'cape-file
                        #'cape-keyword))))
