@@ -307,7 +307,7 @@
 
   (define-key evil-ex-completion-map (kbd "TAB") 'completion-at-point)
 
-  (define-key evil-visual-state-map (kbd "g/") 'comment-or-uncomment-region)
+  (define-key evil-visual-state-map (kbd "/") 'comment-or-uncomment-region)
   (define-key evil-visual-state-map (kbd ">") 'shift-right-visual)
   (define-key evil-visual-state-map (kbd "<") 'shift-left-visual))
 
