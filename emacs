@@ -307,6 +307,7 @@
 
   (define-key evil-ex-completion-map (kbd "TAB") 'completion-at-point)
 
+
   (define-key evil-visual-state-map (kbd "/") 'comment-or-uncomment-region)
   (define-key evil-visual-state-map (kbd ">") 'shift-right-visual)
   (define-key evil-visual-state-map (kbd "<") 'shift-left-visual))
@@ -759,6 +760,12 @@
 
   ;; Always redisplay inline images after executing SRC block
   (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images))
+
+(use-package fountain-mode
+  :ensure t
+  :defer t
+  :config
+  (evil-define-key 'insert fountain-mode-map (kbd "<tab>") #'tab-to-tab-stop))
 
 (use-package markdown-mode
   :ensure t
