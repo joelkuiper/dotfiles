@@ -464,6 +464,7 @@
 ;; Popup completion-at-point
 ;; https://github.com/minad/corfu
 (use-package corfu
+  :ensure t
   :bind
   (:map corfu-map
         (("<escape>" . my-corfu-quit-and-escape)
