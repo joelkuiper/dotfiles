@@ -594,6 +594,31 @@
   (dolist (map (list c-mode-map c++-mode-map))
     (define-key map (kbd "<tab>") #'c-indent-then-complete)))
 
+;; Python
+(use-package elpy
+  :ensure t
+  :config
+  (elpy-enable))
+
+(use-package python
+  :ensure nil
+  :hook ((python-mode . electric-indent-mode)
+         (python-mode . electric-pair-mode))
+  :custom
+  (python-indent-guess-indent-offset nil)
+  (python-indent-offset 4)
+  (indent-tabs-mode nil))  ;; Always use spaces
+
+;; Format with black (pipx install black)
+(use-package python-black
+  :ensure t
+  :hook (python-mode . python-black-on-save-mode))
+
+;;  Lint with flycheck (pipx install flake8)
+(use-package flycheck
+  :ensure t
+  :hook (python-mode . flycheck-mode))
+
 ;; LSP Client
 (use-package eglot
   :ensure t
