@@ -600,46 +600,89 @@
   :config
   (elpy-enable))
 
+
+;; If GUI Emacs on macOS, pull PATH so `uv/uvx` are found
+(use-package exec-path-from-shell
+  :if (memq window-system '(mac ns))
+  :init (setq exec-path-from-shell-variables '("PATH" "MANPATH"))
+  :config (exec-path-from-shell-initialize))
+
 (use-package python
   :ensure nil
+  :init
+  ;; Pick ONE: project-pinned IPython…
+  (setq python-shell-interpreter "uv"
+        python-shell-interpreter-args "run ipython --simple-prompt -i")
+  ;; …or tool runner (no project dep):
+  ;; (setq python-shell-interpreter "uvx"
+  ;;       python-shell-interpreter-args "ipython --simple-prompt -i")
+
+  (setq python-shell-prompt-detect-failure-warning nil
+        python-shell-completion-native-enable nil
+        python-shell-completion-native-disabled-interpreters '("python3" "ipython" "uv" "uvx"))
+
+  ;; Arrow-key history in REPL
+  (defun jk/comint-up-or-prev-input ()
+    (interactive)
+    (if (and (derived-mode-p 'comint-mode) (comint-after-pmark-p))
+        (comint-previous-input 1)
+      (previous-line 1)))
+  (defun jk/comint-down-or-next-input ()
+    (interactive)
+    (if (and (derived-mode-p 'comint-mode) (comint-after-pmark-p))
+        (comint-next-input 1)
+      (next-line 1)))
+
+  ;; Persistent, de-duplicated history per project; auto-load/save
+  (defun jk/python-repl-history-setup ()
+    (when (derived-mode-p 'inferior-python-mode)
+      (let* ((root (or (ignore-errors (project-root (project-current))) user-emacs-directory))
+             (hist (expand-file-name ".pyrepl-history" root)))
+        (setq-local comint-input-ring-file-name hist
+                    comint-input-ring-size 10000
+                    comint-input-ignoredups t
+                    comint-scroll-to-bottom-on-input t
+                    comint-move-point-for-output t
+                    comint-process-echoes nil)
+        (comint-read-input-ring 'silent)
+        (add-hook 'kill-buffer-hook #'comint-write-input-ring nil t))))
+
   :hook ((python-mode . electric-indent-mode)
-         (python-mode . electric-pair-mode))
+         (python-mode . electric-pair-mode)
+         (inferior-python-mode . jk/python-repl-history-setup))
   :custom
   (python-indent-guess-indent-offset nil)
   (python-indent-offset 4)
-  (indent-tabs-mode nil))  ;; Always use spaces
+  (indent-tabs-mode nil))
 
-;; Format with black (pipx install black)
-(use-package python-black
-  :ensure t
-  :hook (python-mode . python-black-on-save-mode))
-
-;;  Lint with flycheck (pipx install flake8)
-(use-package flycheck
-  :ensure t
-  :hook (python-mode . flycheck-mode))
+(with-eval-after-load 'comint
+  (define-key comint-mode-map (kbd "<up>")   #'jk/comint-up-or-prev-input)
+  (define-key comint-mode-map (kbd "<down>") #'jk/comint-down-or-next-input)
+  (define-key comint-mode-map (kbd "M-r")    #'comint-history-isearch-backward)
+  (define-key comint-mode-map (kbd "M-s")    #'comint-history-isearch-forward))
+(with-eval-after-load 'python
+  (define-key inferior-python-mode-map (kbd "C-c C-o") #'comint-delete-output))
 
 ;; LSP Client
 (use-package eglot
   :ensure t
   :defer t
   :hook ((clojure-mode . eglot-ensure)
-         (c-mode . eglot-ensure)
-         (c++-mode . eglot-ensure))
+         (c-mode      . eglot-ensure)
+         (c++-mode    . eglot-ensure)
+         (python-mode . eglot-ensure)
+         ;; Enable format-on-save only in buffers managed by Eglot
+         (eglot-managed-mode . (lambda ()
+                                 (add-hook 'before-save-hook
+                                           #'eglot-format-buffer nil t))))
   :custom
   (eglot-autoshutdown t)
   :config
-
   (setq completion-category-overrides '((eglot (styles prescient))))
-  ;; https://github.com/minad/corfu/wiki#continuously-update-the-candidates
-  ;; Enable cache busting, depending on if your server returns
-  ;; sufficiently many candidates in the first place.
   (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
 
-  ;; https://github.com/minad/corfu/wiki#making-a-cape-super-capf-for-eglot
   (defun my-eglot-capf ()
     (setq-local completion-at-point-functions
-                ;; Bit of a hack to get Cider and Eglot to play
                 (append
                  (when (and (boundp 'cider-mode) cider-mode)
                    (list (cape-capf-super #'cider-complete-at-point)))
@@ -647,7 +690,6 @@
                        #'cape-dabbrev
                        #'cape-file
                        #'cape-keyword))))
-
   (add-hook 'eglot-managed-mode-hook #'my-eglot-capf)
 
   ;;  Is there a way of making the the modeline not flicker? #1283
@@ -656,17 +698,19 @@
         (delete '(eglot--managed-mode (" [" eglot--mode-line-format "] "))
                 mode-line-misc-info))
 
-  (setq
-   eldoc-echo-area-use-multiline-p nil
-   eglot-extend-to-xref t
-   eglot-connect-timeout 6000
-   eglot-confirm-server-initiated-edits nil)
+  (setq eldoc-echo-area-use-multiline-p nil
+        eglot-extend-to-xref t
+        eglot-connect-timeout 6000
+        eglot-confirm-server-initiated-edits nil)
 
   (define-key evil-normal-state-map (kbd "C-c l") 'eglot-code-actions)
 
-  ;; Languages
+  ;; Servers
   (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd-14"))
-  (add-to-list 'eglot-server-programs '(clojure-mode . ("clojure-lsp"))))
+  (add-to-list 'eglot-server-programs '(clojure-mode . ("clojure-lsp")))
+  (add-to-list 'eglot-server-programs '(python-mode . ("ruff" "server"))))
+
+
 
 ;; https://github.com/joaotavora/eglot/issues/661
 (use-package jarchive :ensure t
