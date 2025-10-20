@@ -82,8 +82,8 @@
    vc-follow-symlinks t                              ;; Never prompt when visiting symlinks
    window-combination-resize t                       ;; Resize windows proportionally
    frame-inhibit-implied-resize t                    ;; Whether frames should be resized implicitly
-   pixel-scroll-precision-mode t                     ;; Scroll by pixel
    x-stretch-cursor t                                ;; Stretch cursor to the glyph width
+   line-spacing 0.1                                  ;; A bit of air for PragmataPro
    browse-url-browser-function 'eww-browse-url)      ;; Click hyperlink, open eww (or use ,wB)
 
   ;; Do not allow the cursor in the minibuffer prompt
@@ -242,7 +242,6 @@
   (setq spaceline-highlight-face-func 'spaceline-highlight-face-evil-state
         spaceline-buffer-size-p nil
         spaceline-buffer-encoding-abbrev-p nil)
-  :init
   (spaceline-emacs-theme))
 
 ;; You'll see what it does below, if not harfbuzz is broken.
@@ -430,10 +429,20 @@
   :config
   (marginalia-mode))
 
+(use-package orderless
+  :ensure t
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-defaults nil)
+  (completion-category-overrides '((file (styles basic partial-completion)))))
+
 (use-package consult
   :ensure t
+  :init (setq xref-show-definitions-function #'consult-xref
+              xref-show-xrefs-function        #'consult-xref)
   :config
-  (setq completion-in-region-function 'consult-completion-in-region))
+  (setq completion-in-region-function #'consult-completion-in-region))
+
 
 (use-package embark
   :ensure t
@@ -576,7 +585,7 @@
 (use-package dtrt-indent
   :ensure t
   :config
-  (setq dtrt-indent-global-mode t))
+  (dtrt-indent-global-mode 1))
 
 ;; C/C++
 (use-package cc-mode
@@ -600,22 +609,11 @@
   :config
   (elpy-enable))
 
-
-;; If GUI Emacs on macOS, pull PATH so `uv/uvx` are found
-(use-package exec-path-from-shell
-  :if (memq window-system '(mac ns))
-  :init (setq exec-path-from-shell-variables '("PATH" "MANPATH"))
-  :config (exec-path-from-shell-initialize))
-
 (use-package python
   :ensure nil
   :init
-  ;; Pick ONE: project-pinned IPython…
   (setq python-shell-interpreter "uv"
         python-shell-interpreter-args "run ipython --simple-prompt -i")
-  ;; …or tool runner (no project dep):
-  ;; (setq python-shell-interpreter "uvx"
-  ;;       python-shell-interpreter-args "ipython --simple-prompt -i")
 
   (setq python-shell-prompt-detect-failure-warning nil
         python-shell-completion-native-enable nil
