@@ -13,6 +13,7 @@
 (setq
  package-archives
  '(("gnu" . "https://elpa.gnu.org/packages/")
+   ("nongnu" . "https://elpa.nongnu.org/nongnu/")
    ("melpa" . "https://melpa.org/packages/")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -667,6 +668,7 @@
   :defer t
   :hook ((clojure-mode . eglot-ensure)
          (c-mode      . eglot-ensure)
+         (R-mode      . eglot-ensure)
          (c++-mode    . eglot-ensure)
          (python-mode . eglot-ensure)
          ;; Enable format-on-save only in buffers managed by Eglot
