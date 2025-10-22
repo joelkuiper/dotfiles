@@ -320,6 +320,12 @@
   (evil-collection-init
    '(corfu cider eglot dired vterm magit eww vundo org vertico)))
 
+(defun jk/line-numbers-relative ()
+  "Enable relative line numbers in the current buffer."
+  (interactive)
+  (setq display-line-numbers-type 'relative)
+  (display-line-numbers-mode 1))
+
 (use-package evil-leader
   :ensure t
   :after evil
@@ -338,58 +344,59 @@
     "5"      (lambda () (interactive) (find-file "~/Sync/org/repl.org"))
 
     ;; General
-    "<SPC>"  'embark-act                       ;; Do something
-    "."      'er/expand-region                 ;; See expand-region
-    ","      'consult-imenu-multi              ;; Find a thing in all buffers
-    ";"      'consult-imenu                    ;; Navigate buffer
-    "'"      'consult-line-multi               ;; Find ALL the lines
-    "/"      'consult-line                     ;; Like Vim / in current buffer
-    "x"      'execute-extended-command         ;; eXecute
-    ":"      'emoji-search                     ;; :melting-face: => 🫠
-    "e"      'eval-expression                  ;; Eval
-    ">"      'ffap                             ;; > FindFileAtPoint
-    "<"      'consult-buffer                   ;; < Been there before
-    "q"      'kill-current-buffer              ;; Quit
-    "y"      'consult-yank-pop                 ;; Yank (well paste...)
-    "c"      'consult-mode-command             ;; Command
-    "r"      'consult-recent-file              ;; Recentf
-    "u"      'vundo                            ;; Undo
-    "?"      'eldoc                            ;; Help?
-    "!"      'async-shell-command              ;; Like [esc]:! in Vim
-    "sh"     'term                             ;; SHell
-    "vt"     'multi-vterm                      ;; VTerm
-    "ws"     'whitespace-mode                  ;; WhiteSpace
-    "wb"     'eww                              ;; WebBrowse
-    "wB"     'browse-url-xdg-open              ;; WebBROWSE (with anger)
-    "wi"     'my-open-wikipedia                ;; WIki
-    "ln"     'display-line-numbers-mode        ;; LineNumbers
-    "ff"     'find-file                        ;; FindFile
-    "fg"     'consult-ripgrep                  ;; FindGrep
-    "ai"     'gptel                            ;; ArtificialIntelligence
-    "aai"    'gptel-menu                       ;; AnotherArtificialIntelligence
-    "XX"     'kill-emacs                       ;; ...
+    "<SPC>"  'embark-act                ;; Do something
+    "."      'er/expand-region          ;; See expand-region
+    ","      'consult-imenu-multi       ;; Find a thing in all buffers
+    ";"      'consult-imenu             ;; Navigate buffer
+    "'"      'consult-line-multi        ;; Find ALL the lines
+    "/"      'consult-line              ;; Like Vim / in current buffer
+    "x"      'execute-extended-command  ;; eXecute
+    ":"      'emoji-search              ;; :melting-face: => 🫠
+    "e"      'eval-expression           ;; Eval
+    ">"      'ffap                      ;; > FindFileAtPoint
+    "<"      'consult-buffer            ;; < Been there before
+    "q"      'kill-current-buffer       ;; Quit
+    "y"      'consult-yank-pop          ;; Yank (well paste...)
+    "c"      'consult-mode-command      ;; Command
+    "r"      'consult-recent-file       ;; Recentf
+    "u"      'vundo                     ;; Undo
+    "?"      'eldoc                     ;; Help?
+    "!"      'async-shell-command       ;; Like [esc]:! in Vim
+    "sh"     'term                      ;; SHell
+    "vt"     'multi-vterm               ;; VTerm
+    "ws"     'whitespace-mode           ;; WhiteSpace
+    "wb"     'eww                       ;; WebBrowse
+    "wB"     'browse-url-xdg-open       ;; WebBROWSE (with anger)
+    "wi"     'my-open-wikipedia         ;; WIki
+    "ln"     'display-line-numbers-mode ;; LineNumbers
+    "lrn"    'jk/line-numbers-relative  ;; Line Relative Numbers
+    "ff"     'find-file                 ;; FindFile
+    "fg"     'consult-ripgrep           ;; FindGrep
+    "ai"     'gptel                     ;; ArtificialIntelligence
+    "aai"    'gptel-menu                ;; AnotherArtificialIntelligence
+    "XX"     'kill-emacs                ;; ...
 
     ;; Buffers
-    "|"      'evil-window-vsplit               ;; :vsp
-    "_"      'evil-window-split                ;; :sp
-    "br"     'my-reload-buffer                 ;; BufferReload
-    "bs"     'consult-buffer                   ;; BufferSwtich
-    "bk"     'kill-buffer                      ;; BufferKill
+    "|"      'evil-window-vsplit ;; :vsp
+    "_"      'evil-window-split  ;; :sp
+    "br"     'my-reload-buffer   ;; BufferReload
+    "bs"     'consult-buffer     ;; BufferSwtich
+    "bk"     'kill-buffer        ;; BufferKill
 
     ;; Magit
-    "gs"     'magit-status                     ;; GitStatus
-    "gd"     'magit-diff-unstaged              ;; GitDiff
-    "gl"     'magit-log-all                    ;; GitLog
-    "gP"     'magit-push-current-to-upstream   ;; GitPUSH
-    "gp"     'magit-pull-from-upstream         ;; GitPull
+    "gs"     'magit-status                   ;; GitStatus
+    "gd"     'magit-diff-unstaged            ;; GitDiff
+    "gl"     'magit-log-all                  ;; GitLog
+    "gP"     'magit-push-current-to-upstream ;; GitPUSH
+    "gp"     'magit-pull-from-upstream       ;; GitPull
 
     ;; "Projects"
-    "pb"     'consult-project-buffer           ;; ProjectBuffer
-    "pg"     'consult-git-grep                 ;; Project(git)Grep
-    "ps"     'project-switch-project           ;; ProjectSwitch
-    "pf"     'project-find-file                ;; ProjectFind
-    "pd"     'project-dired                    ;; ProjectDired
-    "p!"     'project-shell-command            ;; Like ! but p!
+    "pb"     'consult-project-buffer ;; ProjectBuffer
+    "pg"     'consult-git-grep       ;; Project(git)Grep
+    "ps"     'project-switch-project ;; ProjectSwitch
+    "pf"     'project-find-file      ;; ProjectFind
+    "pd"     'project-dired          ;; ProjectDired
+    "p!"     'project-shell-command  ;; Like ! but p!
 
     ;; Org mode
     "o."     'org-time-stamp
