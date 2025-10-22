@@ -326,6 +326,19 @@
   (setq display-line-numbers-type 'relative)
   (display-line-numbers-mode 1))
 
+(defun jk/project-ripgrep-thing-at-point ()
+  "Search the current project for region or symbol/word at point via consult-ripgrep."
+  (interactive)
+  (let* ((query (if (use-region-p)
+                    (buffer-substring-no-properties (region-beginning) (region-end))
+                  (or (thing-at-point 'symbol t)
+                      (thing-at-point 'word t)
+                      "")))
+         (dir   (or (when-let ((pr (project-current))) (project-root pr))
+                    default-directory)))
+    (consult-ripgrep dir query)))
+
+
 (use-package evil-leader
   :ensure t
   :after evil
@@ -391,12 +404,13 @@
     "gp"     'magit-pull-from-upstream       ;; GitPull
 
     ;; "Projects"
-    "pb"     'consult-project-buffer ;; ProjectBuffer
-    "pg"     'consult-git-grep       ;; Project(git)Grep
-    "ps"     'project-switch-project ;; ProjectSwitch
-    "pf"     'project-find-file      ;; ProjectFind
-    "pd"     'project-dired          ;; ProjectDired
-    "p!"     'project-shell-command  ;; Like ! but p!
+    "pb"     'consult-project-buffer             ;; ProjectBuffer
+    "pg"     'consult-git-grep                   ;; Project(git)Grep
+    "ps"     'project-switch-project             ;; ProjectSwitch
+    "pf"     'project-find-file                  ;; ProjectFind
+    "pd"     'project-dired                      ;; ProjectDired
+    "p!"     'project-shell-command              ;; Like ! but p!
+    "p/"     'jk/project-ripgrep-thing-at-point  ;; Does what it says
 
     ;; Org mode
     "o."     'org-time-stamp
@@ -610,12 +624,6 @@
 	(completion-at-point)))
   (dolist (map (list c-mode-map c++-mode-map))
     (define-key map (kbd "<tab>") #'c-indent-then-complete)))
-
-;; Python
-(use-package elpy
-  :ensure t
-  :config
-  (elpy-enable))
 
 (use-package python
   :ensure nil
