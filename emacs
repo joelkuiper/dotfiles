@@ -411,7 +411,7 @@
     "pf"     'project-find-file                  ;; ProjectFind
     "pd"     'project-dired                      ;; ProjectDired
     "p!"     'project-shell-command              ;; Like ! but p!
-    "p/"     'jk/project-ripgrep-thing-at-point  ;; Does what it says
+    "p;"     'jk/project-ripgrep-thing-at-point  ;; Does what it says
 
     ;; Org mode
     "o."     'org-time-stamp
