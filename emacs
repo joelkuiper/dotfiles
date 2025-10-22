@@ -405,7 +405,8 @@
 
     ;; "Projects"
     "pb"     'consult-project-buffer             ;; ProjectBuffer
-    "pg"     'consult-git-grep                   ;; Project(git)Grep
+    "pG"     'consult-git-grep                   ;; Project(git)Grep
+    "pg"     'consult-ripgrep
     "ps"     'project-switch-project             ;; ProjectSwitch
     "pf"     'project-find-file                  ;; ProjectFind
     "pd"     'project-dired                      ;; ProjectDired
