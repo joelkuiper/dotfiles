@@ -357,37 +357,37 @@
     "5"      (lambda () (interactive) (find-file "~/Sync/org/repl.org"))
 
     ;; General
-    "<SPC>"  'embark-act                ;; Do something
-    "."      'er/expand-region          ;; See expand-region
-    ","      'consult-imenu-multi       ;; Find a thing in all buffers
-    ";"      'consult-imenu             ;; Navigate buffer
-    "'"      'consult-line-multi        ;; Find ALL the lines
-    "/"      'consult-line              ;; Like Vim / in current buffer
-    "x"      'execute-extended-command  ;; eXecute
-    ":"      'emoji-search              ;; :melting-face: => 🫠
-    "e"      'eval-expression           ;; Eval
-    ">"      'ffap                      ;; > FindFileAtPoint
-    "<"      'consult-buffer            ;; < Been there before
-    "q"      'kill-current-buffer       ;; Quit
-    "y"      'consult-yank-pop          ;; Yank (well paste...)
-    "c"      'consult-mode-command      ;; Command
-    "r"      'consult-recent-file       ;; Recentf
-    "u"      'vundo                     ;; Undo
-    "?"      'eldoc                     ;; Help?
-    "!"      'async-shell-command       ;; Like [esc]:! in Vim
-    "sh"     'term                      ;; SHell
-    "vt"     'multi-vterm               ;; VTerm
-    "ws"     'whitespace-mode           ;; WhiteSpace
-    "wb"     'eww                       ;; WebBrowse
-    "wB"     'browse-url-xdg-open       ;; WebBROWSE (with anger)
-    "wi"     'my-open-wikipedia         ;; WIki
-    "ln"     'display-line-numbers-mode ;; LineNumbers
-    "lrn"    'jk/line-numbers-relative  ;; Line Relative Numbers
-    "ff"     'find-file                 ;; FindFile
-    "fg"     'consult-ripgrep           ;; FindGrep
-    "ai"     'gptel                     ;; ArtificialIntelligence
-    "aai"    'gptel-menu                ;; AnotherArtificialIntelligence
-    "XX"     'kill-emacs                ;; ...
+    "<SPC>"  'embark-act                        ;; Do something
+    "."      'er/expand-region                  ;; See expand-region
+    ","      'consult-imenu-multi               ;; Find a thing in all buffers
+    ";"      'jk/project-ripgrep-thing-at-point ;; Ripgrep makes a statement;
+    "'"      'consult-line-multi                ;; Find ALL the lines
+    "/"      'consult-line                      ;; Like Vim / in current buffer
+    "x"      'execute-extended-command          ;; eXecute
+    ":"      'emoji-search                      ;; :melting-face: => 🫠
+    "e"      'eval-expression                   ;; Eval
+    ">"      'ffap                              ;; > FindFileAtPoint
+    "<"      'consult-buffer                    ;; < Been there before
+    "q"      'kill-current-buffer               ;; Quit
+    "y"      'consult-yank-pop                  ;; Yank (well paste...)
+    "c"      'consult-mode-command              ;; Command
+    "r"      'consult-recent-file               ;; Recentf
+    "u"      'vundo                             ;; Undo
+    "?"      'eldoc                             ;; Help?
+    "!"      'async-shell-command               ;; Like [esc]:! in Vim
+    "sh"     'term                              ;; SHell
+    "vt"     'multi-vterm                       ;; VTerm
+    "ws"     'whitespace-mode                   ;; WhiteSpace
+    "wb"     'eww                               ;; WebBrowse
+    "wB"     'browse-url-xdg-open               ;; WebBROWSE (with anger)
+    "wi"     'my-open-wikipedia                 ;; WIki
+    "ln"     'display-line-numbers-mode         ;; LineNumbers
+    "lrn"    'jk/line-numbers-relative          ;; Line Relative Numbers
+    "ff"     'find-file                         ;; FindFile
+    "fg"     'consult-ripgrep                   ;; FindGrep
+    "ai"     'gptel                             ;; ArtificialIntelligence
+    "aai"    'gptel-menu                        ;; AnotherArtificialIntelligence
+    "XX"     'kill-emacs                        ;; ...
 
     ;; Buffers
     "|"      'evil-window-vsplit ;; :vsp
@@ -404,14 +404,13 @@
     "gp"     'magit-pull-from-upstream       ;; GitPull
 
     ;; "Projects"
-    "pb"     'consult-project-buffer             ;; ProjectBuffer
-    "pG"     'consult-git-grep                   ;; Project(git)Grep
-    "pg"     'consult-ripgrep                    ;; Project(rip)grep
-    "ps"     'project-switch-project             ;; ProjectSwitch
-    "pf"     'project-find-file                  ;; ProjectFind
-    "pd"     'project-dired                      ;; ProjectDired
-    "p!"     'project-shell-command              ;; Like ! but p!
-    "p;"     'jk/project-ripgrep-thing-at-point  ;; Does what it says
+    "pb"     'consult-project-buffer ;; ProjectBuffer
+    "pG"     'consult-git-grep       ;; Project(git)Grep
+    "pg"     'consult-ripgrep        ;; Project(rip)grep
+    "ps"     'project-switch-project ;; ProjectSwitch
+    "pf"     'project-find-file      ;; ProjectFind
+    "pd"     'project-dired          ;; ProjectDired
+    "p!"     'project-shell-command  ;; Like ! but p!
 
     ;; Org mode
     "o."     'org-time-stamp
