@@ -24,3 +24,9 @@ filetype plugin indent on    " required
 "
 " see :h vundle for more details or wiki for FAQ
 " Put your non-Plugin stuff after this line
+"
+" 256-color (cterm) — white text
+highlight Visual    cterm=NONE ctermbg=8  ctermfg=15  
+highlight Search    cterm=NONE ctermbg=11 ctermfg=15 
+highlight IncSearch cterm=NONE ctermbg=14 ctermfg=15
+
