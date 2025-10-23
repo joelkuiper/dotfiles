@@ -1,5 +1,0 @@
-/* Kill the headerbar/bottom gap */
-window.csd headerbar, window.csd .titlebar {
-  border: none;        /* many themes draw a 1px bottom border */
-}
-
