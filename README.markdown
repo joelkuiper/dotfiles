@@ -1,7 +1,7 @@
-Personal dotfiles.
+Personal dotfiles. 
 
 - Emacs with Evil
-- GhosTTY
+- Ghostty
 - ZSH
 - Minimal Vim
 
