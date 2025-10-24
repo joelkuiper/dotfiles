@@ -5,4 +5,4 @@ Personal dotfiles.
 - ZSH
 - Minimal Vim
 
-![./img/emacs.png]
+![Emacs](./img/emacs.png)
