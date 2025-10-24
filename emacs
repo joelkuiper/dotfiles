@@ -338,7 +338,6 @@
                     default-directory)))
     (consult-ripgrep dir query)))
 
-
 (use-package evil-leader
   :ensure t
   :after evil
@@ -368,26 +367,26 @@
     "e"      'eval-expression                   ;; Eval
     ">"      'ffap                              ;; > FindFileAtPoint
     "<"      'consult-buffer                    ;; < Been there before
-    "q"      'kill-current-buffer               ;; Quit
-    "y"      'consult-yank-pop                  ;; Yank (well paste...)
-    "c"      'consult-mode-command              ;; Command
-    "r"      'consult-recent-file               ;; Recentf
-    "u"      'vundo                             ;; Undo
-    "?"      'eldoc                             ;; Help?
-    "!"      'async-shell-command               ;; Like [esc]:! in Vim
-    "sh"     'term                              ;; SHell
-    "vt"     'multi-vterm                       ;; VTerm
-    "ws"     'whitespace-mode                   ;; WhiteSpace
-    "wb"     'eww                               ;; WebBrowse
-    "wB"     'browse-url-xdg-open               ;; WebBROWSE (with anger)
-    "wi"     'my-open-wikipedia                 ;; WIki
-    "ln"     'display-line-numbers-mode         ;; LineNumbers
-    "lrn"    'jk/line-numbers-relative          ;; Line Relative Numbers
-    "ff"     'find-file                         ;; FindFile
-    "fg"     'consult-ripgrep                   ;; FindGrep
-    "ai"     'gptel                             ;; ArtificialIntelligence
-    "aai"    'gptel-menu                        ;; AnotherArtificialIntelligence
-    "XX"     'kill-emacs                        ;; ...
+    "q"      'kill-current-buffer       ;; Quit
+    "y"      'consult-yank-pop          ;; Yank (well paste...)
+    "c"      'consult-mode-command      ;; Command
+    "r"      'consult-recent-file       ;; Recentf
+    "u"      'vundo                     ;; Undo
+    "?"      'eldoc                     ;; Help?
+    "!"      'async-shell-command       ;; Like [esc]:! in Vim
+    "sh"     'term                      ;; SHell
+    "vt"     'multi-vterm               ;; VTerm
+    "ws"     'whitespace-mode           ;; WhiteSpace
+    "wb"     'eww                       ;; WebBrowse
+    "wB"     'browse-url-xdg-open       ;; WebBROWSE (with anger)
+    "wi"     'my-open-wikipedia         ;; WIki
+    "ln"     'display-line-numbers-mode ;; LineNumbers
+    "lrn"    'jk/line-numbers-relative  ;; Line Relative Numbers
+    "ff"     'find-file                 ;; FindFile
+    "fg"     'consult-ripgrep           ;; FindGrep
+    "ai"     'gptel                     ;; ArtificialIntelligence
+    "aai"    'gptel-menu                ;; AnotherArtificialIntelligence
+    "XX"     'kill-emacs                ;; ...
 
     ;; Buffers
     "|"      'evil-window-vsplit ;; :vsp
@@ -606,76 +605,9 @@
 ;; https://github.com/jscheid/dtrt-indent/
 (use-package dtrt-indent
   :ensure t
+  :diminish dtrt-indent-mode
   :config
   (dtrt-indent-global-mode 1))
-
-;; C/C++
-(use-package cc-mode
-  :defer t
-  :hook ((c++-mode . electric-pair-mode)
-         (c++-mode . electric-indent-mode)
-         (c-mode . electric-pair-mode)
-         (c-mode . electric-indent-mode))
-  :config
-  ;; https://www.reddit.com/r/emacs/comments/u8szz6/help_me_get_c_tab_completion_working/
-  (defun c-indent-then-complete ()
-    (interactive)
-    (if (= 0 (c-indent-line-or-region))
-	(completion-at-point)))
-  (dolist (map (list c-mode-map c++-mode-map))
-    (define-key map (kbd "<tab>") #'c-indent-then-complete)))
-
-(use-package python
-  :ensure nil
-  :init
-  (setq python-shell-interpreter "uv"
-        python-shell-interpreter-args "run ipython --simple-prompt -i")
-
-  (setq python-shell-prompt-detect-failure-warning nil
-        python-shell-completion-native-enable nil
-        python-shell-completion-native-disabled-interpreters '("python3" "ipython" "uv" "uvx"))
-
-  ;; Arrow-key history in REPL
-  (defun jk/comint-up-or-prev-input ()
-    (interactive)
-    (if (and (derived-mode-p 'comint-mode) (comint-after-pmark-p))
-        (comint-previous-input 1)
-      (previous-line 1)))
-  (defun jk/comint-down-or-next-input ()
-    (interactive)
-    (if (and (derived-mode-p 'comint-mode) (comint-after-pmark-p))
-        (comint-next-input 1)
-      (next-line 1)))
-
-  ;; Persistent, de-duplicated history per project; auto-load/save
-  (defun jk/python-repl-history-setup ()
-    (when (derived-mode-p 'inferior-python-mode)
-      (let* ((root (or (ignore-errors (project-root (project-current))) user-emacs-directory))
-             (hist (expand-file-name ".pyrepl-history" root)))
-        (setq-local comint-input-ring-file-name hist
-                    comint-input-ring-size 10000
-                    comint-input-ignoredups t
-                    comint-scroll-to-bottom-on-input t
-                    comint-move-point-for-output t
-                    comint-process-echoes nil)
-        (comint-read-input-ring 'silent)
-        (add-hook 'kill-buffer-hook #'comint-write-input-ring nil t))))
-
-  :hook ((python-mode . electric-indent-mode)
-         (python-mode . electric-pair-mode)
-         (inferior-python-mode . jk/python-repl-history-setup))
-  :custom
-  (python-indent-guess-indent-offset nil)
-  (python-indent-offset 4)
-  (indent-tabs-mode nil))
-
-(with-eval-after-load 'comint
-  (define-key comint-mode-map (kbd "<up>")   #'jk/comint-up-or-prev-input)
-  (define-key comint-mode-map (kbd "<down>") #'jk/comint-down-or-next-input)
-  (define-key comint-mode-map (kbd "M-r")    #'comint-history-isearch-backward)
-  (define-key comint-mode-map (kbd "M-s")    #'comint-history-isearch-forward))
-(with-eval-after-load 'python
-  (define-key inferior-python-mode-map (kbd "C-c C-o") #'comint-delete-output))
 
 ;; LSP Client
 (use-package eglot
@@ -725,6 +657,93 @@
   (add-to-list 'eglot-server-programs '(clojure-mode . ("clojure-lsp")))
   (add-to-list 'eglot-server-programs '(python-mode . ("ruff" "server"))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Languages
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; C/C++
+(use-package cc-mode
+  :defer t
+  :hook ((c++-mode . electric-pair-mode)
+         (c++-mode . electric-indent-mode)
+         (c-mode . electric-pair-mode)
+         (c-mode . electric-indent-mode))
+  :config
+  ;; https://www.reddit.com/r/emacs/comments/u8szz6/help_me_get_c_tab_completion_working/
+  (defun c-indent-then-complete ()
+    (interactive)
+    (if (= 0 (c-indent-line-or-region))
+	(completion-at-point)))
+  (dolist (map (list c-mode-map c++-mode-map))
+    (define-key map (kbd "<tab>") #'c-indent-then-complete)))
+
+;; Python
+;; Use Tree-sitter major mode when available
+;; Currently to get this to compile you need to grab the debs from https://launchpad.net/ubuntu/+source/tree-sitter
+;; libtree-sitter0.25_0.25.9-4 and libtree-sitter-dev_0.25.9-4 were the ones that (finally) worked
+(setq major-mode-remap-alist '((python-mode . python-ts-mode)))
+
+(use-package python
+  :ensure nil ;; built-in
+  :init
+  ;; Launch IPython via uv
+  (setq python-shell-interpreter "uv"
+        python-shell-interpreter-args "run ipython --simple-prompt -i"
+        python-shell-prompt-detect-failure-warning nil
+        python-shell-completion-native-enable nil
+        python-shell-completion-native-disabled-interpreters '("python3" "ipython" "uv" "uvx")
+        python-indent-guess-indent-offset nil
+        python-indent-offset 4
+        indent-tabs-mode nil)
+
+  ;; Arrow key history in comint/REPL, but keep normal use elsewhere
+  (defun jk/comint-up-or-prev-input ()
+    (interactive)
+    (if (and (derived-mode-p 'comint-mode) (comint-after-pmark-p))
+        (comint-previous-input 1)
+      (previous-line 1)))
+  (defun jk/comint-down-or-next-input ()
+    (interactive)
+    (if (and (derived-mode-p 'comint-mode) (comint-after-pmark-p))
+        (comint-next-input 1)
+      (next-line 1)))
+
+  ;; Project-scoped, deduplicated REPL history
+  (defun jk/python-repl-history-setup ()
+    (when (derived-mode-p 'inferior-python-mode)
+      (let* ((proj (ignore-errors (project-current)))
+             (root (if proj (project-root proj) user-emacs-directory))
+             (hist (expand-file-name ".pyrepl-history" root)))
+        (setq-local comint-input-ring-file-name hist
+                    comint-input-ring-size 10000
+                    comint-input-ignoredups t
+                    comint-scroll-to-bottom-on-input t
+                    comint-move-point-for-output t
+                    comint-process-echoes nil)
+        (comint-read-input-ring 'silent)
+        (add-hook 'kill-buffer-hook #'comint-write-input-ring nil t))))
+
+  ;; Minor-mode setup for editing Python (works for python-mode & python-ts-mode)
+  (defun jk/python-editing-setup ()
+    (electric-indent-mode 1)
+    (electric-pair-mode 1))
+
+  :hook
+  ((python-base-mode . jk/python-editing-setup)   ;; covers python-ts-mode too
+   (inferior-python-mode . jk/python-repl-history-setup))
+
+  :bind
+  (:map comint-mode-map
+        ([up]   . jk/comint-up-or-prev-input)
+        ([down] . jk/comint-down-or-next-input)))
+
+(with-eval-after-load 'comint
+  (define-key comint-mode-map (kbd "<up>")   #'jk/comint-up-or-prev-input)
+  (define-key comint-mode-map (kbd "<down>") #'jk/comint-down-or-next-input)
+  (define-key comint-mode-map (kbd "M-r")    #'comint-history-isearch-backward)
+  (define-key comint-mode-map (kbd "M-s")    #'comint-history-isearch-forward))
+(with-eval-after-load 'python
+  (define-key inferior-python-mode-map (kbd "C-c C-o") #'comint-delete-output))
 
 
 ;; https://github.com/joaotavora/eglot/issues/661
@@ -733,9 +752,6 @@
   :init
   (jarchive-setup))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Languages
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package sgml-mode
   :ensure nil
   :hook
@@ -823,7 +839,7 @@
   :config
   (setq org-directory "~/Sync/org/"
         ;; https://orgmode.org/worg/org-contrib/babel/examples/fontify-src-code-blocks.html
-        org-src-fontify-natively t ;; font-lock src-block
+        org-src-fontify-natively t   ;; font-lock src-block
         org-startup-folded 'content) ;; collapse all trees
 
   (defconst my-org-babel-languages
@@ -845,12 +861,6 @@
 
   ;; Always redisplay inline images after executing SRC block
   (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images))
-
-(use-package fountain-mode
-  :ensure t
-  :defer t
-  :config
-  (evil-define-key 'insert fountain-mode-map (kbd "<tab>") #'tab-to-tab-stop))
 
 (use-package markdown-mode
   :ensure t
