@@ -6,6 +6,6 @@ git clone --depth 1 --branch emacs-30.2 git@github.com:emacs-mirror/emacs.git
 
 cd ~/emacs
 CC="gcc-10" ./autogen.sh
-CC="gcc-10" ./configure --with-harfbuzz --with-threads --with-cairo --with-json --with-native-compilation --with-tree-sitter CFLAGS="-O2 -pipe -march=native -fomit-frame-pointer"
+CC="gcc-10" ./configure --with-harfbuzz --with-threads --with-cairo --with-native-compilation CFLAGS="-O2 -pipe -march=native -fomit-frame-pointer"
 CC="gcc-10" make -j $(nproc --all)
 sudo make install
