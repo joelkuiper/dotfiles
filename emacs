@@ -279,6 +279,53 @@
   (global-ligature-mode t))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Apply a patch from clipboard or region (uses Magit if available) ---
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun jk--git-root ()
+  (or (and (fboundp 'magit-toplevel) (magit-toplevel))
+      (locate-dominating-file default-directory ".git")
+      (user-error "Not inside a git repo")))
+
+(defun jk--guess-mbox-patch-p (s)
+  "Heuristically detect if S looks like a `git format-patch` (mbox) email."
+  (and (string-match-p "^From [0-9a-fA-F]\\{7,\\} " s)
+       (string-match-p "^Subject: \\(\\[PATCH\\|Re: \\[PATCH\\)" s)))
+
+(defun jk--write-temp (content &optional ext)
+  (let ((f (make-temp-file "clip-patch-" nil (or ext ".patch"))))
+    (with-temp-file f (insert content))
+    f))
+
+(defun jk--run-git (default-directory args)
+  "Run `git ARGS` in DEFAULT-DIRECTORY using Magit when available."
+  (if (fboundp 'magit-run-git-async)
+      (progn (magit-run-git-async args)
+             (message "magit: git %s" (mapconcat #'identity args " ")))
+    (let* ((cmd (mapconcat #'shell-quote-argument (cons "git" args) " ")))
+      (compilation-start cmd 'compilation-mode (lambda (_) "*patch-apply*"))
+      (message "%s" cmd))))
+
+(defun jk/apply-patch-from-clipboard (&optional arg)
+  "Apply patch from clipboard to current repo.
+   Default = `git apply --index -p1`.
+   With numeric prefix ARG: use that strip level (`-pN`).
+   With plain `C-u`: force `git am` (mbox)."
+  (interactive "P")
+  (let* ((root (jk--git-root))
+         (clip (current-kill 0 t))
+         (is-mbox (jk--guess-mbox-patch-p clip))
+         (tmp (jk--write-temp clip (if is-mbox ".mbox" ".patch")))
+         (default-directory root)
+         (pstrip (if (numberp arg) arg 1))
+         (force-am (and arg (not (numberp arg))))
+         (use-am (or force-am is-mbox))
+         (args (if use-am
+                   (list "am" tmp)
+                 (list "apply" "--index" (format "-p%d" pstrip) tmp))))
+    (jk--run-git default-directory args)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Evil (Vim)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package evil
@@ -401,6 +448,8 @@
     "gl"     'magit-log-all                  ;; GitLog
     "gP"     'magit-push-current-to-upstream ;; GitPUSH
     "gp"     'magit-pull-from-upstream       ;; GitPull
+
+    "ap" #'jk/apply-patch-from-clipboard   ;; , ApplyPatch from clipboard
 
     ;; "Projects"
     "pb"     'consult-project-buffer ;; ProjectBuffer
