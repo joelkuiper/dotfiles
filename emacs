@@ -281,6 +281,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Apply a patch from clipboard or region (uses Magit if available) ---
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(require 'pulse)
+(defvar jk/patch-pulse t
+  "If non-nil, briefly pulse the current line when a patch is applied.")
 
 (defun jk--git-root ()
   (or (and (fboundp 'magit-toplevel) (magit-toplevel))
@@ -288,7 +291,6 @@
       (user-error "Not inside a git repo")))
 
 (defun jk--guess-mbox-patch-p (s)
-  "Heuristically detect if S looks like a `git format-patch` (mbox) email."
   (and (string-match-p "^From [0-9a-fA-F]\\{7,\\} " s)
        (string-match-p "^Subject: \\(\\[PATCH\\|Re: \\[PATCH\\)" s)))
 
@@ -297,33 +299,51 @@
     (with-temp-file f (insert content))
     f))
 
-(defun jk--run-git (default-directory args)
-  "Run `git ARGS` in DEFAULT-DIRECTORY using Magit when available."
-  (if (fboundp 'magit-run-git-async)
-      (progn (magit-run-git-async args)
-             (message "magit: git %s" (mapconcat #'identity args " ")))
-    (let* ((cmd (mapconcat #'shell-quote-argument (cons "git" args) " ")))
-      (compilation-start cmd 'compilation-mode (lambda (_) "*patch-apply*"))
-      (message "%s" cmd))))
+(defun jk--run-git-quiet (dir args)
+  "Run `git ARGS` in DIR. Returns (EXIT-CODE . OUTPUT-BUFFER)."
+  (let* ((default-directory dir)
+         (buf (generate-new-buffer "*patch-apply*"))
+         (exit (apply #'process-file "git" nil buf t args)))
+    (cons exit buf)))
 
-(defun jk/apply-patch-from-clipboard (&optional arg)
-  "Apply patch from clipboard to current repo.
-   Default = `git apply --index -p1`.
-   With numeric prefix ARG: use that strip level (`-pN`).
-   With plain `C-u`: force `git am` (mbox)."
-  (interactive "P")
+(defun jk--success-msg (msg)
+  (when jk/patch-pulse
+    (when (fboundp 'pulse-momentary-highlight-one-line)
+      (pulse-momentary-highlight-one-line (point))))
+  (message "✅ %s" msg))
+
+(defun jk--fail-msg (buf)
+  (message "❌ Patch failed (see buffer)")
+  (pop-to-buffer buf))
+
+(defun jk--apply-patch (content arg)
   (let* ((root (jk--git-root))
-         (clip (current-kill 0 t))
-         (is-mbox (jk--guess-mbox-patch-p clip))
-         (tmp (jk--write-temp clip (if is-mbox ".mbox" ".patch")))
-         (default-directory root)
+         (is-mbox (jk--guess-mbox-patch-p content))
+         (tmp (jk--write-temp content (if is-mbox ".mbox" ".patch")))
          (pstrip (if (numberp arg) arg 1))
          (force-am (and arg (not (numberp arg))))
          (use-am (or force-am is-mbox))
          (args (if use-am
                    (list "am" tmp)
                  (list "apply" "--index" (format "-p%d" pstrip) tmp))))
-    (jk--run-git default-directory args)))
+    (message "… applying patch")
+    (cl-destructuring-bind (code . buf) (jk--run-git-quiet root args)
+      (if (zerop code)
+          (progn
+            (kill-buffer buf)
+            (when (featurep 'magit)
+              (ignore-errors (magit-refresh-all)))
+            (jk--success-msg (if use-am "Applied with `git am`" "Applied with `git apply`")))
+        (jk--fail-msg buf)))))
+
+;;; Entry points
+(defun jk/apply-patch-from-clipboard (&optional arg)
+  "Apply patch from clipboard.
+   Default: `git apply --index -p1`.
+   `C-u` forces `git am`; numeric prefix sets strip level."
+  (interactive "P")
+  (jk--apply-patch (current-kill 0 t) arg))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Evil (Vim)
